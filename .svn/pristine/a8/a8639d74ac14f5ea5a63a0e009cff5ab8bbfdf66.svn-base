@@ -1,0 +1,123 @@
+﻿
+@*
+05.23.13 - TR - Hooked into services
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Cropuse Part Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@model BLTServices.CROP_USE
+           
+@{
+    ViewBag.Title = "Crop Use Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/loading1.gif")"  /></p></div></div>
+
+<div class="partsTitle">Manage Bulletins Components - Crop Use
+ <span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+</div>
+
+@if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+{
+    using (Html.BeginForm("CropUse_Edit", "Parts", FormMethod.Post, new { id = Model.ID }))
+    {
+        <div class="siteColumn" style="width:80%">
+     
+         <input type="hidden" name="ID" value="@Model.ID" />     
+         <input type="hidden" name="CROP_USE_ID" value="@Model.CROP_USE_ID" />
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a" style="width:20%">@Html.Label(ResStrings.CropUse_Label)</div>
+	                <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="USE" data-mini="true" value="@Model.USE"  /></div>
+	            </div>
+            </div>
+    
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a" style="width:20%">@Html.Label(ResStrings.Formulation_Label)</div>
+	                <div class="ui-block-b" style="width:70%"><textarea rows="6" cols="30"class="bltTextInput ui-shadow-inset" name="FORMULATION" data-mini="true">@Model.FORMULATION</textarea></div>
+	            </div>
+            </div>
+        
+            <div id="formSubmitDiv">
+                <div class="leftSideSubmit">
+                    <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+                    <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="cancelClick();" /></div></div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div>You are not authorized to edit a Crop Use.</div>
+}
+
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        window.location.href = '@Url.Action("Index", "Parts")'
+    };
+</script>
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    }
+</script>
+
+<script type="text/javascript">
+    $("#form0").submit(function () {
+        var MISSING = "ui-req";
+        var requiredInput = $('input[class*="required"]');
+        var requiredSelect = $('select[class*="required"]');
+        var requiredFields = $.merge(requiredInput, requiredSelect);
+        var err = false;
+        var missingMsg = "The highlighted fields are required.";
+        // Reset the previously highlighted form elements  
+        requiredFields.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Perform form validation  
+        requiredInput.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                if (!err) {
+                    err = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            }
+        });
+        requiredSelect.each(function (index) {
+            if ($(this).val() == "0") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                if (!err) {
+                    err = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            }
+        });
+        // Check if validation fails
+        if (err == true) {
+            return false;
+        } else {
+            loading();
+            return true;
+        }
+    });
+</script>

@@ -1,0 +1,223 @@
+﻿@* Comments:
+11.27.12 - TR - changed labels to html helper
+11.20.12 - TR - Created 
+*@
+
+@*
+/* Authors:
+*      Tonia Roddick (troddick@usgs.gov)
+* Copyright:
+*      2013 USGS - WiM
+* Purpose:
+*      Edit a user (Partial View)
+*/
+*@
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@model BLTServices.USER_
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#loading").fadeOut();
+    });        
+</script>
+
+    @using (Ajax.BeginForm("UserEdit", "Users", new { id = Model.USER_ID }, new AjaxOptions() { HttpMethod = "POST", UpdateTargetId = "content" }))
+    {
+        <input type="hidden" name="MEMBER_ID" value="@Model.USER_ID" />
+        //one version for admin, another for manager and field members
+        if (ViewData["Role"] == "Admin")
+        {
+            <div class="siteColumn">
+        
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.FirstName_Label)</span>
+                    <input type="text" class="margin" name="FNAME" data-mini="true" value="@Model.FNAME" />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.LastName_Label)</span>
+                    <input type="text" class="margin" name="LNAME" data-mini="true" value="@Model.LNAME" />
+                </div>
+    
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.UserName_Label)</span>
+                    <input type="text" class="margin" name="USERNAME" data-mini="true" value="@Model.USERNAME" />
+                </div>
+          
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Org_Label)</span>
+                    <select id="selectAgencyId" class="margin" name="ORGANIZATION_ID" data-native-menu="false" data-mini="true">
+					    <option value="0"></option>
+                        @foreach (BLTServices.ORGANIZATION anOrg in ViewData["AllOrgs"] as List<ORGANIZATION>)
+                        {
+                            <option @( (anOrg.ORGANIZATION_ID == Model.ORGANIZATION_ID) ? "selected" : "") value='@anOrg.ORGANIZATION_ID'>@anOrg.NAME</option> 
+                        }
+                    </select>
+                    <br />	
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Division_Label)</span>
+                    <select id="selectDivId" class="margin" name="DIVISION_ID" data-native-menu="false" data-mini="true">
+					    <option value="0"></option>
+                        @foreach (BLTServices.DIVISION aDiv in ViewData["AllDivs"] as List<DIVISION>)
+                        {
+                            <option @( (aDiv.DIVISION_ID == Model.DIVISION_ID) ? "selected" : "") value='@aDiv.DIVISION_ID'>@aDiv.DIVISION_NAME</option> 
+                        }
+                    </select>
+                    <br />	
+                </div>
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Role_Label)</span>
+                    <select id="selectRoleId" class="margin" name="ROLE_ID" data-native-menu="false" data-mini="true">
+					    <option value="0"></option>
+                        @foreach (BLTServices.ROLE aRole in ViewData["AllRoles"] as List<ROLE>)
+                        {
+                            <option @( (aRole.ROLE_ID == Model.ROLE_ID) ? "selected" : "") value='@aRole.ROLE_ID'>@aRole.ROLE_NAME</option> 
+                        }
+                    </select>
+                    <br />	
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Phone_Label)</span>
+                    <input type="text" class="margin" name="PHONE" data-mini="true" value="@Model.PHONE" />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Email_Label)</span>
+                    <input type="text" class="margin" name="EMAIL" data-mini="true" value="@Model.EMAIL" />
+                </div>
+            
+            </div>
+        }
+        else if (Model.USERNAME == User.Identity.Name)
+        {
+            //user editing their own info
+            <div class="siteColumn">
+            @{string orgName = string.Empty;
+              string divName = string.Empty;
+              string rolename = string.Empty;
+              }
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.FirstName_Label)</span>
+                    <input type="hidden" name="FNAME" value="@Model.FNAME" />
+                    <label>@Model.FNAME</label>
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.LastName_Label)</span>
+                    <input type="hidden" name="LNAME" value="@Model.LNAME" />
+                    <label>@Model.LNAME</label>
+                </div>
+    
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.UserName_Label)</span>
+                    <input type="hidden" name="USERNAME" value="@Model.USERNAME" />
+                    <label>@Model.USERNAME</label>
+                </div>
+          
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Org_Label)</span>
+                    <input type="hidden" name="ORGANIZATION_ID" value="@Model.ORGANIZATION_ID" />                    
+                    @foreach (BLTServices.ORGANIZATION anOrg in ViewData["AllOrgs"] as List<ORGANIZATION>)
+                    {
+                         @( orgName = anOrg.ORGANIZATION_ID == Model.ORGANIZATION_ID ? anOrg.NAME : "")
+                    }    
+                    <label>@orgName</label>                        
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Division_Label)</span>
+                    <input type="hidden" name="DIVISION_ID" value="@Model.DIVISION_ID" />                    
+                    @foreach (BLTServices.DIVISION aDiv in ViewData["AllDivs"] as List<DIVISION>)
+                    {
+                         @( divName = aDiv.DIVISION_ID == Model.DIVISION_ID ? aDiv.DIVISION_NAME : "")
+                    }    
+                    <label>@orgName</label>                        
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Role_Label)</span>
+                    <input type="hidden" name="ROLE_ID" value="@Model.ROLE_ID" />
+					@foreach (BLTServices.ROLE aRole in ViewData["AllRoles"] as List<ROLE>)
+                    {
+                        @( rolename =  aRole.ROLE_ID == Model.ROLE_ID ? aRole.ROLE_NAME : "") 
+                    }
+                    <label>@rolename</label>
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Phone_Label)</span>
+                    <input type="text" class="margin" name="PHONE" data-mini="true" value="@Model.PHONE" />
+                </div>
+
+                <div data-role="fieldcontain">
+                    <span class="bold ui-label-a">@Html.Label(ResStrings.Email_Label)</span>
+                    <input type="text" class="margin" name="EMAIL" data-mini="true" value="@Model.EMAIL" />
+                </div>
+            </div>
+            
+        }
+    <br clear="all" />
+    <br />
+    
+    <div id="formSubmitDiv" class="formSection">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Save" /></div></div>
+            <div class="cancelDiv"><div class="lightButtonBorder"><input id="resetButton" type="reset" class="cancel" value="Cancel" onclick="cancelClick();" /></div></div>
+
+            <asp:Button ID="SaveSiteButton" runat="server" Text="Save" />
+        </div>
+    
+    </div>
+    }
+
+   <script type="text/javascript">
+       function cancelClick() {
+           $("#loading").fadeIn();
+           window.location.href = '@Url.Action("Index", "Users")'
+       };
+    </script>
+    <script type="text/javascript">
+        function loading() {
+            $("#loading").fadeIn();
+        };
+    </script>
+    <script type="text/javascript">
+        $("#form0").submit(function () {
+            var MISSING = "ui-req";
+
+            var requiredInput = $('input[class*="required"]');
+            var err = false;
+            var missingMsg = "The highlighted fields are required.";
+
+            // Reset the previously highlighted form elements  
+            requiredInput.each(function (index) {
+                $(this).removeClass(MISSING);
+                $(this).addClass("ui-shadow-inset");
+            });
+
+            // Perform form validation  
+            requiredInput.each(function (index) {
+                if ($(this).val() == null || $(this).val() == "") {
+                    $(this).addClass(MISSING);
+                    $(this).removeClass("ui-shadow-inset");
+                    err = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            });
+
+            // Check if validation fails
+            if (err == true) {
+                return false;
+            }
+            else {
+                loading();
+                return true;
+            }
+        });
+
+    </script>

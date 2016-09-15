@@ -1,0 +1,386 @@
+﻿//------------------------------------------------------------------------------
+//----- EntityObjectHandler -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jon Baier USGS Wisconsin Internet Mapping
+//              Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   A generic handler for access to the many lookup tables. 
+//              Removes the need for a large number of handlers for simple tables.
+//              Handles EntityObject resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+#region Comments
+// 10.19.12 - JB - Added delete method
+// 07.03.12 - JKN - Role authorization, and moved context to base class
+// 06.01.12 - JB - Added BadRequest response to PUT attempts that cannot find the row to update
+// 05.31.12 - JB - Added generic POST and PUT methods to allow updates and additions to lookup tables
+// 05.29.12 - JKN - 
+// 01.30.12 - JB - Created
+#endregion
+
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Data.Objects.DataClasses;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Xml.Serialization;
+
+namespace BLTServices.Handlers
+{
+    public class EntityObjectHandler:HandlerBase
+    {
+ 
+        #region Routed Methods
+
+        #region GetMethods
+
+        /*****
+         * Get any entity object in the database by table name
+         * 
+         * Returns: table entity object
+         ****/
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(String entityName)
+        {
+
+
+
+            List<HypermediaEntity> entities = new List<HypermediaEntity>();
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities( string.Format(connectionString, 
+                                                            Context.User.Identity.Name, 
+                                                            securedPassword.decryptString())))
+                {
+                    // Get the metadata workspace from the connection.
+                    MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
+
+                    // Get a collection of the entity containers.
+                    ReadOnlyCollection<EntityContainer> containers =
+                             workspace.GetItems<EntityContainer>(
+                                                DataSpace.CSpace);
+                    
+                    EntitySet es;
+                    if (containers[0].TryGetEntitySetByName(entityName, true, out es))
+                    {
+                        string queryString =
+                        @"SELECT VALUE anEntity FROM BLTRDSEntities." + es.Name + " as anEntity";
+                        ObjectQuery<HypermediaEntity> entityQuery =
+                            aBLTE.CreateQuery<HypermediaEntity>(queryString,
+                                new ObjectParameter("ent", es.ElementType.Name));
+
+                        entities = entityQuery.ToList<HypermediaEntity>();
+
+                        entities.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_group));
+
+                    }
+
+                }//end using
+            }//end using
+            return new OperationResult.OK { ResponseResource = entities };
+        }//end HttpMethod.GET
+
+        /*****
+         * Get any entity object in the database by table name and primary key
+         * 
+         * Returns: table entity object
+         ****/
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]
+        public OperationResult Get(String entityName, Decimal entityId)
+        {
+
+            //Return BadRequest if there is no ID
+            if (entityId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+            HypermediaEntity entity = null;
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities( string.Format(connectionString, 
+                                                            Context.User.Identity.Name, 
+                                                            securedPassword.decryptString())))
+                {
+                    // Get the metadata workspace from the connection.
+                    MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
+                    
+                    // Get a collection of the entity containers.
+                    ReadOnlyCollection<EntityContainer> containers =
+                             workspace.GetItems<EntityContainer>(
+                                                DataSpace.CSpace);
+
+                    EntitySet es;
+                    if (containers[0].TryGetEntitySetByName(entityName, true, out es))
+                    {
+                        //Only works for single key tables
+                        string queryString =
+                        @"SELECT VALUE anEntity FROM BLTRDSEntities." + es.Name + " as anEntity WHERE anEntity." + es.ElementType.KeyMembers[0] + " = @entId";
+                        ObjectQuery<HypermediaEntity> entityQuery =
+                            aBLTE.CreateQuery<HypermediaEntity>(queryString,
+                                new ObjectParameter("entId", entityId));
+
+                        List<HypermediaEntity> entities = entityQuery.ToList<HypermediaEntity>();
+                        entities.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual));
+                        //Take the first if there is more than one
+                        entity = entities.First();
+                    }
+
+                }//end using
+            }//end using
+
+            if (entity == null)
+            {
+                return new OperationResult.NotFound {};
+            }
+            else {
+                return new OperationResult.OK { ResponseResource = entity };
+            }
+        }//end HttpMethod.GET
+        #endregion
+
+        #region PostMethods
+
+        /*****
+         * Post a new entity object (single row) in the database by table name
+         * 
+         * Returns: the new table row entity object
+         ****/
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.POST, ForUriName = "PostEntity")]
+        public OperationResult Post(String entityName, EntityObject anEntityObject)
+        {
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString,
+                                                            Context.User.Identity.Name,
+                                                            securedPassword.decryptString())))
+                {
+                    // Get the metadata workspace from the connection.
+                    MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
+
+                    // Get a collection of the entity containers.
+                    ReadOnlyCollection<EntityContainer> containers = 
+                        workspace.GetItems<EntityContainer>(DataSpace.CSpace);
+
+                    EntitySet es;
+                    if (containers[0].TryGetEntitySetByName(entityName, true, out es))
+                    {
+                        //Only works for single key tables
+                        string queryString = @"SELECT VALUE anEntity FROM BLTRDSEntities." + 
+                                             es.Name + " as anEntity ORDER BY anEntity." + 
+                                             es.ElementType.KeyMembers[0] + " DESC";
+
+                        ObjectQuery<EntityObject> entityQuery =
+                            aBLTE.CreateQuery<EntityObject>(queryString);
+
+
+                        //Get next key
+                        var lastKey = entityQuery.First().EntityKey.EntityKeyValues[0].Value;
+                        Decimal nextKey = (Decimal) lastKey + 1;
+                        
+                        // Create the key that represents the entity object
+                        EntityKey objectKey =
+                            new EntityKey( "BLTRDSEntities." + es.Name,
+                                            es.ElementType.KeyMembers[0].ToString(), 
+                                            nextKey);
+                        anEntityObject.EntityKey = objectKey;
+
+                        //Use reflection to sync key field with entity key
+                        Type t = anEntityObject.GetType();
+                        System.Reflection.PropertyInfo pi = t.GetProperty( es.ElementType.KeyMembers[0].ToString() );
+                        pi.SetValue(anEntityObject, nextKey, null);
+
+                        //Save new object
+                        aBLTE.AddObject(entityName, anEntityObject);
+                        aBLTE.SaveChanges();
+                        
+                    }
+
+                }//end using
+            }//end using
+
+            //Return OK instead of created, Flex incorrectly treats 201 as error
+            return new OperationResult.OK { ResponseResource = anEntityObject };
+
+        }//end HttpMethod.POST
+        #endregion
+
+        #region PutMethods
+
+        /*****
+         * Update entity object (single row) in the database by table name and primary key
+         * 
+         * Returns: the updated table row entity object
+         ****/
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.PUT, ForUriName = "PutEntity")]
+        public OperationResult Put(String entityName, EntityObject anEntityObject, Decimal entityId)
+        {
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString,
+                                                            Context.User.Identity.Name,
+                                                            securedPassword.decryptString())))
+                {
+                         
+                    // Define an ObjectStateEntry and EntityKey for the current object. 
+                    EntityKey key = default(EntityKey);
+                    object originalObject = null;
+
+                        
+                    // Create the detached object's entity key. 
+                    key = aBLTE.CreateEntityKey("BLTRDSEntities." + entityName, anEntityObject);
+
+                    // Get the original item based on the entity key from the context 
+                    // or from the database. 
+                    if (aBLTE.TryGetObjectByKey(key, out originalObject))
+                    {
+                        // Call the ApplyCurrentValues method to apply changes 
+                        // from the updated item to the original version. 
+                        aBLTE.ApplyCurrentValues(key.EntitySetName, anEntityObject);
+                    }
+                    else {
+                        //Return BadRequest if lookup fails
+                        return new OperationResult.BadRequest();
+                    }
+                                                  
+                    //Save new object
+                    aBLTE.SaveChanges();
+
+                    
+                }//end using
+            }//end using
+
+            //Return OK instead of created, Flex incorrectly treats 201 as error
+            return new OperationResult.OK { ResponseResource = anEntityObject };
+
+        }//end HttpMethod.PUT
+        #endregion
+
+
+        #region DeleteMethods
+
+        /*****
+         * Delete entity object (single row) in the database by table name and primary key
+         * 
+         * Returns: nothing
+         ****/
+        
+        // Force the user to provide authentication and authorization 
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.DELETE, ForUriName = "DeleteSite")]
+        public OperationResult Delete(String entityName, Decimal entityId)
+        {
+            //Return BadRequest if missing required fields
+            if (entityId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                  BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    // Get the metadata workspace from the connection.
+                    MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
+
+                    // Get a collection of the entity containers.
+                    ReadOnlyCollection<EntityContainer> containers =
+                             workspace.GetItems<EntityContainer>(
+                                                DataSpace.CSpace);
+                    
+                    //fetch the object to be updated (assuming that it exists)
+                    EntitySet es;
+                    if (containers[0].TryGetEntitySetByName(entityName, true, out es))
+                    {
+                        //Only works for single key tables
+                        string queryString =
+                        @"SELECT VALUE anEntity FROM BLTRDSEntities." + es.Name + " as anEntity WHERE anEntity." + es.ElementType.KeyMembers[0] + " = @entId";
+                        ObjectQuery<HypermediaEntity> entityQuery =
+                            aBLTE.CreateQuery<HypermediaEntity>(queryString,
+                                new ObjectParameter("entId", entityId));
+
+                        List<HypermediaEntity> entities = entityQuery.ToList<HypermediaEntity>();
+                        entities.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual));
+
+                        if (entities.Count > 0)
+                        {
+                            //Take the first if there is more than one
+                            HypermediaEntity objectToBeDeleted = entities.First();
+                            //Delete it
+                            aBLTE.DeleteObject(objectToBeDeleted);
+                        }
+                        else {
+                            //Return NotFound if nothing returned
+                            return new OperationResult.NotFound();
+                        }
+                    }
+                    else
+                    {
+                        //Return BadRequest if lookup fails
+                        return new OperationResult.BadRequest();
+                    }
+
+                    //Save Changes
+                    aBLTE.SaveChanges();
+
+                }// end using
+
+
+            } //end using
+
+            //Return object to verify persisitance
+            return new OperationResult.OK { };
+        }//end HttpMethod.DELETE
+        #endregion
+
+
+        #endregion
+    }//end class EntityObjectHandler
+}//end namespace

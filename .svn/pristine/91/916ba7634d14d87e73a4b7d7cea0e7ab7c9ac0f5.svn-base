@@ -1,0 +1,6 @@
+﻿@{
+    ViewBag.Title = "AI_Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>AI_Edit</h2>

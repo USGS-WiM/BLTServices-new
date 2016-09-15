@@ -1,0 +1,767 @@
+﻿//------------------------------------------------------------------------------
+//----- PartsController.cs-----------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Display a master Parts page and link to individual parts pages 
+//
+//discussion:   
+//
+//     
+
+#region Comments
+// 04.23.13 - TR - Created
+
+#endregion
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Objects.DataClasses;
+using System.Text;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Xml;
+
+using RestSharp;
+using BLTServices;
+using BLTServices.Authentication;
+using BLTWeb.Utilities;
+
+namespace BLTWeb.Controllers
+{
+    [Authorize]
+    public class PartsController : Controller
+    {
+        //
+        // GET: /Parts/
+        public ActionResult Index()
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            
+            #region CropUse
+            request = new RestRequest();
+            request.Resource = "/CropUses/";
+            request.RootElement = "ArrayOfCROP_USE";
+            List<CROP_USE> CropUseList = serviceCaller.Execute<List<CROP_USE>>(request);
+            ViewData["CropUseList"] = CropUseList;
+            #endregion CropUse
+
+            #region LimitationCodes
+            request.Resource = "/Limitations/";
+            request.RootElement = "ArrayOfLIMITATIONS";
+            List<LIMITATION> LimitationList = serviceCaller.Execute<List<LIMITATION>>(request);
+            ViewData["LimitationList"] = LimitationList;
+            #endregion LimitationCodes
+
+            #region Product
+            List<string> ProductList = new List<string>();
+            ProductList.Add("ProductA");
+            ProductList.Add("ProductB");
+            ProductList.Add("ProductC");
+            ViewData["ProductList"] = ProductList;
+            //request = new RestRequest();
+            //request.Resource = "/ActiveIngredients/";
+            //request.RootElement = "ArrayOfACTIVE_INGREDIENT";
+            //List<ACTIVE_INGREDIENT> AIList = serviceCaller.Execute<List<ACTIVE_INGREDIENT>>(request);
+            //ViewData["AIList"] = AIList;
+            #endregion Product
+
+            #region Modifier
+            request = new RestRequest();
+            request.Resource = "/Modifiers/";
+            request.RootElement = "ArrayOfMODIFIER";
+            List<MODIFIER> ModList = serviceCaller.Execute<List<MODIFIER>>(request);
+            ViewData["ModList"] = ModList;
+            #endregion Modifier
+            
+            #region AI
+            request = new RestRequest();
+            request.Resource = "/ActiveIngredients/";
+            request.RootElement = "ArrayOfACTIVE_INGREDIENT";
+            List<ACTIVE_INGREDIENT> aiList = serviceCaller.Execute<List<ACTIVE_INGREDIENT>>(request);
+            ViewData["AIList"] = aiList;
+            #endregion AI
+
+            #region AI Class
+            request = new RestRequest();
+            request.Resource = "/AIClasses/";
+            request.RootElement = "ArrayOfAI_CLASS";
+            List<AI_CLASS> AIClassList = serviceCaller.Execute<List<AI_CLASS>>(request);
+            ViewData["AIClassList"] = AIClassList;
+            #endregion  AI Class
+
+            #region Spp
+            #endregion Spp
+
+            return View();
+        }
+        
+        #region CropUse
+               
+        //want to do something, depends on Create for CropUse
+        [HttpPost]
+        public ActionResult CropUse(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("CropUseNew");
+                }
+                else
+                {
+                    //edit
+                    int CropUseId = Convert.ToInt32(fc["ID"]);
+                    if (CropUseId == 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page
+                        return RedirectToAction("CropUseEdit", new { id = CropUseId });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //crop use edit page
+        public ActionResult CropUseEdit(int id)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/CropUses/{entityID}";
+            request.RootElement = "CROP_USE";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            CROP_USE thisCropUse = serviceCaller.Execute<CROP_USE>(request);
+            
+            return View("CropUse/CropUseEdit",thisCropUse);
+        }
+
+        //Post the edit to update the CropUse (actually a GET .. no edits allowed
+        public ActionResult CropUse_Edit(int id, CROP_USE editedCropUse)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/CropUses/{entityID}/Edit?ActiveDate={date}";
+            request.RootElement = "CROP_USE";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+
+            //Use extended serializer
+            BLTWebSerializer serializer = new BLTWebSerializer();
+            request.AddParameter("application/xml", serializer.Serialize<CROP_USE>(editedCropUse), ParameterType.RequestBody);
+            CROP_USE updatedCropUse = serviceCaller.Execute<CROP_USE>(request);
+
+            //update the AI and go back to the AI index
+            return RedirectToAction("Index");
+        }
+
+        //crop use new page
+        public ActionResult CropUseNew()
+        {
+            return View("CropUse/CropUseNew");
+        }
+
+        //post the new CropUse
+        [HttpPost]
+        public ActionResult CropUse_New(CROP_USE newCropUse)
+        {
+            try
+            {
+                BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+                var request = new RestRequest(Method.POST);
+
+                request.Resource = "/CropUses";
+                request.RequestFormat = DataFormat.Xml;
+                request.AddHeader("Content-Type", "application/xml");
+                //Use extended serializer
+                BLTWebSerializer serializer = new BLTWebSerializer();
+                request.AddParameter("application/xml", serializer.Serialize<CROP_USE>(newCropUse), ParameterType.RequestBody);
+
+                CROP_USE createdCU = serviceCaller.Execute<CROP_USE>(request);
+
+                return RedirectToAction("../Parts/Index");
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+               
+        #endregion CropUse
+        
+        #region Limitations Codes
+
+        //want to do something, depends on which button they clicked (Create) for Code
+        [HttpPost]
+        public ActionResult Codes(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("CodesNew");
+                }
+                else
+                {
+                    //edit
+                    int LimiationId = Convert.ToInt32(fc["ID"]);
+                    if (LimiationId == 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page
+                        return RedirectToAction("CodesEdit", new { id = LimiationId });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //get the edit page for codes
+        public ActionResult CodesEdit(int id)
+        {
+             BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/Limitations/{entityID}";
+            request.RootElement = "LIMITATIONS";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            LIMITATION thisLimitation = serviceCaller.Execute<LIMITATION>(request);
+            
+            return View("Codes/CodesEdit",thisLimitation);
+        }
+
+        //Post the edit to update the Code
+        public ActionResult Codes_Edit(int id, LIMITATION editedCode)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/ActiveIngredients/{entityID}/Edit?ActiveDate={date}";
+            request.RootElement = "ACTIVE_INGREDIENT";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            //Use extended serializer
+            BLTWebSerializer serializer = new BLTWebSerializer();
+            request.AddParameter("application/xml", serializer.Serialize<LIMITATION>(editedCode), ParameterType.RequestBody);
+            LIMITATION updatedCode = serviceCaller.Execute<LIMITATION>(request);
+
+            //update the AI and go back to the AI index
+            return RedirectToAction("Index");
+        }
+
+        //get the codes new page
+        public ActionResult CodesNew()
+        {
+            return View("Codes/CodesNew");
+        }
+
+        //post the new Code
+        [HttpPost]
+        public ActionResult Codes_New(LIMITATION newLimitation)
+        {
+           try
+            {
+                BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+                var request = new RestRequest(Method.POST);
+
+                request.Resource = "/Limitations";
+                request.RequestFormat = DataFormat.Xml;
+                request.AddHeader("Content-Type", "application/xml");
+                //Use extended serializer
+                BLTWebSerializer serializer = new BLTWebSerializer();
+                request.AddParameter("application/xml", serializer.Serialize<LIMITATION>(newLimitation), ParameterType.RequestBody);
+
+                LIMITATION createdLimitation = serviceCaller.Execute<LIMITATION>(request);
+
+                return RedirectToAction("../Parts/Index");
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        #endregion Limitations Codes
+        
+        #region Product
+
+        //want to do something, depends on Create for Product
+        [HttpPost]
+        public ActionResult Product(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("ProductNew");
+                }
+                else
+                {
+                    //edit
+                    string ProductId = fc["PRODUCT_ID"];
+                    if (ProductId == "0")
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page (for now passing string rather than service entity
+                        return RedirectToAction("ProductEdit", new { id = ProductId });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //product edit page
+        public ActionResult ProductEdit(string id)
+        {
+            ViewData["thisProduct"] = id;            
+            return View("Product/ProductEdit");
+        }
+
+        //Post the edit to update the Product
+        [HttpPost]
+        public ActionResult Product_Edit(string Product)
+        {
+            //update the AI and go back to the AI index
+            return RedirectToAction("Product");
+        }
+
+        //crop use new page
+        public ActionResult ProductNew()
+        {
+            return View("Product/ProductNew");
+        }
+
+        //post the new Product
+        [HttpPost]
+        public ActionResult Product_New()
+        {
+            //post the new Product and redirect to the index for Product with new one added to dropdown
+            return RedirectToAction("Product");
+        }
+
+        public Boolean Product_Delete(string id)
+        {
+            return true;
+        }
+
+        #endregion Product
+        
+        #region Modifiers
+
+        //want to do something, depends on Create for Modifiers
+        [HttpPost]
+        public ActionResult Modifiers(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("ModifiersNew");
+                }
+                else
+                {
+                    //edit
+                    int ModifierId = Convert.ToInt32(fc["ID"]);
+                    if (ModifierId == 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page
+                        return RedirectToAction("ModifiersEdit", new { id = ModifierId });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //edit page
+        public ActionResult ModifiersEdit(int id)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/Modifiers/{entityID}";
+            request.RootElement = "MODIFIER";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            MODIFIER thisModifier = serviceCaller.Execute<MODIFIER>(request);
+
+            return View("Modifiers/ModifiersEdit", thisModifier);
+        }
+
+        //Post the edit to update the Modifiers
+        [HttpPost]
+        public ActionResult Modifiers_Edit(int id, MODIFIER editedModifier)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/Modifiers/{entityID}/Edit?ActiveDate={date}";
+            request.RootElement = "MODIFIER";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            //Use extended serializer
+            BLTWebSerializer serializer = new BLTWebSerializer();
+            request.AddParameter("application/xml", serializer.Serialize<MODIFIER>(editedModifier), ParameterType.RequestBody);
+            MODIFIER updatedModifier = serviceCaller.Execute<MODIFIER>(request);
+
+            //update the AI and go back to the AI index
+            return RedirectToAction("Index");
+        }
+
+        //create new page
+        public ActionResult ModifiersNew()
+        {
+            return View("Modifiers/ModifiersNew");
+        }
+
+        //post the new AI
+        [HttpPost]
+        public ActionResult Modifiers_New(MODIFIER newModifier)
+        {
+            try
+            {
+                BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+                var request = new RestRequest(Method.POST);
+
+                request.Resource = "/Modifiers";
+                request.RequestFormat = DataFormat.Xml;
+                request.AddHeader("Content-Type", "application/xml");
+                //Use extended serializer
+                BLTWebSerializer serializer = new BLTWebSerializer();
+                request.AddParameter("application/xml", serializer.Serialize<MODIFIER>(newModifier), ParameterType.RequestBody);
+
+                MODIFIER createdModifier = serviceCaller.Execute<MODIFIER>(request);
+
+                return RedirectToAction("../Parts/Index");
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+       
+        #endregion Modifiers
+
+        #region AI
+        
+        //want to do something, depends on Create for AI
+        [HttpPost]
+        public ActionResult AI(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("AINew");
+                }
+                else
+                {
+                    //edit
+                    int AI_Id = Convert.ToInt32(fc["ID"]);
+                    if (AI_Id == 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page
+                        return RedirectToAction("AIEdit", new { id = AI_Id });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //edit page
+        public ActionResult AIEdit(int id)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/ActiveIngredients/{entityID}";
+            request.RootElement = "ACTIVE_INGREDIENT";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            ACTIVE_INGREDIENT thisAI = serviceCaller.Execute<ACTIVE_INGREDIENT>(request);
+
+            request = new RestRequest();
+            request.Resource = "/AIClasses/";
+            request.RootElement = "ArrayOfAI_CLASS";
+            List<AI_CLASS> AIClassList = serviceCaller.Execute<List<AI_CLASS>>(request);
+            ViewData["AIClassList"] = AIClassList;
+
+            return View("AI/AIEdit", thisAI);
+        }
+        
+        //Post the edit to update the AI
+        public ActionResult AI_Edit(int id, ACTIVE_INGREDIENT editedAI)
+        {
+            
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/ActiveIngredients/{entityID}/Edit?ActiveDate=05/24/2013";
+            request.RootElement = "ACTIVE_INGREDIENT";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            //Use extended serializer
+            BLTWebSerializer serializer = new BLTWebSerializer();
+            request.AddParameter("application/xml", serializer.Serialize<ACTIVE_INGREDIENT>(editedAI), ParameterType.RequestBody);
+            ACTIVE_INGREDIENT updatedAI = serviceCaller.Execute<ACTIVE_INGREDIENT>(request);
+
+            //update the AI and go back to the AI index
+            return RedirectToAction("Index");
+        }
+
+        //new page
+        public ActionResult AINew()
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/AIClasses/";
+            request.RootElement = "ArrayOfAI_CLASS";
+            List<AI_CLASS> AIClassList = serviceCaller.Execute<List<AI_CLASS>>(request);
+            ViewData["AIClassList"] = AIClassList;
+            return View("AI/AINew");
+        }
+
+        //post the new AI
+        [HttpPost]
+        public ActionResult AI_New(ACTIVE_INGREDIENT newAI)
+        {
+            try
+            {
+                BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+                var request = new RestRequest(Method.POST);
+
+                //for now hard-code values that will come from the service based on ingredient_name
+                newAI.PC_CODE = "333";
+                newAI.CAS_NUMBER = "111";
+
+                request.Resource = "/ActiveIngredients";
+                request.RequestFormat = DataFormat.Xml;
+                request.AddHeader("Content-Type", "application/xml");
+                //Use extended serializer
+                BLTWebSerializer serializer = new BLTWebSerializer();
+                request.AddParameter("application/xml", serializer.Serialize<ACTIVE_INGREDIENT>(newAI), ParameterType.RequestBody);
+
+                ACTIVE_INGREDIENT createdAI = serviceCaller.Execute<ACTIVE_INGREDIENT>(request);
+
+                return RedirectToAction("../Parts/Index");
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        #endregion AI
+
+        #region AI_Class
+
+        //want to do something, depends on Create for AI
+        [HttpPost]
+        public ActionResult AI_Class(FormCollection fc, string Create)
+        {
+            try
+            {
+                if (Create == "Add New")
+                {
+                    return RedirectToAction("AI_ClassNew");
+                }
+                else
+                {
+                    //edit
+                    int AIClass_Id = Convert.ToInt32(fc["ID"]);
+                    if (AIClass_Id == 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        //send them to edit page
+                        return RedirectToAction("AI_ClassEdit", new { id = AIClass_Id });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        //edit page
+        public ActionResult AI_ClassEdit(int id)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/AIClasses/{entityID}";
+            request.RootElement = "AI_CLASS";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            AI_CLASS thisAIClass = serviceCaller.Execute<AI_CLASS>(request);
+
+            return View("AI_Class/AI_ClassEdit", thisAIClass);
+        }
+
+        //Post the edit to update the AI
+        [HttpPost]
+        public ActionResult AI_Class_Edit(int id, AI_CLASS editedAIClass)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "/AIClasses/{entityID}/Edit?ActiveDate={date}";
+            request.RootElement = "AI_CLASS";
+            request.AddParameter("entityID", id, ParameterType.UrlSegment);
+            //Use extended serializer
+            BLTWebSerializer serializer = new BLTWebSerializer();
+            request.AddParameter("application/xml", serializer.Serialize<AI_CLASS>(editedAIClass), ParameterType.RequestBody);
+            AI_CLASS updatedAIClass = serviceCaller.Execute<AI_CLASS>(request);
+
+            //update the AI and go back to the AI index
+            return RedirectToAction("Index");
+        }
+
+        //new page
+        public ActionResult AI_ClassNew()
+        {
+            return View("AI_Class/AI_ClassNew");
+        }
+
+        //post the new AI
+        [HttpPost]
+        public ActionResult AI_Class_New(AI_CLASS newAIClass)
+        {
+            try
+            {
+                BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+                var request = new RestRequest(Method.POST);
+                request.Resource = "/AIClasses";
+                request.RequestFormat = DataFormat.Xml;
+                request.AddHeader("Content-Type", "application/xml");
+                //Use extended serializer
+                BLTWebSerializer serializer = new BLTWebSerializer();
+                request.AddParameter("application/xml", serializer.Serialize<AI_CLASS>(newAIClass), ParameterType.RequestBody);
+
+                AI_CLASS createdAIclass = serviceCaller.Execute<AI_CLASS>(request);
+
+                return RedirectToAction("../Parts/Index");
+            }
+            catch (Exception e)
+            {
+                return View(e.ToString());
+            }
+        }
+
+        #endregion AI_Class
+
+       
+        
+        #region Species
+
+        public ActionResult Species()
+        {
+            //get all the Species
+            List<string> SpeciesList = new List<string>();
+            SpeciesList.Add("Aiea | Nothocestrum breviflorum | Solanaceaa | Plant");
+            SpeciesList.Add("Akia Loa, Kauai | Hemignathus procerus | Fringillidae | Bird");
+            SpeciesList.Add("Akoko | Chamaesyce rockii | Euphorbiaceae | Plant");
+            ViewData["SpeciesList"] = SpeciesList;
+
+            return View("Species/Species");
+        }
+
+        //want to do something, depends on Create for Species
+        [HttpPost]
+        public ActionResult Species(FormCollection fc, string Create)
+        {
+            string SpeciestoEdit = fc["Species"];
+            string[] parts = SpeciestoEdit.Split('|');
+
+            ViewData["CommonName"] = parts[0];
+            ViewData["ScienceName"] = parts[1];
+            ViewData["Family"] = parts[2];
+            ViewData["Taxa"] = parts[3];
+            
+            List<string> Families = new List<string>();
+            Families.Add(" Nothocestrum breviflorum ");
+            Families.Add(" Hemignathus procerus ");
+            Families.Add(" Chamaesyce rockii ");
+            ViewData["FamilyList"] = Families;
+
+            List<string> Taxas = new List<string>();
+            Taxas.Add("Plant");
+            Taxas.Add("Bird");
+            ViewData["TaxaList"] = Taxas;
+            
+            if (Create == "Edit")
+            {
+                return View("Species/Species_Edit");
+            }
+            else // Add New
+            {
+                return View("Species/Species_New");
+            }
+            if (Create == "Edit")
+            {
+                ViewData["thisSpecies"] = SpeciestoEdit;
+                return View("Species/Species_Edit");
+            }
+            else // Add New
+            {
+                return View("Species/Species_New");
+            }
+        }
+
+        //Post the edit to update the Species
+        [HttpPost]
+        public ActionResult Species_Edit(string CropUse)
+        {
+            //update the AI and go back to the AI index
+            return RedirectToAction("Species");
+        }
+
+        //post the new Species
+        [HttpPost]
+        public ActionResult Species_New()
+        {
+            //post the new Species and redirect to the index for uses with new one added to dropdown
+            return RedirectToAction("Species");
+        }
+
+        public Boolean Species_Delete(string id)
+        {
+            return true;
+        }
+
+        #endregion Species
+
+        
+    }
+}

@@ -1,0 +1,69 @@
+﻿@* Comments:
+06.13.13 - TR - Created (Parial View)
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display details of a user 
+ */
+ *@
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@model BLTServices.USER_
+           
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#loading").fadeOut();
+    });        
+</script>
+
+<div class="siteColumn">
+
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.FirstName_Label)</span>
+        <label class="inline">@Model.FNAME</label>
+    </div>
+
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.LastName_Label)</span>
+        <label class="inline">@Model.LNAME</label>
+    </div>
+    
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.UserName_Label)</span>
+        <label class="inline">@Model.USERNAME</label>
+    </div>
+    
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.Org_Label)</span>
+        <label class="inline">@( ViewData.ContainsKey("Organization") ? ViewData["Organization"] : "")</label>
+    </div>
+
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.Division_Label)</span>
+        <label class="inline">@( ViewData.ContainsKey("Division") ? ViewData["Division"] : "")</label>
+    </div>
+
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.Role_Label)</span>
+        <label class="inline">@( ViewData.ContainsKey("Role") ? ViewData["Role"] : "")</label>
+    </div>
+    
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.Phone_Label)</span>
+        <label class="inline">@Model.PHONE</label>
+    </div>
+
+    <div>
+        <span class="bold ui-label-a">@Html.Label(ResStrings.Email_Label)</span>
+        <label class="inline">@Model.EMAIL</label>
+    </div>
+
+</div>

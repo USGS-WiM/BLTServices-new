@@ -1,0 +1,152 @@
+﻿@*
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Species Part Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@model BLTServices.SPECIES
+           
+@{
+    ViewBag.Title = "Species Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="partsTitle">Manage Bulletins Components - Species</div>
+
+@using (Html.BeginForm("Species_Edit", "Parts", FormMethod.Post, new {id = Model.SPECIES_ID}))
+{    
+    <div class="siteColumn">
+
+        <input type="hidden" name="SPECIES_ID" value="@Model.SPECIES_ID" />
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+        	    <div class="ui-block-a">@Html.Label(ResStrings.SppCommonName_Label)</div> 
+	            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="COMMON_NAME" data-mini="true" value="@Model.COMMON_NAME"  /></div>
+            </div>
+        </div>
+    
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+        	    <div class="ui-block-a">@Html.Label(ResStrings.SppScientName_Label)</div>
+	            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="SCIENTIFIC_NAME" data-mini="true" value="@Model.SCIENTIFIC_NAME"  /></div>
+    	    </div>
+        </div>
+    
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+        	    <div class="ui-block-a">@Html.Label(ResStrings.SppFamily_Label)</div>
+                <div class="ui-block-b">
+                    <select id="SppFdropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_FAMILY_ID" data-native-menu="false" data-mini="true">
+		                @foreach (SPECIES_FAMILY fl in ViewData["FamilyList"] as List<SPECIES_FAMILY>)
+                        {
+                            <option @( fl.SPECIES_FAMILY_ID == Model.SPECIES_FAMILY_ID ? "selected" : "") value='@fl.SPECIES_FAMILY_ID'>@fl.FAMILY</option> 
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+        	    <div class="ui-block-a">@Html.Label(ResStrings.SppGroup_Label)</div>
+                <div class="ui-block-b">
+                    <select id="SppGdropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_GROUP_ID" data-native-menu="false" data-mini="true">
+		                @foreach (SPECIES_GROUP sg in ViewData["GroupList"] as List<SPECIES_GROUP>)
+                        {
+                            <option @( sg.SPECIES_GROUP_ID == Model.SPECIES_GROUP_ID ? "selected" : "") value='@sg.SPECIES_GROUP_ID'>@sg.SP_GROUP</option> 
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>        
+    
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+        	    <div class="ui-block-a">@Html.Label(ResStrings.SppTaxa_Label)</div>
+                <div class="ui-block-b">
+                    <select id="SppTdropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_TAXA_ID" data-native-menu="false" data-mini="true">
+		                @foreach (SPECIES_TAXA taxa in ViewData["TaxaList"] as List<SPECIES_TAXA>)
+                        {
+                            <option @( taxa.SPECIES_TAXA_ID == Model.SPECIES_TAXA_ID ? "selected" : "") value='@taxa.SPECIES_TAXA_ID'>@taxa.TAXA</option> 
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    
+        <div id="formSubmitDiv">
+            <div class="leftSideSubmit">
+                <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+                <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="cancelClick();" /></div></div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        window.location.href = '@Url.Action("Index", "Parts")'
+    };
+</script>
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    }
+</script>
+
+<script type="text/javascript">
+    $("#form0").submit(function () {
+        var MISSING = "ui-req";
+        var requiredInput = $('input[class*="required"]');
+        var requiredSelect = $('select[class*="required"]');
+        var requiredFields = $.merge(requiredInput, requiredSelect);
+        var err = false;
+        var missingMsg = "The highlighted fields are required.";
+        // Reset the previously highlighted form elements  
+        requiredFields.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Perform form validation  
+        requiredInput.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                if (!err) {
+                    err = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            }
+        });
+        requiredSelect.each(function (index) {
+            if ($(this).val() == "0") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                if (!err) {
+                    err = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            }
+        });
+        // Check if validation fails
+        if (err == true) {
+            return false;
+        } else {
+            loading();
+            return true;
+        }
+    });
+</script>

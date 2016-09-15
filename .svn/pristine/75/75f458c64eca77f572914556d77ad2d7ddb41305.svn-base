@@ -1,0 +1,450 @@
+//Copyright 2013 USGS Wisconsin Internet Mapping(WiM)
+//Author: WiM JS Dev Team
+//Created: May 17th, 2013	
+
+//This template has been commented heavily for development purposes. Please delete comments before publishing live mapper code.
+//Below are all the dojo.require statements needed for this template mapper. These statements import esri and dijit out-of-box functionality. At bottom are custom wimjits being included.
+//This list will vary as features are added to mappers and different Dojo, Esri, or WiM tools are used. 
+
+//07.16.2013 - NE - Add functionality for adding icon and execute zoom to scale.
+//06.19.2013 - NE - Updated to create lat/lng scale bar programmatically after map is created and ready.
+//06.18.2013 - TR - Added color style to USGSLinks <a> tags
+//06.03.2013 - ESM - Adds function to build and display usgs links on user logo click
+
+dojo.require("esri.map");
+dojo.require("esri.dijit.Popup");
+dojo.require("esri.dijit.Legend");
+dojo.require("esri.dijit.BasemapGallery");
+dojo.require("esri.arcgis.utils");
+dojo.require("esri.virtualearth.VETiledLayer");
+dojo.require("esri.tasks.locator");
+dojo.require("esri.graphic");
+dojo.require("esri.tasks.query");
+dojo.require("esri.utils");
+
+dojo.require("dijit.TitlePane");
+dojo.require("dijit.Tooltip");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.Menu");
+dojo.require("dijit.TooltipDialog");
+
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+
+dojo.require("dijit.form.CheckBox");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ComboBox");
+dojo.require("dijit.form.DropDownButton");
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dijit.Dialog");
+dojo.require("dojox.data.XmlStore");
+
+dojo.require("wim.ExtentNav");
+dojo.require("wim.LatLngScale");
+dojo.require("wim.CollapsingContainer");
+dojo.require("wim.Disclaimer");
+dojo.require("modules.SiteFilter");
+dojo.require("wim.RefreshScreen");
+dojo.require("wim.LoadingScreen");
+
+
+//various global variables are set here (Declare here, instantiate below)     
+var map, legendLayers = [];
+var identifyTask, identifyParams;
+var navToolbar;
+var locator;
+var ProdListResponse = false;
+var AIListResponse = false;
+//var ProductList;
+
+function init() {
+
+//    esri.config.defaults.io.proxyUrl = "/Proxy/proxy.ashx";
+//    esri.config.defaults.io.alwaysUseProxy = true;
+
+	//sets up the onClick listener for the USGS logo
+	//dojo.connect(dojo.byId("usgsLogo"), "onclick", showUSGSLinks);
+	
+	// a popup is constructed below from the dijit.Popup class, which extends some addtional capability to the InfoWindowBase class.
+	var popup = new esri.dijit.Popup({},dojo.create("div"));
+	
+	//IMPORANT: map object declared below. Basic parameters listed here. 
+	//String referencing container id for the map is required (in this case, "map", in the parens immediately following constructor declaration).
+	//Default basemap is set using "basemap" parameter. See API reference page, esri.map Constructor Detail section for parameter info. 
+	//For template's sake, extent parameter has been set to contiguous US.
+	//sliderStyle parameter has been commented out. Remove comments to get a large slider type zoom tool (be sure to fix CSS to prevent overlap with other UI elements)
+	//infoWindow parameter sets what will be used as an infoWindow for a map click. 
+	//If using FeatureLayer,an infoTemplate can be set in the parameters of the FeatureLayer constructor, which will automagically generate an infoWindow.	 
+	map = new esri.Map("map", {
+    	basemap: "topo",
+		wrapAround180: true,
+		extent: new esri.geometry.Extent({xmin:-14580516.019450117,ymin:2072972.2070934423,xmax:-5618427.327072154,ymax:7527518.54552217,spatialReference:{wkid:102100}}), 
+		slider: true,
+		sliderStyle: "small", //use "small" for compact version, "large" for long slider version
+		logo:false,
+		infoWindow: popup
+	});
+	
+	//navToolbar constructor declared, which serves the extent navigator tool.
+    navToolbar = new esri.toolbars.Navigation(map);
+	
+	//dojo.connect method (a common Dojo framework construction) used to call mapReady function. Fires when the first or base layer has been successfully added to the map.
+    dojo.connect(map, "onLoad", mapReady);
+	
+	//basemapGallery constructor which serves the basemap selector tool. List of available basemaps can be customized. Here,default ArcGIS online basemaps are set to be available.
+	var basemapGallery = new esri.dijit.BasemapGallery({
+		showArcGISBasemaps: true,
+		map: map
+	}, "basemapGallery");
+	basemapGallery.startup();
+	
+	//basemapGallery error catcher
+	dojo.connect(basemapGallery, "onError", function() {console.log("Basemap gallery failed")});
+	
+	//calls the executeSiteIdentifyTask function from a click on the map. 
+	dojo.connect(map, "onClick", executeSiteIdentifyTask);
+	
+	//declaration of layers. ArcGISDynamicMapServiceLayer used, with one FeatureLayer at the end. See API documentation for available constructor parameters.  
+	//under the layer declaration, the layer and its desired alias for the legend and toggle elements are pushed to the legendLayers array, which informs 
+	//the legend element and toggle (checkbox) elements.
+	
+	//layer 1 (layer 0 is the basemap, which was brought in via the map object declaration)	
+	var pulaLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULA/MapServer", { "visible": true, "opacity": 0.5 });
+	legendLayers.push({ layer: pulaLayer, title: 'PULAs' });
+
+
+    /////////////// Request and Dropdown Populating for PRODUCT ////////////////////////////////
+	var ProdRequest = esri.request({
+	    url: "https://localhost/BLTServices/Products",
+	    handleAs: "xml"
+	});
+	ProdRequest.then(ProdRequestSucceeded, ProdRequestFailed);
+
+	//function for request to get Products
+	function ProdRequestSucceeded(data) {
+	    var select = document.getElementById("productSelectInput");
+	    var so = document.createElement("option");
+	    so.textContent = "All";
+	    so.value = "0";
+	    select.appendChild(so);
+        //now get the rest of the PRODUCTS
+	    var HTMLstuff = data.documentElement.children;
+	    var collection = Array.prototype.slice.call(HTMLstuff);
+	    for (var i = 0; i < collection.length; i++) {
+	        var opt = collection[i];
+	        var el = document.createElement("option");
+	        el.textContent = opt.children[3].innerHTML;
+	        el.value = opt.children[1].innerHTML;
+	        select.appendChild(el);
+	    }
+	    ProdListResponse = true;
+	    if (ProdListResponse == true && AIListResponse == true) {
+	        AllDone();
+	    }
+	}
+
+	function ProdRequestFailed(error) {
+	    console.log("Error: ", error.message);
+	}
+	/////////// end Product Request and Dropdown populating //////////////////////
+
+	/////////////// Request and Dropdown Populating for ACTIVE INGREDIENT ////////////////////////////////
+	var AIRequest = esri.request({
+	    url: "https://localhost/BLTServices/ActiveIngredients",
+	    handleAs: "xml"
+	});
+	AIRequest.then(AIRequestSucceeded, AIRequestFailed);
+
+	//function for request to get AI
+	function AIRequestSucceeded(data) {
+	    var AIselect = document.getElementById("AISelectInput");
+	    var so = document.createElement("option");
+	    so.textContent = "All";
+	    so.value = "0";
+	    AIselect.appendChild(so);
+	    //now get the rest of the ACTIVE INGREDIENTS
+	    var HTMLstuff = data.documentElement.children;
+	    var collection = Array.prototype.slice.call(HTMLstuff);
+	    for (var i = 0; i < collection.length; i++) {
+	        var opt = collection[i];
+	        var el = document.createElement("option");
+	        el.textContent = opt.children[2].innerHTML;
+	        el.value = opt.children[1].innerHTML;
+	        AIselect.appendChild(el);
+	    }
+	    AIListResponse = true;
+	    if (ProdListResponse == true && AIListResponse == true) {
+	        AllDone();
+	    }
+	}
+
+	function AIRequestFailed(error) {
+	    console.log("Error: ", error.message);
+	}
+	/////////// end AI Request and Dropdown populating //////////////////////
+
+//    var productQuery = new esri.tasks.Query();
+//    productQuery.where = "PRODUCT_NAME IS NOT null";
+
+//    productList.queryFeatures(productQuery, function (featureSet) {
+//	    var productFilterValues = dojo.map(featureSet.features, function (feature) {
+//	        return {
+//	            productName: feature.attributes.PRODUCT_NAME
+//	        };
+//	    });
+
+//	    productFilterValues.unshift(new Object({ productName: " All" }));
+
+//	    var productDataItems = {
+//	        identifier: 'productName',
+//	        label: 'productName',
+//	        items: eventFilterValues
+//	    };
+
+//	    productStore = new dojo.data.ItemFileReadStore({
+//	        data: productDataItems
+//	    });
+
+//	    dijit.byId("productSelectInput").set("store", productStore);
+
+	//});
+		
+//	//graphicsLayer6. This is an example of a FeatureLayer. Feature layers are identified differently in the data model, but follow the numerical order with other layers. 
+//	//In order to display a FeatureLayer, the SNAPSHOT mode is required. See API reference for details. 
+//	var pointFeatLayer = new esri.layers.FeatureLayer("http://wim.usgs.gov/arcgis/rest/services/BadRiverDataPortal/NWIS_Sites/MapServer/0", {"mode":esri.layers.FeatureLayer.MODE_SNAPSHOT});
+//	legendLayers.push({layer:pointFeatLayer,title:'Pt Feat Layer'});
+//	
+	//IMPORTANT: This is where the layers are added to the map. Normally, this would be a simple list of variables. In this build, the layer variable names must be contained witin
+	//an array bracket because the layer info has been placed inside the legendLayers array for the construction of a legend and toggle buttons.
+	//IMPORTANT: Layers will be placed in ascending order from the order in this list. i.e., the first layer listed will be on bottom, the last layer listed will be on top.
+	map.addLayers([pulaLayer]);
+	
+	//this function fires after all layers have been added to map with the map.addLayers method above.
+	//this function creates the legend element based on the legendLayers array which contains the relevant data for each layer. 
+	dojo.connect(map,'onLayersAddResult',function(results){
+		var legend = new esri.dijit.Legend({
+			map:map,
+			layerInfos:legendLayers
+		},"legendDiv");
+		legend.startup();
+		
+		//this forEach loop generates the checkbox toggles for each layer by looping through the legendLayers array (same way the legend element is generated). 
+		dojo.forEach (legendLayers, function(layer){
+			var layerName = layer.title;
+			var checkBox = new dijit.form.CheckBox({
+				name:"checkBox" + layer.layer.id,
+				value:layer.layer.id,
+				checked:layer.layer.visible,
+				onChange:function(evt){
+					var checkLayer = map.getLayer(this.value);
+					checkLayer.setVisibility(!checkLayer.visible);
+					this.checked = checkLayer.visible;						
+				}
+			});
+			if (layer.zoomScale) {
+				//create the holder for the checkbox and zoom icon
+				var toggleDiv = dojo.doc.createElement("div");
+				dojo.place(toggleDiv,dojo.byId("toggle"),"after");
+				dojo.place(checkBox.domNode,toggleDiv,"first");
+				var checkLabel = dojo.create('label',{'for':checkBox.name,innerHTML:layerName},checkBox.domNode,"after");
+				var scale = layer.zoomScale;
+				var zoomImage = dojo.doc.createElement("div");
+				zoomImage.id = 'zoom' + layer.layer.id;
+				zoomImage.innerHTML = '<img id="zoomImage" style="height: 18px;width: 18px" src="images/zoom.gif" />';
+				dojo.connect(zoomImage, "click", function() {
+					if (map.getScale() > scale) {
+						map.setScale(scale);;
+					}
+				});
+				dojo.place(zoomImage,toggleDiv,"last");
+				dojo.setStyle(checkBox.domNode, "float", "left");
+				dojo.setStyle(checkLabel, "float", "left");
+				dojo.setStyle(toggleDiv, "paddingTop", "5px");
+				dojo.setStyle(dojo.byId("zoomImage"), "paddingLeft", "10px");
+				dojo.setStyle(toggleDiv, "height", "25px");
+				//dojo.byId("toggle").appendChild(zoomImage);
+				//dojo.appendChild(zoomImage.domNode,dojo.byId("toggle"),"after");
+				
+				dojo.place("<br/>",zoomImage,"after");
+			} else {
+				dojo.place(checkBox.domNode,dojo.byId("toggle"),"after");
+				var checkLabel = dojo.create('label',{'for':checkBox.name,innerHTML:layerName},checkBox.domNode,"after");
+				dojo.place("<br/>",checkLabel,"after");
+			}
+		}); //end dojo.foreach
+	}); //end dojo.connect
+	
+	//OPTIONAL: the below remaining lines within the init function are for performing an identify task on a layer in the mapper. 
+	// the following 7 lines establish an IdentifyParameters object(which is an argument for an identifyTask.execute method)and specifies the criteria used to identify features. 
+	// the constructor of the identifyTask is especially important. the service URL there should match that of the layer from which you'd like to identify.
+	identifyParams = new esri.tasks.IdentifyParameters();
+    identifyParams.tolerance = 15;
+    identifyParams.returnGeometry = true;
+    identifyParams.layerOption = esri.tasks.IdentifyParameters.LAYER_OPTION_TOP;
+    identifyParams.width  = map.width;
+    identifyParams.height = map.height;
+    identifyTask = new esri.tasks.IdentifyTask("https://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULA/MapServer");
+
+    
+	//OPTIONAL: the following function carries out an identify task query on a layer and returns attributes for the feature in an info window according to the 
+	//InfoTemplate defined below. It is also possible to set a default info window on the layer declaration which will automatically display all the attributes 
+	//for the layer in the order they come from the table schema. This code below creates custom labels for each field and substitutes in the value using the notation ${[FIELD NAME]}. 
+    function executeSiteIdentifyTask(evt) {
+        identifyParams.geometry = evt.mapPoint;
+        identifyParams.mapExtent = map.extent;
+       
+	    // the deferred variable is set to the parameters defined above and will be used later to build the contents of the infoWindow.
+        var deferredResult = identifyTask.execute(identifyParams);
+
+        deferredResult.addCallback(function(response) {     
+            // response is an array of identify result objects    
+            // dojo.map is used to set the variable feature to each result in the response array and apply the same template to each of those features, 
+            return dojo.map(response, function(result) {
+                var feature = result.feature;
+                feature.attributes.layerName = result.layerName;
+                
+				//set the customized template for displaying content in the info window. HTML tags can be used for styling.
+				// The string before the comma within the parens immediately following the constructor sets the title of the info window.
+                var template = new esri.InfoTemplate("",
+					"<b>${SITE_NO}</b><br/>"+
+					"<b>Study Date</b>: ${STUDY_DATE}<br/>" +
+                    "<b>AHPS ID</b>: ${AHPS_ID}<br/>" +
+					"<b>Short name</b>: ${SHORT_NAME}<br/>" +
+					"<b>State</b>: ${STATE}<br/>" +
+					"<b>Community</b>: ${COMMUNITY}<br/>");
+					
+				//ties the above defined InfoTemplate to the feature result returned from a click event	
+                feature.setInfoTemplate(template);
+                
+				//returns the value of feature, which is the result of the click event
+                return feature;
+            });
+        });
+		
+        //sets the content that informs the info window to the previously established "deferredResult" variable.
+	    map.infoWindow.setFeatures([ deferredResult ]);
+		//tells the info window to render at the point where the user clicked. 
+        map.infoWindow.show(evt.mapPoint);
+    }
+	//end executeSiteIdentifyTask method
+	  
+	//Geocoder reference to geocoding services
+    locator = new esri.tasks.Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+	//calls the function that does the goeocoding logic (found in geocoder.js, an associated JS module)*
+    dojo.connect(locator, "onAddressToLocationsComplete", showResults);
+
+
+}//end of init function	
+
+//mapReady function that fires when the first or base layer has been successfully added to the map. Very useful in many situations. called above by this line: dojo.connect(map, "onLoad", mapReady)
+function mapReady(map){ 	
+	//Sets the globe button on the extent nav tool to reset extent to the initial extent.
+	dijit.byId("extentSelector").set("initExtent", map.extent);  
+	
+	//Create scale bar programmatically because there are some event listeners that can't be set until the map is created.
+	//Just uses a simple div with id "latLngScaleBar" to contain it
+	var latLngBar = new wim.LatLngScale({ map: map }, 'latLngScaleBar');
+
+	dojo.style('loadingScreen', 'opacity', '0.75');
+	var loadingUpdate = dojo.connect(map, "onUpdateStart", function () {
+	    dojo.style('loadingScreen', 'visibility', 'visible');
+	});
+
+	dojo.connect(map, "onUpdateEnd", function () {
+	    
+	    dojo.disconnect(loadingUpdate);
+
+	    dojo.connect(map, "onUpdateStart", function () {
+	        dojo.style('refreshScreen', 'visibility', 'visible');
+	    });
+
+	    dojo.connect(map, "onUpdateEnd", function () {
+	        dojo.style('refreshScreen', 'visibility', 'hidden');
+	    });
+
+	});
+}
+
+//function to hide the loading div
+function AllDone() {
+    dojo.style('loadingScreen', 'visibility', 'hidden');
+}
+
+//function that sends filtered choices to the services to get corresponding shape IDs
+function executeUpdatePULAs() {
+    //get chosen values
+    var date = document.getElementById("startDate").value;
+    var AI_index = document.getElementById("AISelectInput").selectedIndex;
+    var AI_value = document.getElementsByTagName("option")[AI_index].value;
+    var prod_index = document.getElementById("productSelectInput").selectedIndex;
+    var prod_value = document.getElementsByTagName("option")[prod_index].value;
+    //var URL = "https://localhost/BLTServices/PULAs?publishedDate=" + date + "&aiID=" + AI_value + "&productID=" + prod_value; 
+    //make request to service endpoint to say 'give me all the shape ID's so that I can show them, based on these filters'
+//    var filterRequest = esri.request({
+//        url: URL,
+//        handleAs: "xml"
+//    });
+//    filterRequest.then(filterRequestSucceeded, filterRequestFailed);
+    parent.GetFilteredShapes(date, AI_value, prod_value);
+    //function for request to get AI
+    function filterRequestSucceeded(data) {
+        //now get the rest of the ACTIVE INGREDIENTS
+        var HTMLstuff = data.documentElement.children;
+        var collection = Array.prototype.slice.call(HTMLstuff);
+//        for (var i = 0; i < collection.length; i++) {
+//            var opt = collection[i];
+//            var el = document.createElement("option");
+//            el.textContent = opt.children[2].innerHTML;
+//            el.value = opt.children[1].innerHTML;
+//            AIselect.appendChild(el);
+//        }
+//        AIListResponse = true;
+//        if (ProdListResponse == true && AIListResponse == true) {
+//            AllDone();
+//        }
+    }
+
+    function filterRequestFailed(error) {
+        console.log("Error: ", error.message);
+    }
+
+}
+// USGS Logo click handler function
+/*function showUSGSLinks(evt){
+	//check to see if there is already an existing linksDiv so that it is not build additional linksDiv. Unlikely to occur since the usgsLinks div is being destroyed on mouseleave.
+	if (!dojo.byId('usgsLinks')){
+		//create linksDiv
+		var linksDiv = dojo.doc.createElement("div");
+		linksDiv.id = 'usgsLinks';
+		//LINKS BOX HEADER TITLE HERE
+		linksDiv.innerHTML = '<div class="usgsLinksHeader"><b>USGS Links</b></div>';
+		//USGS LINKS GO HERE
+		linksDiv.innerHTML += '<p>';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/">USGS Home</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/ask/">Contact USGS</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://search.usgs.gov/">Search USGS</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/laws/accessibility.html">Accessibility</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/foia/">FOIA</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/laws/privacy.html">Privacy</a><br />';
+		linksDiv.innerHTML += '<a style="color:white" target="_blank" href="http://www.usgs.gov/laws/policies_notices.html">Policies and Notices</a></p>';
+		
+		//place the new div at the click point minus 5px so the mouse cursor is within the div
+		linksDiv.style.top =  evt.clientY-5 + 'px';
+		linksDiv.style.left = evt.clientX-5 + 'px';
+		
+		//add the div to the document
+		dojo.byId('map').appendChild(linksDiv);
+		//on mouse leave, call the removeLinks function
+		dojo.connect(dojo.byId("usgsLinks"), "onmouseleave", removeLinks);
+
+	}
+}*/
+
+//remove (destroy) the usgs Links div (called on mouseleave event)
+function removeLinks(){
+	dojo.destroy('usgsLinks');
+}
+
+dojo.ready(init);
+//IMPORTANT: while easy to miss, this little line above makes everything work. it fires when the DOM is ready and all dojo.require calls have been resolved. 
+//Also when all other JS has been parsed, as it lives here at the bottom of the document. Once all is parsed, the init function is executed*

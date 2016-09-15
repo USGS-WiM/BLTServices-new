@@ -1,0 +1,156 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page (mapper) 
+ */
+ *@
+
+@using System.Configuration;
+@using BLTServices;
+@using BLT_Map;
+
+<style type="text/css">
+#main 
+{
+    padding: 12px 0 !important;
+}
+.page
+{
+    width: 98% !important;
+    /*width: 100%;
+    height: 100%*/
+}
+</style>    
+
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+
+<div>
+    @* <img id="Map" onclick="ShapeClick();" style="float:left; width:40%" src="@Url.Content("~/Assets/Images/testMapper.JPG")"  />onload="iframeclick();"
+    *@
+    <iframe id="theIframe" width="40%" height="600" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
+        src='https://localhost/BLT_Map/index.html'></iframe>
+    <div style="float:right; width:60%" id="content">
+        <span style="padding-left:10px">Choose a PULA shape to get started.</span>
+    </div>
+</div>
+
+
+<br clear="all" />
+
+<script type="text/javascript">
+    function iframeclick() {
+        document.getElementById("theIframe").contentWindow.document.body.onclick = function () {
+            //document.getElementById("theiframe").contentWindow.location.reload();
+            $("#loading").fadeIn();
+            $.ajax({
+                url: '@Url.Action("PULA_Publish", "PULA")',
+                type: 'GET',
+                data: { shapeId: 3, date: '@DateTime.Now' },
+                success: function (response) {
+                    $("#loading").fadeOut();
+                    $("#content").html(response);
+                },
+                error: function (xhr) {
+                    alert("PULA Details didn't come back");
+                }
+            });
+        }
+    }
+
+    function GetFilteredShapes(date, AI_value, prod_value) {
+        var aDate = date != "" ? date.toString() : "0";
+        $.ajax({
+            url: '@Url.Action("GetFilteredSimplePULAs", "PULA")',
+            type: 'GET',
+            data: { fDate: aDate, aiID: AI_value, productID: prod_value },
+            success: function (response) {
+                alert("HI");
+            },
+            error: function (xhr) {
+                alert("Error");
+            }
+        });
+    }
+//    function ShapeClick() {
+//        $("#loading").fadeIn();
+//        $.ajax({
+//            url: '@Url.Action("PULA_Create", "PULA")',
+//            type: 'GET',
+//            data: { shapeId: 4 },
+//            success: function (response) {
+//                $("#loading").fadeOut();
+//                $("#content").html(response);
+//            },
+//            error: function (xhr) {
+//                alert("PULA Create didn't come back");
+//            }
+//        });
+//    }
+
+//function ShapeClick() {
+//        $("#loading").fadeIn();
+//        $.ajax({
+//            url: '@Url.Action("PULA_Details", "PULA")',
+//            type: 'GET',
+//            data: { shapeId: 4, date: '@DateTime.Now' },
+//            success: function (response) {
+//                $("#loading").fadeOut();
+//                $("#content").html(response);
+//            },
+//            error: function (xhr) {
+//                alert("PULA Details didn't come back");
+//            }
+//        });
+//    }
+
+//    function ShapeClick() {
+//        $("#loading").fadeIn();
+//        $.ajax({
+//            url: '@Url.Action("PULA_Publish", "PULA")',
+//            type: 'GET',
+//            data: { shapeId: 3, date: '@DateTime.Now' },
+//            success: function (response) {
+//                $("#loading").fadeOut();
+//                $("#content").html(response);
+//            },
+//            error: function (xhr) {
+//                alert("PULA Details didn't come back");
+//            }
+//        });
+//    }
+
+//    $(function () {
+//        $("#createForm").submit(function () {
+//            $("#loading").fadeIn();
+//            $.ajax({
+//                url: this.action,
+//                type: this.method,
+//                data: $(this).serialize(),
+//                success: function (result) {
+//                    if (result) {
+//                        $("#loading").fadeOut();
+//                        $("#content").html(response);
+//                    }
+//                }
+//            });
+//            // it is important to return false in order to cancel the default submission of the form and perform the AJAX call
+//            return false;
+//        });
+//    });
+</script>

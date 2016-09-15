@@ -1,0 +1,470 @@
+﻿@* Comments:
+06.24.13 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked (created already = publish)
+ */
+ *@
+
+@using BLTServices;
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+
+<link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+
+
+@*<link rel="stylesheet" href="/resources/demos/style.css" />*@
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab1-Gen">PULA Information</a></li>
+@*            <input style="background-color:#4B6C9E;color:white" type="button" onclick="PULA_NEW();" value="Copy To New" class="popup-button" />
+            @Html.ActionLink("Copy To New", "PULA_New", "PULA", new {@class="BLTButton blue"})*@
+        </ul>
+
+        @*General Detail Tab*@
+        @{
+            VERSION thisVersion = ViewData["Version"] as VERSION; 
+            USER_ Creator = ViewData["creator"] as USER_;
+            USER_ loggedIn = ViewData["loggedIn"] as USER_;
+            ACTIVE_INGREDIENT_PULA thisAIPULA = ViewData["AIPULA"] as ACTIVE_INGREDIENT_PULA; 
+          }
+        
+        <div id="tab1-Gen"> 
+
+             <input type="hidden" name="shapeId" value="@Model.PULA_SHAPE_ID" />
+
+             <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Effective Date: <br />(if known)</div>
+	                <div class="ui-block-b">
+                        <div>Month:&nbsp;
+                            <select class="bltTextInput ui-shadow-inset" style="width:50%;margin-top:5px" id="effectiveMonth" name="EffMonths" data-mini="true">
+                                <option value="0"></option>
+                                @foreach (var mo in ViewData["EffMonths"] as List<SelectListItem>)
+                                {
+                                    if (thisAIPULA.EFFECTIVE_DATE != null)
+                                    {
+                                       <option @((mo.Value == ((DateTime)thisAIPULA.EFFECTIVE_DATE).Month.ToString()) ? "selected" : "") value="@mo.Value">@mo.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@mo.Value">@mo.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <br />
+                        <div>Year:&nbsp;&nbsp;&nbsp
+                            <select class="bltTextInput ui-shadow-inset" style="width:50%" id="effectiveYear" name="effYears" data-mini="true">
+                                <option value="0"></option>
+                                @foreach (var yr in ViewData["EffYears"] as List<SelectListItem>)
+                                {
+                                    if (thisAIPULA.EFFECTIVE_DATE != null)
+                                    {
+                                        <option @( (yr.Value == ((DateTime)thisAIPULA.EFFECTIVE_DATE).Year.ToString()) ? "selected" : "") value="@yr.Value">@yr.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@yr.Value">@yr.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+	            </div>
+            </div>
+            
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">Creation Date:</div>
+                    <div class="ui-block-b"><label>@(((DateTime)thisVersion.CREATED_TIME_STAMP).ToShortDateString())</label></div>
+	            </div>
+            </div>
+                <input type="hidden" name="Version.CreateDate" value="@thisVersion.CREATED_TIME_STAMP" />
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Created By:</div>
+	                <div class="ui-block-b"><label>@( Creator != null ? string.Format("{0} {1}", Creator.FNAME, Creator.LNAME) : "" )</label></div>
+                </div>
+            </div>            
+                <input type="hidden" name="Version.Creator" value="@thisVersion.CREATOR_ID" />
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Creator Organization:</div>
+	                <div class="ui-block-b"><label>@( ViewData.ContainsKey("creatorOrg") ? ViewData["creatorOrg"] : "")</label></div>
+                 </div>
+            </div>
+                       
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">Creator Division:</div>
+                    <div class="ui-block-b"><label>@(ViewData.ContainsKey("creatorDiv") ? ViewData["creatorDiv"] : "") </label></div>
+                </div>
+            </div>       
+           
+           
+        @* I don't think we should show these fields, just populate on the backend, since they can't choose someone else 
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Published Date:</div>
+	                <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="V.PUBLISHIED_TIME_STAMP" data-mini="true"  value="@DateTime.Now.ToShortDateString()" /></div>
+	            </div>
+            </div>            
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Published By:</div>
+	                <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="Publisher.PUBLISHER_NAME" data-mini="true"  value=@(string.Format("{0} {1}", loggedIn.FNAME, loggedIn.LNAME)) />
+                </div>
+	        </div>
+            <input type="hidden" name="V.PUBLISHER_ID" value="@loggedIn.USER_ID" />
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Publisher Organization:</div>
+	                <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="Publisher.ORGANIZATION_NAME" data-mini="true" value="@(ViewData.ContainsKey("publisherOrg") ? ViewData["publisherOrg"] : "")" /></div>
+                </div>
+            </div>
+            <input type="hidden" name="Publisher.ORGANIZATION_ID" value="@loggedIn.ORGANIZATION_ID" />
+
+            @if (ViewData.ContainsKey("publisherDiv"))
+            {
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+                        <div class="ui-block-a">Publisher Division:</div>
+                        <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="PDiv" name="Publisher.DIVISION_NAME" data-mini="true" value="@ViewData["publisherDiv"]" /></div>
+                    </div>
+	            </div>
+            }
+            else
+            { 
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Publisher Division:</div>
+                        <div class="ui-block-b">
+                            <select id="Divdropdown" class="bltSelectInput ui-shadow-inset" name="Publisher.DIVISION_ID" data-native-menu="false" data-mini="true">
+                                <option value="0">Choose Division</option>
+		                        @foreach (DIVISION div in ViewData["DivisionList"] as List<DIVISION>)
+                            {
+                                    <option value='@div.DIVISION_ID'>@div.DIVISION_NAME</option> 
+                            }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Expired By:</div>
+	                <div class="ui-block-b">
+                        @if (thisVersion.EXPIRER_ID != null)
+                        {
+                            <label>@thisVersion.EXPIRER_ID</label>    
+                        }
+                        else
+                        {
+                            <input type="text" class="bltTextInput ui-shadow-inset" name="Expirer.EXPIRER_NAME" data-mini="true"  value="@User.Identity.Name" />
+                        }
+                </div>
+            </div>
+
+*@            
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Expiration Date: <br />(if known)</div>
+	                    <div class="ui-block-b">
+                           <div>Month:&nbsp;
+                                @if (thisVersion.EXPIRED_TIME_STAMP != null)
+                                {
+                                <select class="bltTextInput ui-shadow-inset" style="width:50%;margin-top:5px" id="expirationMonth" name="exMonths" data-mini="true">
+                                    <option value="0"></option>
+                                    @foreach (var month in ViewData["ExMonths"] as List<SelectListItem>)
+                                    {
+                                        
+                                        <option @( (month.Value == ((DateTime)thisVersion.EXPIRED_TIME_STAMP).Month.ToString()) ? "selected" : "") value="@month.Value">@month.Text</option>
+                                    }
+                                </select>
+                                }
+                                else
+                                {
+                                    <select class="bltTextInput ui-shadow-inset" style="width:50%;margin-top:5px" id="expirationMonth" name="exMonths" data-mini="true">
+                                    <option value="0"></option>
+                                    @foreach (var month in ViewData["ExMonths"] as List<SelectListItem>)
+                                    {
+                                        
+                                        <option value="@month.Value">@month.Text</option>
+                                    }
+                                </select>
+                                }
+                            </div>
+                            <br />
+                            <div>Year:&nbsp;&nbsp;&nbsp;
+                                @if (thisVersion.EXPIRED_TIME_STAMP != null)
+                                {
+                                    <select class="bltTextInput ui-shadow-inset" style="width:50%" id="expirationYear" name="exYears" data-mini="true">
+                                        <option value="0"></option>
+                                        @foreach (var year in ViewData["ExYears"] as List<SelectListItem>)
+                                        {
+                                            <option @( (year.Value == ((DateTime)thisVersion.EXPIRED_TIME_STAMP).Year.ToString() ? "selected" : "")) value="@year.Value">@year.Text</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <select class="bltTextInput ui-shadow-inset" style="width:50%" id="expirationYear" name="exYears" data-mini="true">
+                                        <option value="0"></option>
+                                        @foreach (var year in ViewData["ExYears"] as List<SelectListItem>)
+                                        {
+                                            <option value="@year.Value">@year.Text</option>
+                                        }
+                                    </select>
+                                }
+                            </div>
+                        </div>
+                     </div>
+                </div>    
+            
+            <br clear="all" />       
+
+        @*AIs Tab*@
+        @{  }
+       
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Additional Information:</div>
+                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" rows="8" id="addInfo" name="Pula.AdditionalInfo">@thisAIPULA.ADDITIONAL_INFORMATION</textarea></div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">PULA Justification:</div>
+                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" rows="8" id="Justification" name="Pula.Justification">@thisAIPULA.JUSTIFICATION</textarea></div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="ui-block-a">Base Data:</div>
+                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" rows="8" id="bd" name="Pula.BaseData">@thisAIPULA.BASE_DATA</textarea></div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">Base Data Modifiers:</div>
+                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" rows="8" id="bdm" name="Pula.BaseDataModifiers">@thisAIPULA.BASE_DATA_MODIFIERS</textarea></div>
+                </div>
+            </div>
+                
+            <div class="ui-grid-a"><div data-role="fieldcontain"><div class="ui-block-a">History:</div></div></div>
+
+            <div class="ui-grid-a">
+                <div class="ui-block-a" style="width:90%">
+                    <table>
+                        <tr>
+                            @{if (Model.BIOLOGICAL_OPINION != null)
+                              {
+                                <td style="width:0"><input type="checkbox" onclick="showInputBox();" checked="checked" value="Bio" id="BioCheck" /></td>
+                                <td style="width:35%">Biological Opinion</td>
+                                <td><div id="BioChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput" name="BioInput">@Model.BIOLOGICAL_OPINION</textarea></div></td>
+                              }
+                              else
+                              {
+                                <td style="width:0"><input type="checkbox" onclick="showInputBox();" value="Bio" id="BioCheck" /></td>
+                                <td style="width:35%">Biological Opinion</td>
+                                <td><div id="BioChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput" name="BioInput"></textarea></div></td>  
+                              }
+                            }                             
+                        </tr>
+                        <tr>
+                            @{if (Model.INTERIM_PROPOSED_DECISION != null)
+                              {
+                                <td style="width:0"><input type="checkbox" checked="checked" onclick="showInputBox();" id="IntCheck" value="Lit" /></td>
+                                <td style="width:35%">Proposed Interim Decision</td>
+                                <td><div id="IntChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Interim Decision from which this PULA came." cols="30" rows="5" id="intInput" name="InterimInput">@Model.INTERIM_PROPOSED_DECISION</textarea></div></td>
+                              }
+                              else
+                              {
+                                <td style="width:0"><input type="checkbox" onclick="showInputBox();" id="IntCheck" value="Lit" /></td>
+                                <td style="width:35%">Proposed Interim Decision</td>
+                                <td><div id="IntChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Interim Decision from which this PULA came." cols="30" rows="5" id="intInput" name="InterimInput"></textarea></div></td>
+                              }
+        }
+                        </tr>
+                        <tr>
+                         @{if (Model.LITIGATION != null)
+                           {
+                            <td style="width:0"><input type="checkbox" checked="checked" onclick="showInputBox();" id="LitCheck" value="Int" /></td>
+                            <td style="width:35%">Litigation</td>
+                            <td><div id="LitChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Litigation" cols="30" rows="5" id="litInput" name="LitigationInput">@Model.LITIGATION</textarea></div></td>
+                           }
+                           else
+                           {
+                            <td style="width:0"><input type="checkbox" onclick="showInputBox();" id="LitCheck" value="Int" /></td>
+                            <td style="width:35%">Litigation</td>
+                            <td><div id="LitChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Litigation" cols="30" rows="5" id="litInput" name="LitigationInput"></textarea></div></td>
+                           }
+        }
+                             </tr>
+                             <tr>
+                             @{if (Model.FOCUS_MEETING != null)
+                               {
+                                <td style="width:0"><input type="checkbox" checked="checked" onclick="showInputBox();" id="FocCheck" value="Foc" /></td>
+                                <td style="width:35%">Focus Meeting</td>
+                                <td><div id="FocChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Provide information regarding the data of the focus meeting from which this PULA came." cols="30" rows="5" id="focInput" name="FocusInput">@Model.FOCUS_MEETING</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td style="width:0"><input type="checkbox" onclick="showInputBox();" id="FocCheck" value="Foc" /></td>
+                                <td style="width:35%">Focus Meeting</td>
+                                <td><div id="FocChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Provide information regarding the data of the focus meeting from which this PULA came." cols="30" rows="5" id="focInput" name="FocusInput"></textarea></div></td>
+                               }
+        }
+                        </tr>
+                        <tr>
+                         @{if (Model.REGISTRATION_REVIEW != null)
+                           {
+                            <td style="width:0"><input type="checkbox" checked="checked" onclick="showInputBox();" id="RegCheck" value="Reg" /></td>
+                            <td style="width:35%">Registration Review</td>
+                            <td><div id="RegChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Registration Review" cols="30" rows="5" id="regInput" name="RegistrationInput">@Model.REGISTRATION_REVIEW</textarea></div></td>
+                           }
+                           else
+                           {
+                               <td style="width:0"><input type="checkbox" onclick="showInputBox();" id="RegCheck" value="Reg" /></td>
+                            <td style="width:35%">Registration Review</td>
+                            <td><div id="RegChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Registration Review" cols="30" rows="5" id="regInput" name="RegistrationInput"></textarea></div></td>
+                           }
+        }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <br clear="all" />
+
+            @{ List<PublishedPULA> pubPULAModel = ViewData["PulaModel"] as List<PublishedPULA>; }
+            <h3>Active Ingredient Limitations</h3>
+            <table class="peak-table-a">  @* ADD DELETE ROW TO THIS TABLE *@
+                <thead>
+                    <tr>
+                        <th scope="col">Active Ingredient</th>
+                        <th scope="col">Application Method</th>
+                        <th scope="col">Formulation</th>
+                        <th scope="col">Crop Use</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">AI Class</th>
+                        <th scope="col">CAS</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (PublishedPULA ppm in pubPULAModel)
+                {
+                    <tr>
+                        <td>@ppm.AI</td> 
+                        <td>@ppm.AppMethod</td>
+                        <td>@ppm.Formulation</td>
+                        <td>@ppm.CropUse</td>
+                        <td>@ppm.Code</td>
+                        <td>@ppm.AIClass</td>
+                        <td>@ppm.CAS</td>                      
+                    </tr>
+                }
+                </tbody>
+            </table>
+
+     
+  
+        @*Species Tab*@
+            
+             <h3>Species</h3>
+             <ul>
+                <li>Species 1</li>
+                <li>Species 2</li>
+             </ul>
+        
+
+        @*Product Tab*@
+        @{ List<PRODUCT> theseProds = ViewData["AIProducts"] as List<PRODUCT>; }
+             
+                <h3>Products</h3>
+             <ul>
+                <li>Product 1</li>
+                <li>Product 2</li>
+             </ul>      
+        </div> @* end id="tabs" div*@
+
+    </div>
+    
+        
+</body>
+</html>
+
+<script type="text/javascript">
+    function showInputBox() {
+        var checkBio = document.getElementById("BioCheck");
+        var checkInt = document.getElementById("IntCheck");
+        var checkLit = document.getElementById("LitCheck");
+        var checkFoc = document.getElementById("FocCheck");
+        var checkReg = document.getElementById("RegCheck");
+
+        //determine which was checked and show corresponding input, ensure others are hidden
+        if (checkBio.checked == true) {  $("#BioChoiceInput").show(); }
+        if (checkBio.checked == false) { $("#BioChoiceInput").hide(); }
+        if (checkInt.checked == true) {  $("#IntChoiceInput").show(); }
+        if (checkInt.checked == false) { $("#IntChoiceInput").hide(); }
+        if (checkLit.checked == true) {  $("#LitChoiceInput").show(); }
+        if (checkLit.checked == false) { $("#LitChoiceInput").hide(); }
+        if (checkFoc.checked == true) {  $("#FocChoiceInput").show(); }
+        if (checkFoc.checked == false) { $("#FocChoiceInput").hide(); }
+        if (checkReg.checked == true) {  $("#RegChoiceInput").show(); }
+        if (checkReg.checked == false) { $("#RegChoiceInput").hide(); }
+    }
+
+    function PULA_NEW() {
+//        $.ajax({
+//            type: 'GET',
+//            url: '@Url.Action("PULA_New", "Members")',
+//            data: { userName: $("#userName").val() },
+//            success: function (response) {
+//                if (response.dir == "") {
+//                    alert("User name does not exist");
+//                }
+//                else {
+//                    alert("Member: " + response);
+//                }
+//            }
+//        });
+    }
+</script>

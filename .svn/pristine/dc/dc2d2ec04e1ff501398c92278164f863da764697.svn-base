@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Web.Mvc;
+using System.Web.Security;
+
+namespace BLTWeb.Models
+{
+
+    public class PublishedPULA
+    {
+        [DataType(DataType.Text)]
+        [Display(Name = "AI")]
+        public string AI { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "AIClass")]
+        public string AIClass { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "CAS")]
+        public string CAS { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Modifier")]
+        public string Modifier { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Crop Use")]
+        public string CropUse { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Code")]
+        public string Code { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Species")]
+        public string Species { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Creator")]
+        public string Creator { get; set; }
+    }
+
+    
+}

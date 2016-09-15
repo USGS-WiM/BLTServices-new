@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="pgtestModel.Store" Provider="Npgsql" ProviderManifestToken="9.4.5" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityType Name="data_manager">
+    <Key>
+      <PropertyRef Name="data_manager_id" />
+    </Key>
+    <Property Name="data_manager_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="username" Type="varchar" MaxLength="60" Nullable="false" />
+    <Property Name="fname" Type="varchar" MaxLength="100" />
+    <Property Name="lname" Type="varchar" MaxLength="100" />
+    <Property Name="organization_system_id" Type="int4" />
+    <Property Name="phone" Type="varchar" MaxLength="30" />
+    <Property Name="email" Type="varchar" MaxLength="100" />
+    <Property Name="role_id" Type="int4" Nullable="false" />
+    <Property Name="password" Type="varchar" MaxLength="8000" Nullable="false" />
+    <Property Name="salt" Type="varchar" MaxLength="8000" Nullable="false" />
+    <Property Name="reset_flag" Type="int4" />
+  </EntityType>
+  <EntityType Name="division">
+    <Key>
+      <PropertyRef Name="division_id" />
+    </Key>
+    <Property Name="division_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="division_name" Type="varchar" MaxLength="500" />
+    <Property Name="org_id" Type="int4" />
+  </EntityType>
+  <EntityType Name="organization">
+    <Key>
+      <PropertyRef Name="organization_id" />
+    </Key>
+    <Property Name="organization_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="organization_name" Type="varchar" MaxLength="250" />
+  </EntityType>
+  <EntityType Name="organization_system">
+    <Key>
+      <PropertyRef Name="organization_system_id" />
+    </Key>
+    <Property Name="organization_system_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="org_id" Type="int4" Nullable="false" />
+    <Property Name="div_id" Type="int4" />
+    <Property Name="sec_id" Type="int4" />
+    <Property Name="science_base_id" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="section">
+    <Key>
+      <PropertyRef Name="section_id" />
+    </Key>
+    <Property Name="section_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="section_name" Type="varchar" MaxLength="500" />
+    <Property Name="div_id" Type="int4" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6005: The data type 'geometry' is currently not supported for the target Entity Framework version; the column 'geom' in the table 'pgtest.lampadmin.site' was excluded.-->
+  <EntityContainer Name="pgtestModelStoreContainer">
+    <EntitySet Name="data_manager" EntityType="Self.data_manager" Schema="lampadmin" store:Type="Tables" />
+    <EntitySet Name="division" EntityType="Self.division" Schema="lampadmin" store:Type="Tables" />
+    <EntitySet Name="organization" EntityType="Self.organization" Schema="lampadmin" store:Type="Tables" />
+    <EntitySet Name="organization_system" EntityType="Self.organization_system" Schema="lampadmin" store:Type="Tables" />
+    <EntitySet Name="section" EntityType="Self.section" Schema="lampadmin" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

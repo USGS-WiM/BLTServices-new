@@ -1,0 +1,64 @@
+﻿@*
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Species Part Add New page 
+ */
+ *@
+ 
+@using BLTServices;
+
+@{
+    ViewBag.Title = "Species New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="partsTitle">Manage Bulletins Components - Species</div>
+
+@using (Html.BeginForm("Species_New", "Parts", FormMethod.Post, null))
+{
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Common Name:</span>
+	    <input type="text" class="margin" name="Common" data-mini="true" />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Scientific Name:</span>
+	    <input type="text" class="margin" name="Scientific" data-mini="true" />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Family:</span>
+        <select id="Familydropdown" class="margin" name="Family" data-native-menu="false" data-mini="true">
+            <option value="0">Choose Family</option>
+		    @foreach (string fl in ViewData["FamilyList"] as List<string>)
+      {
+                <option value='@fl'>@fl</option> 
+      }
+        </select>
+    </div>
+        
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Taxa:</span>
+        <select id="Taxadropdown" class="margin" name="Taxa" data-native-menu="false" data-mini="true">
+            <option value="0">Choose Taxa</option>
+		    @foreach (string taxa in ViewData["TaxaList"] as List<string>)
+      {
+                <option value='@taxa'>@taxa</option> 
+      }
+        </select>
+    </div>
+    
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="location.href='@Url.Action("Species", "Parts")' " /></div></div>
+        </div>
+    </div>
+}

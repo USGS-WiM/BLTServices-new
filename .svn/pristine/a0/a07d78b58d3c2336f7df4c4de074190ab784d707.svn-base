@@ -1,0 +1,39 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the AI Part Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+
+@{
+    ViewBag.Title = "Active Ingredient Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="partsTitle">Manage Bulletins Components - Active Ingredients</div>
+
+@using (Html.BeginForm("AI_Edit", "Parts", FormMethod.Post, null))
+{
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Active Ingredient:</span>
+	    <input type="text" class="margin" name="AI" data-mini="true" value="@ViewData["thisAI"]"  />
+	</div>
+    <br />	
+    
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+            <div class="cancelDiv"><div class="lightButtonBorder"><input id="resetButton" type="reset" class="cancel" value="Cancel" onclick="location.href='@Url.Action("AI", "Parts")' " /></div></div>
+        </div>
+    </div>
+}
+
+</div>

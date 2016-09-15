@@ -1,0 +1,529 @@
+﻿//------------------------------------------------------------------------------
+//----- ModifierHandler -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 05.14.13 - JKN - Created
+#endregion
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+
+namespace BLTServices.Handlers
+{
+    public class ModifierHandler: HandlerBase
+    {
+
+        #region Properties
+        public override string entityName
+        {
+            get { return "MODIFIERs"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        //---------------------Returns List of objects---------------------
+        // returns all MODIFIER
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<MODIFIER> aModifier;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                         aModifier = GetEntities<MODIFIER>(aBLTE).ToList();
+                    }//end using
+                }//end using
+                activateLinks<MODIFIER>(aModifier);
+
+                return new OperationResult.OK { ResponseResource = aModifier };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns all active MODIFIER
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(string date)
+        {
+            List<MODIFIER> aModifierList = null;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now; 
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+               
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aModifierList = GetActive(GetEntities<MODIFIER>(aBLTE), thisDate.Value).ToList();
+                }//end using
+
+                activateLinks<MODIFIER>(aModifierList);
+
+                return new OperationResult.OK { ResponseResource = aModifierList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 modifierID, [Optional] string date)
+        {
+            try
+            {
+                List<MODIFIER> modifierList;
+                DateTime? thisDate = ValidDate(date);
+
+                if (modifierID < 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        IQueryable<MODIFIER> query;
+                        query = GetEntities<MODIFIER>(aBLTE).Where(m => m.MODIFIER_ID == modifierID);
+
+                        if (thisDate.HasValue)
+                            query = GetActive(query, thisDate.Value);
+
+                        //process
+                        modifierList = query.ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<MODIFIER>(modifierList);
+
+                return new OperationResult.OK { ResponseResource = modifierList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        //[WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        //[HttpOperation(HttpMethod.GET)]
+        //public OperationResult Get(Int32 modifierID, [Optional] string date)
+        //{
+        //    try
+        //    {
+        //        List<MODIFIER> ModifierList;
+        //        DateTime? thisDate = ValidDate(date);
+
+        //        if (modifierID < 0)
+        //        { return new OperationResult.BadRequest(); }
+
+        //        using (EasySecureString securedPassword = GetSecuredPassword())
+        //        {
+        //            using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+        //            {
+        //                IQueryable<MODIFIER> query;
+        //                query = GetEntities<MODIFIER>(aBLTE).Where(m => m.MODIFIER_ID == modifierID);
+
+        //                if (thisDate.HasValue)
+        //                    query = GetActive(query, thisDate.Value);
+
+        //                //process
+        //                ModifierList = query.ToList();
+        //            }//end using
+        //        }//end using
+
+        //        activateLinks<MODIFIER>(ModifierList);
+
+        //        return new OperationResult.OK { ResponseResource = ModifierList };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+        //    }
+        //}//end HttpMethod.GET
+
+        // returns active Active Ingredients for the given pulaID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetAILimitationsModifier")]
+        public OperationResult GetAILimitationsModifier(Int32 aiLimitatationsID, [Optional]string date)
+        {
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                List<MODIFIER> modifierList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+
+                    IQueryable<MODIFIER> query1 =
+                            (from AILimit in GetActive(aBLTE.AI_LIMITATIONS.Where(p => p.AI_LIMITATION_ID == aiLimitatationsID), thisDate.Value)
+                             join m in aBLTE.MODIFIERs
+                             on AILimit.MODIFIER_ID equals m.MODIFIER_ID
+                             select m).Distinct();
+
+                    modifierList = GetActive(query1, thisDate.Value).ToList();
+
+                    activateLinks<MODIFIER>(modifierList);
+
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = modifierList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+       
+        //---------------------Returns individual objects---------------------
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]
+        public OperationResult GetEntity(Int32 entityID)
+        {
+            MODIFIER aModifier;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aModifier = GetEntities<MODIFIER>(aBLTE).SingleOrDefault(c => c.ID == entityID);
+
+                    }//end using
+                }//end using
+
+                activateLinks<MODIFIER>(aModifier);
+
+                return new OperationResult.OK { ResponseResource = aModifier };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        #endregion
+        #region POST Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(MODIFIER anEntity)
+        {
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        if (!Exists(aBLTE, ref anEntity))
+                        {
+                            //create version
+                            anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+
+                            anEntity.MODIFIER_ID = GetNextID(aBLTE);
+
+                            aBLTE.MODIFIERs.AddObject(anEntity);
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                        activateLinks<MODIFIER>(anEntity);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region Activate Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Activate")]
+        public OperationResult Activate(Int32 entityID, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            MODIFIER aModifier;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        aModifier = aBLTE.MODIFIERs.FirstOrDefault(c => c.ID == entityID);
+
+                        if (aModifier == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //assign version
+                        aModifier.VERSION_ID = SetVersion(aBLTE, aModifier.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+
+                        ExpireOtherEntities(aBLTE, loggedInUser.USER_ID, aModifier, thisDate.Value);
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<MODIFIER>(aModifier);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aModifier };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EDIT Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Edit")]
+        public OperationResult Edit(Int32 entityID, MODIFIER anEntity, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            MODIFIER aModifier;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        aModifier = aBLTE.MODIFIERs.FirstOrDefault(c => c.ID == entityID);
+
+                        if (aModifier == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //assign version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                        ExpireEntities(aBLTE, loggedInUser.USER_ID, anEntity.MODIFIER_ID, thisDate.Value);
+
+                        aBLTE.MODIFIERs.AddObject(anEntity);
+                        aBLTE.SaveChanges();
+
+                        activateLinks<MODIFIER>(anEntity);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EXPIRE Methods
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Expire")]
+        public OperationResult Expire(Int32 entityID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            MODIFIER aModifier;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+
+                        aModifier = aBLTE.MODIFIERs.FirstOrDefault(m => m.ID == entityID);
+                        if (aModifier == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire current 
+                        aModifier.VERSION_ID = SetVersion(aBLTE, aModifier.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<MODIFIER>(aModifier);
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aModifier };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "ExpireModifier")]
+        public OperationResult ExpireModifier(Int32 modifierID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (modifierID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        ExpireEntities(aBLTE, LoggedInUser(aBLTE).USER_ID, modifierID, thisDate.Value);
+
+                        aBLTE.SaveChanges();
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK();
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #endregion
+        #region Helper Methods
+        private bool Exists(BLTRDSEntities aBLTE, ref MODIFIER anEntity)
+        {
+            MODIFIER existingEntity;
+            MODIFIER thisEntity = anEntity;
+            //check if it exists
+            try
+            {
+                existingEntity = aBLTE.MODIFIERs.FirstOrDefault(mt => string.Equals(mt.MODIFIER1.ToUpper(), thisEntity.MODIFIER1.ToUpper()));
+           
+
+                if (existingEntity == null)
+                    return false;
+
+                //if exists then update ref contact
+                anEntity = existingEntity;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }//end Exists
+        private decimal GetNextID(BLTRDSEntities aBLTE)
+        {
+            //create pulaID
+            Decimal nextID = 1;
+            if (aBLTE.MODIFIERs.Count() > 0)
+                nextID = aBLTE.MODIFIERs.OrderByDescending(p => p.MODIFIER_ID).First().MODIFIER_ID + 1;
+
+            return nextID;
+        }
+        private void ExpireOtherEntities(BLTRDSEntities aBLTE, decimal userId, MODIFIER modifier, DateTime dt)
+        {
+            //get all published, should only be 1
+            List<MODIFIER> aiList = aBLTE.MODIFIERs.Where(p => p.MODIFIER_ID == modifier.MODIFIER_ID &&
+                                                                                p.VERSION.PUBLISHED_TIME_STAMP >= dt).ToList();
+            if (aiList == null) return;
+
+            foreach (var p in aiList)
+            {
+                if (!p.Equals(modifier))
+                p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+            }//next
+        }//end ExpireOtherEntities
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            //get all published, should only be 1
+            List<MODIFIER> aiList = aBLTE.MODIFIERs.Where(p => p.MODIFIER_ID == Id &&
+                                                               p.VERSION.PUBLISHED_TIME_STAMP >= dt).ToList();
+            if (aiList == null) return;
+
+            foreach (var p in aiList)
+            {
+                p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+            }//next
+        }
+        #endregion
+
+
+    }//end class ModifierHandler
+
+}//end namespace

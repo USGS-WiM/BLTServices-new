@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bulletins Live - Environmental Protection Agency</title>
+    
+    <meta name="DC.Language" content="en|sp" />
+	<meta name="DC.Creator" content="US EPA, Office of Pesticide Programs" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    
+    <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+	<link rel="meta" href="http://www.epa.gov/labels.rdf" type="application/rdf+xml" title="ICRA labels" />
+    
+    <style type="text/css" media="screen">@import 'http://www.epa.gov/epafiles/s/epa.css';</style>
+	<style type="text/css" media="screen">@import 'http://www.epa.gov/opp00001/styles/opp_styles.css';</style>
+    
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=7,IE=9">-->
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    
+    <!-- ArcGIS Javascript API and dojo theme references -->
+    <link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/dojo/dijit/themes/claro/claro.css">
+	<link rel="stylesheet" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/js/esri/css/esri.css" />
+    
+    <script src="js/basemap.js" type="text/javascript"></script>
+    <script src="js/geocoder.js" type="text/javascript"></script>
+    <script src="js/geolocator.js" type="text/javascript"></script>
+    
+    <!-- Style sheets -->
+    <link rel="stylesheet" media="screen" type="text/css" href="styles/main.css"/>
+    <link rel="stylesheet" media="only screen and (max-device-width: 480px)" type="text/css" href="styles/handheld.css"/>
+    <link rel="stylesheet" type="text/css" href="wim/css/wim.css">
+    <link rel="stylesheet" type="text/css" href="modules/css/modules.css">
+       
+    <script type="text/javascript">
+    	var dojoConfig = {
+        	parseOnLoad: true,
+			packages: [
+            	{ name: "modules", location: location.pathname.replace(/\/[^/]+$/, "") + "\/modules" },
+				{ name: "wim",location: location.pathname.replace(/\/[^/]+$/, "") + "\/wim"}
+            ]
+        };
+    </script> 
+    
+    <!-- ArcGIS Javascript API reference -->
+	<script src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.3/" type="text/javascript"></script>  
+    <!-- Mapper js file -->
+    <script src="js/BLT.js" type="text/javascript"></script>    
+    
+    <link rel="stylesheet" type="text/css" media="print" href="http://www.epa.gov/epafiles/s/print.css" />
+	<script type="text/javascript" src="http://www.epa.gov/epafiles/js/epa-core.js"></script>
+	<script type="text/javascript" src="http://www.epa.gov/epafiles/js/extra.js"></script>
+</head>
+    
+    
+<body class="claro">
+	<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width:100%;height:100%;margin:0;">
+    <div id="map" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'" style="padding:0;">
+    
+        <div style="position:absolute; right:5px; top:5px; z-index:999;">
+          <div id="basemapSelector" data-dojo-type="dijit.TitlePane" data-dojo-props="title:'<img src=\'images/Basemap16.png\'> Basemap', closable:false, open:false">
+            <div data-dojo-type="dijit.layout.ContentPane" style="width:380px; height:370px; overflow:auto;">
+            <div id="basemapGallery" ></div></div>
+          </div>
+        </div>
+       
+        <!-- Header with logo and title -->
+       <!--<div id="header">
+        	<div id="headerLogo">                   
+ 	        	<img id="usgsLogo" alt="USGS Logo" style="float:left; padding-right:5px;" src="images/usgsLogo.png" />                    
+                <div id="titles">
+                	<div id="title">Bulletins Live</div>
+                    <div id="subTitle">Environmental Protection Agency</div>
+                </div>
+			 </div>
+        </div>-->
+        
+        <div id="paramSelect" data-dojo-type="modules.ParamSelector" data-dojo-props="attachedMapID: 'map'"></div> 
+        
+        <div id="disclaim" data-dojo-type="wim.Disclaimer" data-dojo-props="attachedMapID: 'map'"></div> 
+          
+        <div id="extentSelector" data-dojo-type="wim.ExtentNav" data-dojo-props="attachedMapID: 'map'"></div>
+        
+        <div id="latLngScaleBar" data-dojo-type="wim.LatLngScale" data-dojo-props="attachedMapID: 'map'"></div>
+        <!-- geocoder -->
+        <div id="geocodeBar"> 
+        	<input id="geocode" type="text" name="search" onKeyPress="enterKeyLocate(event)" placeholder="Find address or place" />
+            <input id="searchIcon" type="image" src="images/searchIcon.png" alt="Submit" onClick="locate()" />                
+        </div>
+        
+       
+      
+      	<!--<div id="availableLayers" data-dojo-type="wim.CollapsingContainer" data-dojo-props="title:'Available Layers'">
+        	<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Click to toggle'">
+            	<div id="toggle" style="padding: 2px 2px;"></div>
+            </div>
+            <h3 id="legendHeader">Explanation</h3>
+                <div id="legend" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Explanation',selected:true">
+					<div id="legendDiv"></div>
+                </div>
+        </div>-->
+      
+      <!--<div id="availableLayers">
+        	<div>
+            	<h3 id="layersHeader">Available Layers</h3>
+            	<div id="backToMap">return to map</div>
+                </div>
+                
+                <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Click to toggle'">
+                	<div id="toggle" style="padding: 2px 2px;"></div>
+                </div>
+                <h3 id="legendHeader">Explanation</h3>
+                <div id="legend" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Explanation',selected:true">
+					<div id="legendDiv"></div>
+                </div>
+        </div>--> 
+        
+        
+        <!--<div id="paramWindow">
+          <h3>PULA View Parameters</h3>
+          <div id="info">
+            <div id="horizontalContainer" style="float: none">
+            <label for="fieldNames" style="float:left">Render based on: </label>
+            <select id="fieldNames" style="float:left" name="baseSym" data-dojo-type="dijit.form.FilteringSelect" data-dojo-props="style:'width:200px;'"></select> 
+            </div>
+            <img id="loading" src="http://dl.dropbox.com/u/2654618/loading_black.gif" />
+          </div>
+        </div>-->
+        
+    </div>
+	</div>
+</body>
+</html>

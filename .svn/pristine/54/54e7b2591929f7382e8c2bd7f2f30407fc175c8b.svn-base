@@ -1,0 +1,61 @@
+﻿@*
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Species Part Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+
+@{
+    ViewBag.Title = "Species Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="partsTitle">Manage Bulletins Components - Species</div>
+
+@using (Html.BeginForm("Species_Edit", "Parts", FormMethod.Post, null))
+{    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Common Name:</span>
+	    <input type="text" class="margin" name="Common" data-mini="true" value="@ViewData["CommonName"]"  />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Scientific Name:</span>
+	    <input type="text" class="margin" name="Scientific" data-mini="true" value="@ViewData["ScienceName"]"  />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Family:</span>
+        <select id="Sppdropdown" class="margin" name="Family" data-native-menu="false" data-mini="true">
+		    @foreach (string fl in ViewData["FamilyList"] as List<string>)
+      {
+                <option @( (fl == ViewData["Family"]) ? "selected" : "") value='@fl'>@fl</option> 
+      }
+        </select>
+    </div>
+        
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Taxa:</span>
+        <select id="Sppdropdown" class="margin" name="Taxa" data-native-menu="false" data-mini="true">
+		    @foreach (string taxa in ViewData["TaxaList"] as List<string>)
+      {
+                <option @( (taxa == ViewData["Taxa"]) ? "selected" : "") value='@taxa'>@taxa</option> 
+      }
+        </select>
+    </div>
+    
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="location.href='@Url.Action("Species", "Parts")' " /></div></div>
+        </div>
+    </div>
+}

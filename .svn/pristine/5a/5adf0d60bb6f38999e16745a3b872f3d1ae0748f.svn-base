@@ -1,0 +1,64 @@
+﻿@*
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Species index
+ */
+ *@
+ 
+@using BLTServices;
+@model BLTServices.SPECIES
+           
+
+@{
+    ViewBag.Title = "Species";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="partsTitle">Manage Bulletins Components - Species</div>
+
+@using (Html.BeginForm("Species", "Parts", FormMethod.Post, null))
+{
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Species:</span>
+        <select id="Sppdropdown" class="margin" name="Species" data-native-menu="false" data-mini="true">
+		
+            @foreach (string spp in ViewData["SpeciesList"] as List<string>)
+            {
+                <option value='@spp'>@spp</option> 
+            }
+        </select>
+        <br />	
+    </div>
+
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Edit" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Add New" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="button" onclick="Remove();" class="submit" value="Delete" /></div></div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function Remove() {
+        var answer = confirm("Are you sure you want to delete this Species?");
+        if (answer == true) {
+            var AItoDelete = $("#Sppdropdown").val();
+            $.ajax({
+                url: '@Url.Action("Species_Delete", "Parts")',
+                data: { id: AItoDelete },
+                success: function (response) {
+                    if (response == "True") {
+                        window.location.href = '@Url.Action("Species", "Parts")';
+                    }
+                }
+            });
+        }
+    }
+</script>

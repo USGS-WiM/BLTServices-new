@@ -1,0 +1,69 @@
+﻿@* Comments: 
+06.12.13 - TR - Created 
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2013 USGS - WiM
+ * Purpose:
+ *      Display users listing
+ */
+ *@
+
+ @using BLTServices;
+ @using BLTWeb.Models;
+ 
+
+ @model System.Collections.Generic.List<UsersModel>
+           
+ @{
+    ViewBag.Title = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+<div id="dataTitle">
+        <div class="title">Users</div>
+    </div>
+    <br clear="all" />    
+    <hr class="headerUnderline" />
+
+    @if (ViewData["Role"] == "Admin")
+    {
+        <div>
+            @Html.ActionLink("Create", "UserCreate", "Users", null, new { @class = "BLTButton blue", onclick = "loading();" })
+        </div>
+    }
+    
+<br clear="all" />
+
+<div>
+
+    <table id="MemberListTable-a">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Role</th>
+            </tr>
+        </thead>
+        @foreach (var aUser in Model) 
+        {
+            <tr>
+                <td>@Html.ActionLink(aUser.UserName, "UserDetails", "Users", new { id = aUser.UserID }, new { onclick = "loading();" })</td>
+                <td>@(aUser.Organization)</td>
+                <td>@(aUser.Role)</td>
+            </tr>
+        }
+    </table>                              
+</div>
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    };
+</script>

@@ -1,0 +1,594 @@
+﻿//------------------------------------------------------------------------------
+//----- ActiveIngredientPULAHander ---------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Peak summary resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 05.07.13 - JKN  -Created
+
+#endregion
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+using OpenRasta.Diagnostics;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.ServiceModel.Syndication;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+using BLTServices.Resources;
+
+namespace BLTServices.Handlers
+   
+{
+
+    public class ActiveIngredientPULAHander : HandlerBase
+    {
+        #region Properties
+        public override string entityName
+        {
+            get { return "ACTIVE_INGREDIENT_PULA"; }
+        }
+        #endregion
+        #region Routed Methods    
+        #region Get Methods
+        //---------------------Returns List of objects---------------------
+        // returns all PULAs
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="GetAll")]
+        public OperationResult Get()
+        {
+            List<ACTIVE_INGREDIENT_PULA> aiPula;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aiPula = GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE).ToList();
+                    }//end using
+                }//end using
+                activateLinks<ACTIVE_INGREDIENT_PULA>(aiPula);
+
+                return new OperationResult.OK { ResponseResource = aiPula };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns PULA based on shape ID
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetshapeIDPULA")]
+        public OperationResult Get(int shapeId)
+        {
+            ACTIVE_INGREDIENT_PULA aiPula;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aiPula = GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE).Where(p => p.PULA_SHAPE_ID == shapeId).FirstOrDefault();
+                    }//end using
+                }//end using
+                activateLinks<ACTIVE_INGREDIENT_PULA>(aiPula);
+
+                return new OperationResult.OK { ResponseResource = aiPula };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        
+        // returns all active PULAs
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(string date)
+        {
+            List<ACTIVE_INGREDIENT_PULA> aiPula= null;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+                
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+               
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aiPula = GetActive(GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE), thisDate.Value).ToList();
+                }//end using
+                activateLinks<ACTIVE_INGREDIENT_PULA>(aiPula);
+
+                return new OperationResult.OK { ResponseResource = aiPula };
+            }
+            catch (Exception ex)
+            {
+               return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+
+        }//end HttpMethod.GET
+        
+        // returns active PULAS for the given shapeID
+        [HttpOperation(HttpMethod.GET, ForUriName="GetShapePULAS")]
+        public OperationResult GetShapePULAS(Int32 shapeId, [Optional]string date)
+        {
+            ACTIVE_INGREDIENT_PULA aiPulas;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aiPulas = GetActive(GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE), thisDate.Value).Where(p => p.PULA_SHAPE_ID == shapeId).FirstOrDefault();
+                }//end using   
+                                                                      
+                activateLinks<ACTIVE_INGREDIENT_PULA>(aiPulas);
+
+                return new OperationResult.OK { ResponseResource = aiPulas };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns the active PULAS for the given PULAID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetAIPULA")]
+        public OperationResult GetAIPULA(Int32 pulaId, [Optional] string date)
+        {
+            List<ACTIVE_INGREDIENT_PULA> aiPulas;
+            try
+            {
+                if (pulaId <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+                
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aiPulas  = GetActive(GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE), thisDate.Value).Where(p => p.PULA_SHAPE_ID == pulaId).ToList();
+                }//end using
+
+                activateLinks<ACTIVE_INGREDIENT_PULA>(aiPulas);
+
+                return new OperationResult.OK { ResponseResource = aiPulas };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns active PULAS for the given shapeID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetSimplePULAS")]
+        public OperationResult GetSimplePULAS([Optional] string date)
+        {
+            PULAList aiPulas = new PULAList();
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    IQueryable<ACTIVE_INGREDIENT_PULA> query = GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE);
+
+
+                    aiPulas.PULA = GetActive(GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE), thisDate.Value).AsEnumerable().Select(p => new SimplePULA()
+                    {
+                        entityID = Convert.ToInt32(p.ID),
+                        ShapeID = Convert.ToInt32(p.PULA_SHAPE_ID),
+                        isPublished = Convert.ToInt32(p.IS_PUBLISHED),
+                        Created = p.VERSION.CREATED_TIME_STAMP.Value,
+                        Published = p.VERSION.PUBLISHED_TIME_STAMP.Value,
+                        Expired = p.VERSION.EXPIRED_TIME_STAMP.Value
+                    }).ToList<SimplePULA>();
+                }//end using   
+
+                activateLinks<SimplePULA>(aiPulas.PULA);
+
+                return new OperationResult.OK { ResponseResource = aiPulas };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        //---------------------Returns individual objects---------------------
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]
+        public OperationResult GetEntity(Int32 entityID)
+        {
+            ACTIVE_INGREDIENT_PULA anAIPULA;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //assign pulaID
+                        anAIPULA = GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE).SingleOrDefault(p => p.ID == entityID);
+                        
+                    }//end using
+                }//end using
+
+                activateLinks<ACTIVE_INGREDIENT_PULA>(anAIPULA);
+
+                return new OperationResult.OK { ResponseResource = anAIPULA };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+     
+        #endregion
+        #region POST Methods
+
+         [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(ACTIVE_INGREDIENT_PULA anEntity)
+        {
+            
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        if (!Exists(aBLTE, ref anEntity))
+                        {
+                            //assign pulaID
+                            anEntity.PULA_ID = GetNextPulaID(aBLTE, anEntity);
+
+                            //assign version
+                            anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+
+                            aBLTE.ACTIVE_INGREDIENT_PULA.AddObject(anEntity);
+                            aBLTE.SaveChanges();
+                        }//end if
+                                            
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region Activate Methods
+
+         [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+         [HttpOperation(HttpMethod.GET, ForUriName = "Activate")]
+         public OperationResult Activate(Int32 entityID, [Optional] string date)
+         {
+             //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+             USER_ loggedInUser;
+             ACTIVE_INGREDIENT_PULA aPULA;
+             try
+             {
+                 DateTime? thisDate = ValidDate(date);
+                 if (!thisDate.HasValue)
+                     thisDate = DateTime.Now;
+
+                 if (entityID <= 0)
+                 { return new OperationResult.BadRequest(); }
+
+                 using (EasySecureString securedPassword = GetSecuredPassword())
+                 {
+                     using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                     {
+                         //version user
+                         loggedInUser = LoggedInUser(aBLTE);
+
+                         aPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(ai => ai.ID == entityID);
+
+                         if (aPULA == null)
+                         { return new OperationResult.BadRequest(); }
+
+                         //assign version
+                         aPULA.VERSION_ID = SetVersion(aBLTE, aPULA.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                         ExpireOtherEntities(aBLTE, loggedInUser.USER_ID, aPULA, thisDate.Value);
+
+                         aBLTE.SaveChanges();
+
+
+                         activateLinks<ACTIVE_INGREDIENT_PULA>(aPULA);
+
+                     }//end using
+                 }//end using
+
+                 return new OperationResult.OK { ResponseResource = aPULA };
+             }
+             catch (Exception)
+             { return new OperationResult.BadRequest(); }
+
+         }//end HttpMethod.GET
+
+         [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+         [HttpOperation(HttpMethod.GET, ForUriName = "PublishAIPULA")]
+         public OperationResult PublishAIPULA(Int32 entityID, [Optional]string date)
+         {
+             USER_ loggedInUser;
+             ACTIVE_INGREDIENT_PULA anAIPULA;
+             try
+             {
+                 DateTime? thisDate = ValidDate(date);
+                 if (!thisDate.HasValue)
+                     thisDate = DateTime.Now;
+
+                 using (EasySecureString securedPassword = GetSecuredPassword())
+                 {
+                     using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                     {
+                         //version user
+                         loggedInUser = LoggedInUser(aBLTE);
+
+                         //assign pulaID
+                         anAIPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(ai => ai.ID == entityID);
+                         anAIPULA.IS_PUBLISHED = 1;
+
+                         //assign version
+                         anAIPULA.VERSION = SetVersion(aBLTE, anAIPULA.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value);
+
+                         //expire others, if any
+                         ExpireOtherEntities(aBLTE, loggedInUser.USER_ID, anAIPULA, thisDate.Value);
+
+                         aBLTE.SaveChanges();
+
+                     }//end using
+                 }//end using
+
+                 return new OperationResult.OK { ResponseResource = anAIPULA };
+             }
+             catch (Exception)
+             { return new OperationResult.BadRequest(); }
+
+         }//end HttpMethod.GET
+          
+         #endregion
+        #region EDIT Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="Edit")]
+        public OperationResult Edit(Int32 entityID, ACTIVE_INGREDIENT_PULA anEntity, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            ACTIVE_INGREDIENT_PULA anAIPULA;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        anAIPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(aip => aip.ID == entityID);
+                        if (anAIPULA == null)
+                        { return new OperationResult.BadRequest(); }
+                        
+                        //assign version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                        ExpireEntities(aBLTE, loggedInUser.USER_ID, anEntity.PULA_ID, thisDate.Value);
+
+                        aBLTE.ACTIVE_INGREDIENT_PULA.AddObject(anEntity);
+                        aBLTE.SaveChanges();
+
+                        activateLinks<ACTIVE_INGREDIENT_PULA>(anAIPULA);
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EXPIRE Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName ="Expire")]
+        public OperationResult Expire(Int32 entityID, [Optional]string date)
+        {
+            ACTIVE_INGREDIENT_PULA anAIPULA;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        anAIPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(aip => aip.ID == entityID);
+                        if (anAIPULA == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire current 
+                        anAIPULA.VERSION_ID = SetVersion(aBLTE, anAIPULA.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<ACTIVE_INGREDIENT_PULA>(anAIPULA);
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anAIPULA };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "ExpirePULA")]
+        public OperationResult ExpirePULA(Int32 pulaID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (pulaID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        ExpireEntities(aBLTE, LoggedInUser(aBLTE).USER_ID, pulaID, thisDate.Value);
+
+                        aBLTE.SaveChanges();
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK();
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #endregion
+        #region Helper Methods
+        private bool Exists(BLTRDSEntities aBLTE, ref ACTIVE_INGREDIENT_PULA anEntity)
+        {
+            ACTIVE_INGREDIENT_PULA existingEntity;
+            ACTIVE_INGREDIENT_PULA thisEntity = anEntity;
+            //check if it exists
+            try
+            {
+                existingEntity = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(mt => mt.PULA_SHAPE_ID == thisEntity.PULA_SHAPE_ID);
+            
+                if (existingEntity == null)
+                    return false;
+
+                //if exists then update ref contact
+                anEntity = existingEntity;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }//end Exists
+
+        private decimal GetNextPulaID(BLTRDSEntities aBLTE, ACTIVE_INGREDIENT_PULA AIPULA)
+        {
+            //create pulaID
+            Decimal nextID = 1;
+            if (aBLTE.ACTIVE_INGREDIENT_PULA.Count() > 0)
+            {
+                nextID = aBLTE.ACTIVE_INGREDIENT_PULA.OrderByDescending(p => p.PULA_ID).First().PULA_ID + 1;
+            }
+            return nextID;            
+        }
+
+        private void ExpireOtherEntities(BLTRDSEntities aBLTE, decimal userId, ACTIVE_INGREDIENT_PULA pula, DateTime dt)
+        {
+            //get all published AIPULAS, should only be 1
+            List<ACTIVE_INGREDIENT_PULA> aiPulaList = aBLTE.ACTIVE_INGREDIENT_PULA.Where(p => p.PULA_ID == pula.PULA_ID && p.IS_PUBLISHED > 0).ToList();
+           
+            if (aiPulaList == null) return;
+
+            foreach (var p in aiPulaList)
+            {
+                if (!p.Equals(pula))
+                {
+                    p.IS_PUBLISHED = 0;
+                    p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+                }//end if
+            }//next
+        }//end ExpireOtherEntities
+       
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            //get all published AIPULAS, should only be 1
+            List<ACTIVE_INGREDIENT_PULA> aiPulaList = aBLTE.ACTIVE_INGREDIENT_PULA.Where(p => p.PULA_ID == Id && p.IS_PUBLISHED > 0).ToList();
+
+            if (aiPulaList == null) return;
+
+            foreach (var p in aiPulaList)
+            {
+                p.IS_PUBLISHED = 0;
+                p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+            }//next
+        }
+        #endregion
+
+        
+    }//end CollectionMethodsHandler
+
+}//end namespace

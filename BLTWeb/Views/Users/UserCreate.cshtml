@@ -1,0 +1,208 @@
+﻿@* Comments: 
+06.12.13 - TR - Created 
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2013 USGS - WiM
+ * Purpose:
+ *      Display Create User page
+ */
+ *@
+
+ @using BLTServices;
+ @using BLTWeb.Models;
+ @using BLTWeb.Assets.Resources;
+
+ @model BLTServices.USER_
+               
+ @{
+    ViewBag.Title = "Create Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+<div id="dataTitle">
+        <div class="title">Create Users</div>
+    </div>
+    <br clear="all" />    
+    <hr class="headerUnderline" />
+
+    @using (Ajax.BeginForm("UserCreate", "Users", FormMethod.Post, null))
+    {
+    
+        <div class="siteColumn">            
+                    
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.FirstName_Label)</div>
+                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="FNAME" data-mini="true" /></div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.LastName_Label)</div>
+                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="LNAME" data-mini="true" /></div>
+                </div>
+            </div>
+
+                <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a"><span class="required">@Html.Label(ResStrings.UserName_Label)</span></div>
+                    <div class="ui-block-b"><input type="text" class="required bltTextInput ui-shadow-inset" name="USERNAME" data-mini="true" /></div>
+                </div>
+            </div>
+
+                <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.Org_Label)</div>
+                    <div class="ui-block-b">
+                        <select id="groupPlaceholder" class="bltSelectInput ui-shadow-inset" name="ORGANIZATION_ID" data-native-menu="false" data-mini="true">
+					        <option value="0">Choose Organization</option>
+                            @foreach (BLTServices.ORGANIZATION anOrg in ViewData["OrgList"] as List<ORGANIZATION>)
+                            {
+                                <option value='@anOrg.ORGANIZATION_ID'>@anOrg.NAME</option> 
+                            }
+                        </select>
+                        <br />	
+                    </div>
+                </div>
+            </div>
+                
+                <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.Division_Label)</div>
+                    <div class="ui-block-b">
+                        <select id="groupPlaceholder" class="bltSelectInput ui-shadow-inset" name="DIVISION_ID" data-native-menu="false" data-mini="true">
+					        <option value="0">Choose Division</option>
+                            @foreach (BLTServices.DIVISION aDiv in ViewData["DivList"] as List<DIVISION>)
+                            {
+                                <option value='@aDiv.DIVISION_ID'>@aDiv.DIVISION_NAME</option> 
+                            }
+                        </select>
+                        <br />	
+                    </div>
+                </div>
+            </div>
+            
+           
+            
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a"><span class="required">@Html.Label(ResStrings.Role_Label)</span></div>
+                    <div class="ui-block-b">
+                    @*@if (ViewData["Role"] == "Admin")
+                    {*@
+                        <select id="groupPlaceholder" class="required bltSelectInput ui-shadow-inset" name="ROLE_ID" data-native-menu="false" data-mini="true">
+					        <option value="0">Choose Role</option>
+                            @foreach (BLTServices.ROLE aRole in ViewData["roleList"] as List<ROLE>)
+                            {
+                                <option value='@aRole.ROLE_ID'>@aRole.ROLE_NAME</option> 
+                            }
+                        </select>
+                        <br />	
+                    @*}
+                    else if (ViewData["Role"] == "Manager")
+                    {
+                        <input type="hidden" name="ROLE_ID" value='3' />
+                        <label>Field</label>
+                    }*@
+                    </div>
+                </div>
+            </div>
+        
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.Phone_Label)</div>
+                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="PHONE" data-mini="true" /></div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+                    <div class="ui-block-a">@Html.Label(ResStrings.Email_Label)</div>
+                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="EMAIL" data-mini="true" /></div>
+                </div>
+            </div>
+
+        </div>
+    
+        <br clear="all" />
+        <br />
+    
+        <div id="formSubmitDiv" class="formSection">
+            <div class="leftSideSubmit">
+                <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Submit" /></div></div>
+                <div class="cancelDiv"><div class="lightButtonBorder"><input id="resetButton" type="reset" class="cancel" value="Cancel" onclick="cancelClick();" /></div></div>
+            </div>
+    
+        </div>
+    }
+    
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        window.location.href = '@Url.Action("Index", "Users")'
+    };
+</script>
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    }
+</script>
+
+    <script type="text/javascript">
+        $("#form0").submit(function () {
+            var MISSING = "ui-req";
+            var SelMISSING = "ui-Sel-req";
+
+            var requiredInput = $('input[class*="required"]');
+            var requiredSelect = $('select[class*="required"]');
+            var Ierr = false;
+            var Serr = false;
+            var missingMsg = "The highlighted fields are required.";
+
+            // Reset the previously highlighted form elements  
+            requiredInput.each(function (index) {
+                $(this).removeClass(MISSING);
+                $(this).addClass("ui-shadow-inset");
+            });
+            // Reset the previously highlighted form elements  
+            requiredSelect.each(function (index) {
+                $(this).removeClass(SelMISSING);
+                $(this).addClass("ui-shadow-inset");
+            });
+            // Perform form validation  
+            requiredInput.each(function (index) {
+                if ($(this).val() == null || $(this).val() == "") {
+                    $(this).addClass(MISSING);
+                    $(this).removeClass("ui-shadow-inset");
+                    Ierr = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            });
+            // Perform form validation  
+            requiredSelect.each(function (index) {
+                var ind = $(this).context.selectedIndex;
+                if (ind == 0) {
+                    $(this).addClass(SelMISSING);
+                    Serr = true;
+                    $("#errorSection").append(missingMsg);
+                }
+            });
+            // Check if validation fails
+            if (Ierr == true || Serr == true) {
+                return false;
+            }
+            else {
+                loading();
+                return true;
+            }
+        });
+
+</script>

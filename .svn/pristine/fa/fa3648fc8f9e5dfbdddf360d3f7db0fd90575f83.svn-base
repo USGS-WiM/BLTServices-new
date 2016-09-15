@@ -1,0 +1,263 @@
+﻿@*
+09.12.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Product-AI relationship Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@model BLTWeb.Models.AIModel
+           
+@{
+    ViewBag.Title = "Product to AI Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+<div class="partsTitle">
+    <div  style="float:left">Manage Bulletins Components - Product to AI Edit</div>
+    <span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+</div>
+
+@if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+{
+     using (Html.BeginForm("PAI_Edit", "Parts", new { id = Model.AI.ID }, FormMethod.Post, new { @id = "form0" }))
+     {
+         <div class="siteColumn">
+            @* store AI info to pass *@
+            <input type="hidden" name="AI.ACTIVE_INGREDIENT_ID" value="@Model.AI.ACTIVE_INGREDIENT_ID" />
+            <input type="hidden" name="AI.INGREDIENT_NAME" value="@Model.AI.INGREDIENT_NAME" />
+            <input type="hidden" name="AI.PC_CODE" value="@Model.AI.PC_CODE" />
+            <input type="hidden" name="AI.CAS_NUMBER" value="@Model.AI.CAS_NUMBER" />
+            <input type="hidden" name="AI.AI_CLASS_ID" value="@Model.AI.AI_CLASS_ID" />
+            <input type="hidden" name="AI.VERSION_ID" value="@Model.AI.VERSION_ID" />
+            <input type="hidden" id="ai_ID" name="AI.ID" value="@Model.AI.ID" />
+
+            <div>
+                <span class="popup-label-a" style="width:10em">@Html.Label(ResStrings.AI_Name_Label)</span>
+	            <label class="inline">@Model.AI.INGREDIENT_NAME</label>
+            </div>            
+            <div>
+    	        <span class="popup-label-a" style="width:10em">@Html.Label(ResStrings.PCCode_Label)</span>
+	            <label class="inline">@Model.AI.PC_CODE</label>
+            </div>            
+            <div>
+    	        <span class="popup-label-a" style="width:10em">@Html.Label(ResStrings.CASNum_Label)</span>
+	            <label class="inline">@Model.AI.CAS_NUMBER</label>
+            </div>       
+            <div>
+	            <span class="popup-label-a" style="width:10em">@Html.Label(ResStrings.AI_Class_Label)</span>
+	            <label class="inline">@ViewData["AIClass"]</label>
+            </div> 
+               
+               <br />
+               <h2 style="color: #464646">Products</h2>
+             @{List<PRODUCT> AIProducts = ViewData["AIProducts"] as List<PRODUCT>; }
+
+            <table id="ProductTable" cellspacing="0" cellpadding="0" style="clear:left; margin-left:15px">
+                <thead>
+                    <tr>
+                        <td style="width:3%"></td>
+                        <td></td> 
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (AIProducts != null)
+                        {
+                            int tProdrow;
+                            decimal ProdID;
+                            for (var a = 0; a <= AIProducts.Count - 1; a++)
+                            {
+                                tProdrow = a + 1;
+                                ProdID = AIProducts[a].ID;
+                                <tr id="ProdTr@(tProdrow)">
+                                    <td><a onclick="RemoveProdLine(ProdTr@(tProdrow), @(ProdID));"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td>
+                                    <td style="padding-left:10px">@AIProducts[a].PRODUCT_NAME</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div id="MoreProds" class="hidden">
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+                        <div class="ui-block-a">Products:</div>
+                        <div class="ui-block-b">
+                            <select id="prodDD" class="bltSelectInput" name="product">
+                                <option value="0">Choose a Product</option>
+					            @foreach (PRODUCT med in ViewData["ProductList"] as List<PRODUCT>)
+                                {
+                                    <option value="@med.ID">@med.PRODUCT_NAME</option> 
+                                }
+                            </select>
+                            <br />	
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+                        <div class="ui-block-a"><input type="button" value="Add AI-Product Relationship" onclick="AddProductRow();" /></div>
+                    </div>
+                </div>
+            </div>
+        
+            @* hidden inputs to store id each Objective added *@
+            <input type="hidden" id="productIDs" name="AIProdsToAdd" value="@Model.AIProdsToAdd" />
+            <input type="hidden" id="prodIDsRemove" name="ProductIDsToRemove" />
+        
+            <div id="AddMoreProdButton">
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+                        <div class="ui-block-a"><input type="button" value="Add More Products for this AI" onclick="ShowAddProd();" /></div>
+                    </div>
+                </div>
+            </div>
+            <br clear="all" />
+
+            <div id="formSubmitDiv" class="formSection">
+                <div class="leftSideSubmit">
+                    <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" class="submit" value="Save" /></div></div>
+                    <div class="cancelDiv"><div class="lightButtonBorder"><input type="reset" id="resetButton" class="cancel" value="Cancel" onclick="cancelClick();" /></div></div>
+                </div>
+            </div>
+
+        </div>
+     
+     } 
+ }
+ else
+ {
+     <div>You are not authorized to edit an Active Ingredient.</div>
+ }
+
+     
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        var aiID = $("#ai_ID").val();
+        window.location.href = '@Url.Action("AIEdit", "Parts")' + '/' + aiID;
+    };
+
+    function loading() {
+        $("#loading").fadeIn();
+    }
+
+    function ShowAddProd() {
+        $("#AddMoreProdButton").hide();
+        $("#MoreProds").show();
+    }
+
+    //add AI Prod relationship -table row
+    var trowID;
+    function AddProductRow() {
+        var prodID = $("#prodDD").val();
+        if (prodID == 0) {
+            alert("Choose a Product first");
+        }
+        else {
+            var ProdName = $("#prodDD option:selected").text();
+            $("#prodDD").val("");
+            var thisRow = $("#ProductTable tr").length;
+            trowID = "ProdTr" + thisRow;
+            $("#ProductTable > tbody:last").append('<tr id=' + trowID + '><td><a onclick="RemoveProdLine(' + trowID + ', ' + prodID + ')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td><td style="padding-left:10px">' + ProdName + '</td></tr>');
+            //store ids to pass to controller. see if any IDS in there yet
+            if ($("#productIDs").val() == "") {
+                $("#productIDs").val(prodID);
+            }
+            else {
+                $("#productIDs").val($("#productIDs").val() + "," + prodID);
+            }
+        }
+    }
+
+    function RemoveProdLine(trowID, prodID) {
+        //remove the row
+        $("#" + trowID.id + "").remove();
+        //remove id from hidden field, and add to removedid field
+        $("#productIDs").val($("#productIDs").val().replace(prodID, ""));
+        if ($("#prodIDsRemove").val() == "") {
+            $("#prodIDsRemove").val(prodID);
+        }
+        else {
+            $("#prodIDsRemove").val($("#prodIDsRemove").val() + ", " + prodID);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $("#form0").submit(function () {
+        var MISSING = "ui-req";
+        var SelMISSING = "ui-Sel-req";
+
+        var requiredInput = $('input[class*="required"]');
+        var requiredSelect = $('select[class*="required"]');
+        var requiredTextArea = $('textarea[class*="required"]');
+
+        var Ierr = false;
+        var Serr = false;
+        var Terr = false;
+        var missingMsg = "The highlighted fields are required.";
+
+        // Reset the previously highlighted input fields  
+        requiredInput.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted select fields  
+        requiredSelect.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted textarea fields  
+        requiredTextArea.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Perform form validation (input field)
+        requiredInput.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Ierr = true;
+            }
+        });
+        // Perform form validation (select field) 
+        requiredSelect.each(function (index) {
+            var ind = $(this).context.selectedIndex;
+            if (ind == 0) {
+                $(this).addClass(SelMISSING);
+                Serr = true;
+            }
+        });
+        // Perform form validation (textarea field)
+        requiredTextArea.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Terr = true;
+            }
+        });
+        // Check if validation fails
+        if (Ierr == true || Serr == true || Terr == true) {
+            $("#errorSection").append(missingMsg);
+            return false;
+        }
+        else {
+            loading();
+            return true;
+        }
+    });
+</script>

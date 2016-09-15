@@ -1,0 +1,101 @@
+﻿@*
+05.30.13 - TR - hooked into services
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Species Part Add New page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@{
+    ViewBag.Title = "Species New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/loading1.gif")"  /></p></div></div>
+
+<div class="partsTitle">Manage Bulletins Components - Species
+<span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+</div>
+
+@using (Html.BeginForm("Species_New", "Parts", FormMethod.Post, null))
+{
+    <div class="siteColumn">
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a">@Html.Label(ResStrings.SppCommonName_Label)</div>
+	            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="COMMON_NAME" data-mini="true" /></div>
+        	</div>
+        </div>
+    
+    <div class="ui-grid-a">
+        <div data-role="fieldcontain">
+	        <div class="ui-block-a">@Html.Label(ResStrings.SppScientName_Label)</div>
+        	<div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="SCIENTIFIC_NAME" data-mini="true" /></div>
+        </div>
+    </div>   
+    
+    <div class="ui-grid-a">
+        <div data-role="fieldcontain">
+	        <div class="ui-block-a">@Html.Label(ResStrings.SppFamily_Label)</div>
+            <div class="ui-block-b">
+                <select id="Familydropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_FAMILY_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose Family</option>
+		            @foreach (SPECIES_FAMILY fl in ViewData["FamilyList"] as List<SPECIES_FAMILY>)
+                    {
+                        <option value='@fl.SPECIES_FAMILY_ID'>@fl.FAMILY</option> 
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-grid-a">
+        <div data-role="fieldcontain">
+	        <div class="ui-block-a">@Html.Label(ResStrings.SppGroup_Label)</div>
+            <div class="ui-block-b">
+                <select id="Groupdropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_GROUP_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose Group</option>
+		            @foreach (SPECIES_GROUP sg in ViewData["GroupList"] as List<SPECIES_GROUP>)
+                    {
+                        <option value='@sg.SPECIES_GROUP_ID'>@sg.SP_GROUP</option> 
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ui-grid-a">
+        <div data-role="fieldcontain">
+	        <div class="ui-block-a">@Html.Label(ResStrings.SppTaxa_Label)</div>
+            <div class="ui-block-b">
+                <select id="Taxadropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES_TAXA_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose Taxa</option>
+		            @foreach (SPECIES_TAXA taxa in ViewData["TaxaList"] as List<SPECIES_TAXA>)
+                    {
+                        <option value='@taxa.SPECIES_TAXA_ID'>@taxa.TAXA</option> 
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="location.href='@Url.Action("Species", "Parts")' " /></div></div>
+        </div>
+    </div>
+</div>
+}

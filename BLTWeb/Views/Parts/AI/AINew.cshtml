@@ -1,0 +1,347 @@
+﻿@*
+05.23.13 - TR - Hooked into services
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the AI Part Add New page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@{
+    ViewBag.Title = "New Active Ingredient";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui-1.8.11.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+<script>
+    $(document).ready(function () {
+        $("#AIname").focus();
+    });
+</script>
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+<div class="partsTitle">Manage Bulletins Components - Active Ingredients
+<span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+</div>
+
+@using (Html.BeginForm("AI_New", "Parts", null, FormMethod.Post, new { @id = "form0" }))
+{
+   <div class="siteColumn">
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a" style="width:30%">@Html.Label(ResStrings.AI_Name_Label)</div>
+                <div class="ui-block-b"><input type="text" id="AIname" class="bltTextInput ui-shadow-inset" name="AI.INGREDIENT_NAME" tabindex="1" data-mini="true" /></div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a" style="width:30%"><span class="required">@Html.Label(ResStrings.PCCode_Label)</span></div>
+                <div class="ui-block-b"><input type="text" class="required bltTextInput ui-shadow-inset" name="AI.PC_CODE" tabindex="2" data-mini="true" /></div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a" style="width:30%">@Html.Label(ResStrings.CASNum_Label)</div>
+                <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="AI.CAS_NUMBER" tabindex="3" data-mini="true" /></div>
+            </div>
+        </div>
+         <br clear="all" />
+        <div style="margin-left:2em; margin-top:2em">
+            <span>Associate AI Classes with a Active Ingredient</span><br />
+            <span>(Choose AI Class, Click Add. Can add one to many.)</span>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a" style="width:30%">AI Class:</div>
+                <div class="ui-block-b">
+                    <select id="AIClassdropdown" class="bltSelectInput ui-shadow-inset" name="AI_CLASS_ID" tabindex="4" data-native-menu="false" data-mini="true">
+                        <option value="0"></option>
+                        @foreach (AI_CLASS aic in ViewData["AIClassList"] as List<AI_CLASS>)
+                        {
+                            <option value='@aic.ID'>@aic.AI_CLASS_NAME</option> 
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="formLabel"><input type="button" value="Add" onclick="AddAIClass2AI();" tabindex="6" name="AIClass2AI" /></div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="formLabel" style="width:100%">
+                    <div id="addedAiClasses" class="">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="AIClassIDs" name="AIClassesToAdd" /> @* AI_CLass IDs are stored here *@
+     
+        <div id="formSubmitDiv" class="formSection">
+            <div class="leftSideSubmit">
+                <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" tabindex="7" class="submit" value="Save" /></div></div>
+                <div class="cancelDiv"><div class="lightButtonBorder"><input type="reset" id="resetButton" class="cancel" value="Cancel" onclick="cancelClick();" /></div></div>
+            </div>
+        </div>
+        <br clear="all" />
+    </div>
+    
+    <div class="siteColumn">
+
+        <div class="ui-grid-a">Associate Active Ingredient with a Product </div>
+        <div>(Choose Product, Click Add. Can add one to many.)</div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a" style="width:30%">Product:</div>
+                <div class="ui-block-b">
+                    <div class="ui-widget">
+                        <input placeholder="Type first 3 letters of Product to begin search" id="prods" />
+                        <input type="hidden" name="ID" id="hiddenProdID" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="formLabel"><input type="button" value="Add" onclick="AddAI2Product();" tabindex="6" name="AI2Product" /></div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="formLabel" style="width:100%">
+                    <div id="addedProds" class="">
+                        <ul>
+                        </ul>
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <input type="hidden" id="ProdIDs" name="AIProdsToAdd" /> @* product IDs are stored here *@
+
+    </div>
+    <br clear="all" />
+}
+
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    }
+</script>
+<script type="text/javascript">
+    $(function () {
+        Date.prototype.today = function () {
+            return (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear()
+        };
+        var newDate = new Date();
+        var datetime = newDate.today();
+
+        var cache = {};
+
+        $("#prods").autocomplete({
+            minLength: 3,
+            source: function (request, response) {
+                var product = request.term;
+                if (product in cache) {
+                    response(cache[product]);
+                    return;
+                }
+                $.get("https://blt.wim.usgs.gov/BLTProxy/proxy.ashx?https://blt.wim.usgs.gov/BLTServices/Products?publishedDate=" + datetime, request, function (data, status, xhr) {
+               // $.get("https://blt.wim.usgs.gov/BLTServices/Products?publishedDate=" + datetime, request, function (data, status, xhr) {
+                    var dataTest = $("PRODUCT", data).map(function () {
+                        return {
+                            value: $("PRODUCT_REGISTRATION_NUMBER", this).text(),
+                            label: $("PRODUCT_NAME", this).text(),
+                            id: $("PRODUCT_ID", this).text()
+                        };
+                    });
+                    cache[product] = dataTest;
+                    response(dataTest);
+                }
+                , "xml");
+            },
+            select: function (event, ui) {
+                var name = ui.item.label;
+                $("#prods").val(name);
+
+                $("#hiddenProdID").val(ui.item.id);
+                return false;
+            }
+        });
+        $("#prods").data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li></li>")
+                            .data("item.autocomplete", item)
+                            .append($("<a/>").html(item.label).attr("title", "RegNum: " + item.value))
+                            .appendTo(ul);
+        };
+    });
+
+</script>
+<style type="text/css">
+    .ui-autocomplete-loading 
+    {
+        background: white url('../Assets/Images/ui-anim_basic_16x16.gif') right center no-repeat;
+    }
+    .ui-autocomplete 
+    {
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .ui-autocomplete-input
+    {
+        width: 95%;
+    }
+   ul.ui-autocomplete.ui-menu 
+    {
+         @*left: 353px !important;*@
+        width: 244px !important;
+    }
+    html .ui-autocomplete 
+    {
+        height: 100px;
+    }
+</style>
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        window.location.href = '@Url.Action("Index", "Parts")'
+    };
+
+    //add was clicked to add the ai_class to the table
+    function AddAIClass2AI() {
+        var AI_ClassName = $("#AIClassdropdown option:selected").text();
+        var aiClassID = $("#AIClassdropdown").val();
+        //store id's to pass to controller
+        $("#addedAiClasses ul").append('<li id=' + aiClassID + '>' + AI_ClassName + '     <a onclick="RemoveAIClassLine(' + aiClassID + ')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></li>');
+        if ($("#AIClassIDs").val() == "") {
+            $("#AIClassIDs").val(aiClassID);
+        }
+        else {
+            $("#AIClassIDs").val($("#AIClassIDs").val() + "," + aiClassID);
+        }
+        $("#AIClassdropdown").val("");
+       
+    }
+
+    function RemoveAIClassLine(aiClassID) {
+        //remove the row
+        $("#" + aiClassID + "").remove();
+        //remove ids from hidden fields
+        $("#AIClassIDs").val($("#AIClassIDs").val().replace(aiClassID, ""));
+    }
+
+    //add was clicked to add the product to the table
+    function AddAI2Product() {
+        var productName = $("#prods").val();
+        var prID = $("#hiddenProdID").val();
+        //store id's to pass to controller
+        $("#addedProds ul").append('<li id=' + prID + '>' + productName + '     <a onclick="RemoveProdLine(' + prID + ')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></li>');
+        if ($("#ProdIDs").val() == "") {
+            $("#ProdIDs").val(prID);
+        }
+        else {
+            $("#ProdIDs").val($("#ProdIDs").val() + "," + prID);
+        }
+        $("#prods").val("");
+
+    }
+
+    function RemoveProdLine(prID) {
+        //remove the row
+        $("#" + prID + "").remove();
+        //remove ids from hidden fields
+        $("#ProdIDs").val($("#ProdIDs").val().replace(prID, ""));
+    }
+</script>
+
+<script type="text/javascript">
+    $("#form0").submit(function () {
+        var MISSING = "ui-req";
+        var SelMISSING = "ui-Sel-req";
+
+        var requiredInput = $('input[class*="required"]');
+        var requiredSelect = $('select[class*="required"]');
+        var requiredTextArea = $('textarea[class*="required"]');
+
+        var Ierr = false;
+        var Serr = false;
+        var Terr = false;
+        var missingMsg = "The highlighted fields are required.";
+
+        // Reset the previously highlighted input fields  
+        requiredInput.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted select fields  
+        requiredSelect.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted textarea fields  
+        requiredTextArea.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Perform form validation (input field)
+        requiredInput.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Ierr = true;
+            }
+        });
+        // Perform form validation (select field) 
+        requiredSelect.each(function (index) {
+            var ind = $(this).context.selectedIndex;
+            if (ind == 0) {
+                $(this).addClass(SelMISSING);
+                Serr = true;
+            }
+        });
+        // Perform form validation (textarea field)
+        requiredTextArea.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Terr = true;
+            }
+        });
+        // Check if validation fails
+        if (Ierr == true || Serr == true || Terr == true) {
+            $("#errorSection").append(missingMsg);
+            return false;
+        }
+        else {
+            loading();
+            return true;
+        }
+    });
+</script>

@@ -1,0 +1,21 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the AI Part Add New page 
+ */
+ *@
+ 
+@using BLTServices;
+
+@{
+    ViewBag.Title = "Add New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add New</h2>

@@ -1,0 +1,470 @@
+﻿//------------------------------------------------------------------------------
+//----- SpeciesHandler --------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 05.30.13 - TR - Created
+// 07.08.13 - JKN - Added Method for adding species to pula (/PULAs/{entityID}/AddSpeciesToPULA)
+#endregion
+
+using BLTServices.Authentication;
+using BLTServices.Resources;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+namespace BLTServices.Handlers
+{
+    public class SpeciesHandler: HandlerBase
+    {
+        #region Properties
+        public override string entityName
+        {
+            get { return "SPECIES"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        // returns all Divisions
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<SPECIES> speciesList;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        speciesList = GetEntities<SPECIES>(aBLTE).ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<SPECIES>(speciesList);
+
+                return new OperationResult.OK { ResponseResource = speciesList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns simpleSpecies
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="GetSpeciesList")]
+        public OperationResult GetSpeciesList()
+        {
+            SpeciesList speciesList = new SpeciesList();
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        speciesList.Species = GetEntities<SPECIES>(aBLTE).AsEnumerable().Select(sp=> new SimpleSpecies()
+                                                                                                        {
+                                                                                                            ID = (Int32)sp.SPECIES_ID,
+                                                                                                            CommonName = sp.COMMON_NAME,
+                                                                                                            ScientificName = sp.SCIENTIFIC_NAME,
+                                                                                                            FAMILY = sp.SPECIES_FAMILY.FAMILY,
+                                                                                                            Taxa = sp.SPECIES_TAXA.TAXA,
+                                                                                                            Group = sp.SPECIES_GROUP.SP_GROUP
+                                                                                                        }
+                                                                         ).ToList<SimpleSpecies>();
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = speciesList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 speciesID)
+        {
+            SPECIES aSpp;
+            try
+            {
+                if (speciesID <= 0)
+                { return new OperationResult.BadRequest(); }
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aSpp = GetEntities<SPECIES>(aBLTE).SingleOrDefault(d => d.SPECIES_ID == speciesID);
+
+                    }//end using
+                }//end using
+                activateLinks<SPECIES>(aSpp);
+
+                return new OperationResult.OK { ResponseResource = aSpp };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetPULASpecies")]
+        public OperationResult GetPULASpecies(Int32 pulaID)
+        {
+            try
+            {
+                List<SPECIES> speciesList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    // all the species that associated with a PULA
+                    speciesList =
+                            (from SpeciesPU in (aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA.Where(s => s.PULA_ID == pulaID))
+                             join sp in aBLTE.SPECIES
+                             on SpeciesPU.SPECIES_ID equals sp.SPECIES_ID
+                             select sp).Distinct().ToList();
+
+                    activateLinks<SPECIES>(speciesList);
+                } //end using
+
+                return new OperationResult.OK { ResponseResource = speciesList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        #endregion
+        #region POST Methods
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(SPECIES anEntity)
+        {
+            try
+            {
+                //Return BadRequest if missing required fields
+                if (string.IsNullOrEmpty(anEntity.COMMON_NAME))
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //Prior to running stored procedure, check if username exists
+                        if (!Exists(aBLTE.SPECIES, ref anEntity))
+                        {
+                            aBLTE.SPECIES.AddObject(anEntity);
+                            aBLTE.SaveChanges();
+                        }
+
+                        activateLinks<SPECIES>(anEntity);
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST, ForUriName ="AddSpeciesToPULA")]
+        public OperationResult AddSpeciesToPULA(Int32 entityID, SpeciesList speciesList, [Optional] string date)
+        {
+            USER_ loggedInUser;
+            ACTIVE_INGREDIENT_PULA anAIPULA;
+            try
+            {
+                //Return BadRequest if missing required fields
+                if (speciesList.Species.Count <= 0 || entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        DateTime? thisDate = ValidDate(date);
+                        if (!thisDate.HasValue)
+                            thisDate = DateTime.Now;
+
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        //get pulaID
+                        anAIPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(ai => ai.ID == entityID);
+                        if(anAIPULA == null)
+                        { return new OperationResult.NoContent(); }
+                        
+                        //add species
+                        foreach (SimpleSpecies ss in speciesList.Species)
+                        {
+                            //new species PULA
+                           var aSpeciesAIPULA = new SPECIES_ACTIVE_INGREDIENT_PULA() 
+                                                    { 
+                                                        SPECIES_ID = ss.ID,
+                                                        PULA_ID = anAIPULA.PULA_ID,
+                                                        VERSION = SetVersion(aBLTE,-1, loggedInUser.USER_ID, StatusType.Created, DateTime.Now)
+                                                    };
+
+                            if(aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA.FirstOrDefault(sai=> sai.SPECIES_ID.Equals(aSpeciesAIPULA.SPECIES_ID)  &&
+                                                                                        sai.PULA_ID.Equals(aSpeciesAIPULA.PULA_ID)) == null)
+                                aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA.AddObject(aSpeciesAIPULA);
+
+                        }//next species
+                
+                        aBLTE.SaveChanges();
+
+                        //return the list to tell user what was imported
+                        speciesList = new SpeciesList();
+
+                        IQueryable<SPECIES> query1 =
+                           (from PULA in GetActive(aBLTE.ACTIVE_INGREDIENT_PULA.Where(p => p.PULA_ID == anAIPULA.PULA_ID), thisDate.Value)
+                            join SAI in aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA
+                            on PULA.PULA_ID equals SAI.PULA_ID
+                            select SAI.SPECIES);
+                      
+
+                        speciesList.Species = query1.Select(sp => new SimpleSpecies
+                                                                    {
+                                                                        ID = (Int32)sp.SPECIES_ID,
+                                                                        CommonName = sp.COMMON_NAME,
+                                                                        ScientificName = sp.SCIENTIFIC_NAME,
+                                                                        FAMILY = sp.SPECIES_FAMILY.FAMILY,
+                                                                        Taxa = sp.SPECIES_TAXA.TAXA,
+                                                                        Group = sp.SPECIES_GROUP.SP_GROUP
+                                                                    }).ToList<SimpleSpecies>();
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = speciesList };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST, ForUriName = "RemoveSpeciesFromPULA")]
+        public OperationResult RemoveSpeciesFromPULA(Int32 entityID, SpeciesList speciesList, [Optional] string date)
+        {
+            USER_ loggedInUser;
+            ACTIVE_INGREDIENT_PULA anAIPULA;
+            try
+            {
+                //Return BadRequest if missing required fields
+                if (speciesList.Species.Count <= 0 || entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        //get pulaID
+                        anAIPULA = aBLTE.ACTIVE_INGREDIENT_PULA.FirstOrDefault(ai => ai.ID == entityID);
+                        if (anAIPULA == null)
+                        { return new OperationResult.NoContent(); }
+
+                        //add species
+                        foreach (SimpleSpecies ss in speciesList.Species)
+                        {
+                            //new species PULA
+                           
+                            var aSpeciesAIPULA = aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA.FirstOrDefault(sai=>sai.SPECIES_ID == ss.ID && sai.PULA_ID == anAIPULA.PULA_ID);
+                           
+                            if(aSpeciesAIPULA != null)
+                               aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA.DeleteObject(aSpeciesAIPULA);
+
+                        }//next species
+
+                        aBLTE.SaveChanges();
+
+                        //return the list to tell user what was imported
+                        speciesList = new SpeciesList();
+
+                        IQueryable<SPECIES> query1 =
+                           (from PULA in GetActive(aBLTE.ACTIVE_INGREDIENT_PULA.Where(p => p.PULA_ID == anAIPULA.PULA_ID), thisDate.Value)
+                            join SAI in aBLTE.SPECIES_ACTIVE_INGREDIENT_PULA
+                            on PULA.PULA_ID equals SAI.PULA_ID
+                            select SAI.SPECIES);
+
+
+                        speciesList.Species = query1.Select(sp => new SimpleSpecies
+                        {
+                            ID = (Int32)sp.SPECIES_ID,
+                            CommonName = sp.COMMON_NAME,
+                            ScientificName = sp.SCIENTIFIC_NAME,
+                            FAMILY = sp.SPECIES_FAMILY.FAMILY,
+                            Taxa = sp.SPECIES_TAXA.TAXA,
+                            Group = sp.SPECIES_GROUP.SP_GROUP
+                        }).ToList<SimpleSpecies>();
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = speciesList };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+        #endregion
+        #region PUT Methods
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.PUT)]
+        public OperationResult PUT(Int32 speciesID, SPECIES instance)
+        {
+            try
+            {
+                if (speciesID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        SPECIES ObjectToBeUpdated = aBLTE.SPECIES.SingleOrDefault(o => o.SPECIES_ID == speciesID);
+
+                        if (ObjectToBeUpdated == null) { return new OperationResult.BadRequest(); }
+
+                        //update
+                        ObjectToBeUpdated.COMMON_NAME = instance.COMMON_NAME;
+                        ObjectToBeUpdated.SCIENTIFIC_NAME = instance.SCIENTIFIC_NAME;
+                        ObjectToBeUpdated.SPECIES_FAMILY_ID = instance.SPECIES_FAMILY_ID;
+                        ObjectToBeUpdated.SPECIES_TAXA_ID = instance.SPECIES_TAXA_ID;
+                        aBLTE.SaveChanges();
+                    }// end using
+                }// end using
+
+                activateLinks<SPECIES>(instance);
+
+                return new OperationResult.OK { ResponseResource = instance };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        #endregion
+
+        //#region DELETE Methods
+        //[RequiresRole(AdminRole)]
+        //[HttpOperation(HttpMethod.DELETE)]
+        //public OperationResult Delete(Int32 divisionID)
+        //{
+        //    DIVISION ObjectToBeDeleted = null;
+
+        //    //Return BadRequest if missing required fields
+        //    if (divisionID <= 0)
+        //    { return new OperationResult.BadRequest(); }
+
+
+        //    //Get basic authentication password
+        //    using (EasySecureString securedPassword = GetSecuredPassword())
+        //    {
+        //        using (BLTRDSEntities aBLTRDS = GetRDS(securedPassword))
+        //        {
+
+        //            // create user profile using db stored proceedure
+        //            try
+        //            {
+        //                //fetch the object to be updated (assuming that it exists)
+        //                ObjectToBeDeleted = aBLTRDS.DIVISIONS.SingleOrDefault(
+        //                                        m => m.DIVISION_ID == divisionID);
+
+        //                //delete it
+        //                aBLTRDS.DIVISIONS.DeleteObject(ObjectToBeDeleted);
+        //                aBLTRDS.SaveChanges();
+        //                //Return object to verify persisitance
+
+        //                return new OperationResult.OK { };
+
+        //            }
+        //            catch (Exception)
+        //            {
+        //                //TODO: relay failure type message 
+        //                // EX. if profile failed to be removed
+        //                return new OperationResult.BadRequest();
+        //            }
+
+        //        }// end using
+        //    } //end using
+        //}//end HTTP.DELETE
+        //#endregion
+        #endregion
+
+        #region Helper Methods
+        private Boolean Exists(System.Data.Objects.IObjectSet<SPECIES> species, ref SPECIES aSpecies)
+        {
+            SPECIES existingSpp;
+            SPECIES thisSpp = aSpecies;
+            //check if it exists
+            try
+            {
+                existingSpp = species.FirstOrDefault(o => o.COMMON_NAME == thisSpp.COMMON_NAME);
+
+                if (existingSpp == null)
+                    return false;
+
+                //if exists then update ref contact
+                aSpecies = existingSpp;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            throw new NotImplementedException();
+        }
+    }// end class divisionHandler
+}//end namespace

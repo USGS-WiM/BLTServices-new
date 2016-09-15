@@ -1,0 +1,26 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page (mapper) 
+ */
+ *@
+ 
+@using BLTServices;
+
+
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+<h2>
+    Mapper will be here for EPA personnel to choose their polygon to add attribute information to.
+</h2>

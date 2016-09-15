@@ -1,0 +1,74 @@
+﻿//------------------------------------------------------------------------------
+//-----  PULAResource ----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   PULA resources.
+//              Equivalent to the model in MVC.
+//
+//discussion:   Resources are plain-old CLR objects (POCO) the resources are POCO classes derived from the EF
+//              PULAResource contains additional rederers of the derived EF POCO classes. 
+//              https://github.com/openrasta/openrasta/wiki/Resources
+//
+//     
+
+#region Comments
+// 05.20.13 - jkn - Created
+#endregion
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+using System.Xml.Serialization;
+
+namespace BLTServices.Resources
+{
+    [XmlRoot("ArrayOfPULA")]
+    public class PULAList
+    {
+        [XmlElement(typeof(SimplePULA),
+        ElementName = "PULA")]
+        public List<SimplePULA> PULA { get; set; }
+    }//end PULAList
+
+    public class SimplePULA:PULABase
+    {
+        [XmlElement(typeof(DateTime),
+            ElementName = "CreatedDate")]
+        public DateTime Created { get; set; }
+
+        [XmlElement(typeof(DateTime),
+            ElementName = "PublishedDate")]
+        public DateTime Published { get; set; }
+
+        [XmlElement(typeof(DateTime),
+            ElementName = "ExpiredDate")]
+        public DateTime Expired { get; set; }
+
+    }//end class simplePULA
+
+    public class PULABase:HypermediaEntity
+    {
+        [XmlElement(DataType = "int",
+        ElementName = "ID")]
+        public Int32 entityID { get; set; }
+
+        [XmlElement(DataType = "int",
+        ElementName = "ShapeID")]
+        public Int32 ShapeID { get; set; }
+
+        [XmlElement(DataType = "int",
+        ElementName = "isPublished")]
+        public Int32 isPublished { get; set; }
+
+    }//end class simplePULA
+}

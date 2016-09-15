@@ -1,0 +1,65 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the AI index
+ */
+ *@
+ 
+@using BLTServices;
+
+@{
+    ViewBag.Title = "Active Ingredients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using BLTServices
+@model BLTServices.ACTIVEINGREDIENT
+
+<div class="partsTitle">Manage Bulletins Components - Active Ingredients</div>
+
+@using (Html.BeginForm("AI_DoSomething", "Parts", FormMethod.Post, null) )
+{
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Active Ingredient:</span>
+        <select id="AIdropdown" class="margin" name="AI" data-native-menu="false" data-mini="true">
+		
+            @foreach (string AI in ViewData["AIList"] as List<string>)
+            {
+                <option value='@AI'>@AI</option> 
+            }
+        </select>
+        <br />	
+    </div>
+
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Edit" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="button" onclick="Remove();" class="submit" value="Delete" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Add New" /></div></div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function Remove() {
+        var answer = confirm("Are you sure you want to delete this active ingredient?");
+        if (answer == true) {
+            var AItoDelete = $("#AIdropdown").val();
+            $.ajax ({
+                url:'@Url.Action("Delete", "Parts")',
+                data: {id: AItoDelete},
+                success: function (response) {
+                    if (response == "True") {
+                        window.location.href = '@Url.Action("AI", "Parts")';
+                    }
+                }
+            });
+        }  
+    }
+</script>

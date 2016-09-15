@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="pgtestModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityType Name="data_manager">
+    <Key>
+      <PropertyRef Name="data_manager_id" />
+    </Key>
+    <Property Name="data_manager_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="username" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="fname" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="lname" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="organization_system_id" Type="Int32" />
+    <Property Name="phone" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+    <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="role_id" Type="Int32" Nullable="false" />
+    <Property Name="password" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="salt" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="reset_flag" Type="Int32" />
+  </EntityType>
+  <EntityType Name="division">
+    <Key>
+      <PropertyRef Name="division_id" />
+    </Key>
+    <Property Name="division_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="division_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="org_id" Type="Int32" />
+    <NavigationProperty Name="sections" Relationship="pgtestModel.sectiondivision" FromRole="division" ToRole="section" />
+    <NavigationProperty Name="organization_system" Relationship="pgtestModel.divisionorganization_system" FromRole="division" ToRole="organization_system" />
+    <NavigationProperty Name="organization" Relationship="pgtestModel.divisionorganization" FromRole="division" ToRole="organization" />
+  </EntityType>
+  <EntityType Name="organization">
+    <Key>
+      <PropertyRef Name="organization_id" />
+    </Key>
+    <Property Name="organization_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="organization_name" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="divisions" Relationship="pgtestModel.divisionorganization" FromRole="organization" ToRole="division" />
+    <NavigationProperty Name="organization_system" Relationship="pgtestModel.organizationorganization_system" FromRole="organization" ToRole="organization_system" />
+  </EntityType>
+  <EntityType Name="organization_system">
+    <Key>
+      <PropertyRef Name="organization_system_id" />
+    </Key>
+    <Property Name="organization_system_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="org_id" Type="Int32" Nullable="false" />
+    <Property Name="div_id" Type="Int32" />
+    <Property Name="sec_id" Type="Int32" />
+    <Property Name="science_base_id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="section" Relationship="pgtestModel.sectionorganization_system" FromRole="organization_system" ToRole="section" />
+    <NavigationProperty Name="division" Relationship="pgtestModel.divisionorganization_system" FromRole="organization_system" ToRole="division" />
+    <NavigationProperty Name="organization" Relationship="pgtestModel.organizationorganization_system" FromRole="organization_system" ToRole="organization" />
+  </EntityType>
+  <EntityType Name="section">
+    <Key>
+      <PropertyRef Name="section_id" />
+    </Key>
+    <Property Name="section_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="section_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="div_id" Type="Int32" />
+    <NavigationProperty Name="division" Relationship="pgtestModel.sectiondivision" FromRole="section" ToRole="division" />
+    <NavigationProperty Name="organization_system" Relationship="pgtestModel.sectionorganization_system" FromRole="section" ToRole="organization_system" />
+  </EntityType>
+  <EntityContainer Name="BLTEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="data_manager" EntityType="Self.data_manager" />
+    <EntitySet Name="divisions" EntityType="Self.division" />
+    <EntitySet Name="organizations" EntityType="Self.organization" />
+    <EntitySet Name="organization_system" EntityType="Self.organization_system" />
+    <EntitySet Name="sections" EntityType="Self.section" />
+    <AssociationSet Name="sectiondivision" Association="pgtestModel.sectiondivision">
+      <End Role="section" EntitySet="sections" />
+      <End Role="division" EntitySet="divisions" />
+    </AssociationSet>
+    <AssociationSet Name="sectionorganization_system" Association="pgtestModel.sectionorganization_system">
+      <End Role="section" EntitySet="sections" />
+      <End Role="organization_system" EntitySet="organization_system" />
+    </AssociationSet>
+    <AssociationSet Name="divisionorganization_system" Association="pgtestModel.divisionorganization_system">
+      <End Role="division" EntitySet="divisions" />
+      <End Role="organization_system" EntitySet="organization_system" />
+    </AssociationSet>
+    <AssociationSet Name="divisionorganization" Association="pgtestModel.divisionorganization">
+      <End Role="division" EntitySet="divisions" />
+      <End Role="organization" EntitySet="organizations" />
+    </AssociationSet>
+    <AssociationSet Name="organizationorganization_system" Association="pgtestModel.organizationorganization_system">
+      <End Role="organization" EntitySet="organizations" />
+      <End Role="organization_system" EntitySet="organization_system" />
+    </AssociationSet>
+  </EntityContainer>
+  <Association Name="sectiondivision">
+    <End Type="pgtestModel.section" Role="section" Multiplicity="*" />
+    <End Type="pgtestModel.division" Role="division" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="division">
+        <PropertyRef Name="division_id" />
+      </Principal>
+      <Dependent Role="section">
+        <PropertyRef Name="div_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="sectionorganization_system">
+    <End Type="pgtestModel.section" Role="section" Multiplicity="0..1" />
+    <End Type="pgtestModel.organization_system" Role="organization_system" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="section">
+        <PropertyRef Name="section_id" />
+      </Principal>
+      <Dependent Role="organization_system">
+        <PropertyRef Name="sec_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="divisionorganization_system">
+    <End Type="pgtestModel.division" Role="division" Multiplicity="0..1" />
+    <End Type="pgtestModel.organization_system" Role="organization_system" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="division">
+        <PropertyRef Name="division_id" />
+      </Principal>
+      <Dependent Role="organization_system">
+        <PropertyRef Name="div_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="divisionorganization">
+    <End Type="pgtestModel.division" Role="division" Multiplicity="*" />
+    <End Type="pgtestModel.organization" Role="organization" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="organization">
+        <PropertyRef Name="organization_id" />
+      </Principal>
+      <Dependent Role="division">
+        <PropertyRef Name="org_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="organizationorganization_system">
+    <End Type="pgtestModel.organization" Role="organization" Multiplicity="1" />
+    <End Type="pgtestModel.organization_system" Role="organization_system" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="organization">
+        <PropertyRef Name="organization_id" />
+      </Principal>
+      <Dependent Role="organization_system">
+        <PropertyRef Name="org_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

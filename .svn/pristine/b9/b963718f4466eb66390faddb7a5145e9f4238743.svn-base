@@ -1,0 +1,1036 @@
+﻿@* Comments:
+095.18.13 - TR - Created from PULA_Create page
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked (shapeId doesn't exist yet = Populate)
+ */
+ *@
+
+@using BLTServices;
+@using BLTServices.Resources;
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+
+<link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+
+
+@*<link rel="stylesheet" href="/resources/demos/style.css" />*@
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li><a style="padding: 0.5em" href="#tab1-Gen">General</a></li>
+            <li><a style="padding: 0.5em" href="#tabs2-Justification">Justification</a></li>
+            <li><a style="padding: 0.5em" href="#tabs3-Species">Species</a></li>
+            <li><a style="padding: 0.5em" href="#tabs4-PULA">PULA</a></li>
+            <li><a style="padding: 0.5em" href="#tabs5-Summary" onclick="Summary();">Summary</a></li>
+        </ul>
+
+        @*General Detail Tab*@
+        @{
+            USER_ loggedIn = ViewData["User"] as USER_;
+            VERSION thisVersion = ViewData["Version"] as VERSION;
+         }
+
+        @using (Html.BeginForm("PublishPULA", "PULA", null, FormMethod.Post, new { id = "publishForm" }))
+        {
+            <div id="tab1-Gen"> 
+            
+                <input type="hidden" name="anAIPULA.PULA_SHAPE_ID" value="@Model.PULA_SHAPE_ID" />
+                <input type="hidden" name="anAIPULA.PULA_ID" value="@Model.PULA_ID" />
+                <input type="hidden" name="anAIPULA.VERSION_ID" value="@Model.VERSION_ID" />
+                <input type="hidden" name="anAIPULA.ID" value="@Model.ID" />
+
+                
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="formLabel">Event:</div>
+                        <div class="formValue">
+                            <select id="Eventdropdown" class="bltSelectInput ui-shadow-inset" name="anAIPULA.EVENT_ID" data-native-menu="false" data-mini="true">
+		                        <option value="0">Choose an Event</option>
+                                @foreach (EVENT e in ViewData["EventList"] as List<EVENT>)
+                                {
+                                    <option @(e.EVENT_ID == Model.EVENT_ID ? "selected" : "") value="@e.EVENT_ID">@e.NAME</option> 
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="formLabel">Effective Date: <br />(if known)</div>
+	                    <div class="formValue">
+                            @*Html.DropDownList("EffMonths", null, "--Month--", new { @class = "bltTextInput ui-shadow-inset", @id = "effMonth" })
+                            <br /><br />
+                            @Html.DropDownList("EffYears", null, "--Year--", new { @class = "bltTextInput ui-shadow-inset", @id = "effYear" })*@
+                            @Html.DropDownList("EffMonths", null, "--Month--", new { @class = "bltSelectInput ui-shadow-inset" })
+                            <br /><br />
+                            @Html.DropDownList("EffYears", null, "--Year--", new { @class = "bltSelectInput ui-shadow-inset" })
+                        </div>   
+                    </div>
+	            </div>        
+            
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="formLabel">Creation Date:</div>
+	                    <div class="formValue"><label id="createDate">@(((DateTime)(thisVersion.CREATED_TIME_STAMP)).ToShortDateString())</label></div>
+	                </div>
+                </div>
+           
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="formLabel">Created By:</div>
+	                    <div class="formValue"><label id="createdBy">@ViewData["CreatorName"]</label></div>
+	                </div>
+                </div>                
+            
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="formLabel">Creator Organization:</div>
+	                    <div class="formValue"><label id="COrg">@(ViewData.ContainsKey("creatorOrg") ? ViewData["creatorOrg"] : "") </label></div>
+                    </div>
+                </div>
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+                        <div class="formLabel">Creator Division:</div>
+                        <div class="formValue"><label id="CDDiv">@( ViewData.ContainsKey("creatorDiv") ? ViewData["creatorDiv"] : "")</label></div>
+                    </div>
+	            </div>
+
+                @*admin or publisher*@
+                @if (loggedIn.ROLE_ID <= 2)
+                {
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="formLabel">Expiration Date: <br />(if known)</div>	                    
+                            <div class="formValue">
+                                @*Html.DropDownList("ExMonths", null, "--Month--", new { @class = "bltTextInput ui-shadow-inset", @id = "exMonth" })
+                                <br /><br />
+                                @Html.DropDownList("ExYears", null, "--Year--", new { @class = "bltTextInput ui-shadow-inset", @id = "exYear" })*@
+                                 @Html.DropDownList("ExMonths", null, "--Month--", new { @class = "bltSelectInput ui-shadow-inset" })
+                                <br /><br />
+                                @Html.DropDownList("ExYears", null, "--Year--", new { @class = "bltSelectInput ui-shadow-inset" })
+                            </div>  
+                        </div>
+                    </div>    
+                }
+                <br clear="all" />
+        
+            </div> @* end id="tab1-Gen" div *@
+
+        @*Justification Tab*@
+        <div id="tabs2-Justification">
+
+             <div class="ui-grid-a"><div data-role="fieldcontain"><div class="formLabel bold">PULA Justification</div></div></div>
+
+            <div class="ui-grid-a">
+                <div class="formLabel" style="width:98%">                    
+                     <table>
+                        <tr>
+                            <td style="width:0"></td>
+                            <td style="width:30%"></td>
+                            <td style="width:0"></td>
+                            <td style="width:30%"><b>Litigation</b></td>
+                            <td style="width:0"></td>
+                            <td style="width:30%"><b>Registration Review</b></td>
+                        </tr>    
+                        <tr>
+                            @{ if (!string.IsNullOrEmpty(Model.OTHER_JUSTIFICATION))
+                               {
+                                    <td style="width:0"><input type="checkbox" onclick="showInputBox();" checked="checked" value="Bio" id="OtherCheck" /></td>
+                               }
+                               else
+                               {
+                                   <td style="width:0"><input type="checkbox" onclick="showInputBox();" value="Bio" id="OtherCheck" /></td>
+                               }
+        }
+                            <td style="width:30%">Other</td>
+                            @{if (!string.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_LIT))
+                              {
+                                    <td><input type="checkbox" checked="checked" onclick="showInputBox();" value="Bio1" id="BioCheck1" /></td>
+                              }
+                              else
+                              {
+                                    <td><input type="checkbox" onclick="showInputBox();" value="Bio1" id="BioCheck1" /></td>
+                              }
+        }
+                            <td>Biological Opinion</td>
+                            @{ if (!string.IsNullOrEmpty(Model.FOCUS_MEETING))
+                               {  
+                                   <td><input type="checkbox" checked="checked" onclick="showInputBox();" id="FocCheck" value="Foc" /></td>
+                               }
+                               else
+                               {
+                                   <td><input type="checkbox" onclick="showInputBox();" id="FocCheck" value="Foc" /></td>
+                               }
+        }
+                            <td>Focus Meeting</td>
+                        </tr>
+                        <tr>
+                            @{ if (!string.IsNullOrEmpty(Model.OTHER_JUSTIFICATION))
+                               {
+                                   <td colspan="2"><div id="OtherChoiceInput" style="width:95%"><textarea class="bltTextInput ui-shadow-inset" rows="8" cols="30" rows="5" placeholder="Describe (new use, new chemical)" id="otherInput" name="anAIPULA.OTHER_JUSTIFICATION">@Model.OTHER_JUSTIFICATION</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td colspan="2"><div id="OtherChoiceInput" class="hidden" style="width:95%"><textarea class="bltTextInput ui-shadow-inset" rows="8" cols="30" rows="5" placeholder="Describe (new use, new chemical)" id="otherInput" name="anAIPULA.OTHER_JUSTIFICATION"></textarea></div></td>
+                               }
+        }
+                            @{if (!string.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_LIT))
+                              {
+                                <td colspan="2"><div id="BioChoiceInput1"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput1" name="anAIPULA.BIOLOGICAL_OPINION_LIT">@Model.BIOLOGICAL_OPINION_LIT</textarea></div></td>
+                              }
+                              else
+                              {
+                                  <td colspan="2"><div id="BioChoiceInput1" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput1" name="anAIPULA.BIOLOGICAL_OPINION_LIT"></textarea></div></td>
+                              }
+        }
+                            @{ if (!string.IsNullOrEmpty(Model.FOCUS_MEETING))
+                               {
+                                    <td colspan="2"><div id="FocChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Provide information regarding the date of the focus meeting from which this PULA came." cols="30" rows="5" id="focInput" name="anAIPULA.FOCUS_MEETING">@Model.FOCUS_MEETING</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td colspan="2"><div id="FocChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Provide information regarding the date of the focus meeting from which this PULA came." cols="30" rows="5" id="focInput" name="anAIPULA.FOCUS_MEETING"></textarea></div></td>
+                               }
+        }
+                        </tr>
+                        <tr>
+                            <td></td> <td></td> <td></td> <td></td>
+                            @{ if (!string.IsNullOrEmpty(Model.INTERIM_PROPOSED_DECISION))
+                               {
+                                   <td style="width:0"><input type="checkbox" checked="checked" onclick="showInputBox();" id="IntCheck" value="Lit" /></td>
+                               }
+                               else
+                               {
+                                   <td style="width:0"><input type="checkbox" onclick="showInputBox();" id="IntCheck" value="Lit" /></td>
+                               }
+        }
+                            <td style="width:35%">Proposed Interim Decision</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td></td><td></td>
+                            @{ if (!string.IsNullOrEmpty(Model.INTERIM_PROPOSED_DECISION))
+                               {
+                                   <td colspan="2"><div id="IntChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Interim Decision from which this PULA came." cols="30" rows="5" id="intInput" name="anAIPULA.INTERIM_PROPOSED_DECISION">@Model.INTERIM_PROPOSED_DECISION</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td colspan="2"><div id="IntChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Interim Decision from which this PULA came." cols="30" rows="5" id="intInput" name="anAIPULA.INTERIM_PROPOSED_DECISION"></textarea></div></td>
+                               }
+        }
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td></td><td></td>
+                            @{if (!string.IsNullOrEmpty(Model.PROPOSED_DECISION))
+                              {
+                                  <td><input type="checkbox" checked="checked" onclick="showInputBox();" id="PropCheck" value="Prop" /></td>
+                              }
+                              else
+                              {
+                                  <td><input type="checkbox" onclick="showInputBox();" id="PropCheck" value="Prop" /></td>
+                              }
+        }
+                            <td>Proposed Decision</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td></td><td></td>
+                            @{ if (!string.IsNullOrEmpty(Model.PROPOSED_DECISION))
+                               {
+                                   <td colspan="2"><div id="PropChoiceInput" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Decision from which this PULA came." cols="30" rows="5" id="propInput" name="anAIPULA.PROPOSED_DECISION">@Model.PROPOSED_DECISION</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td colspan="2"><div id="PropChoiceInput" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Proposed Decision from which this PULA came." cols="30" rows="5" id="propInput" name="anAIPULA.PROPOSED_DECISION"></textarea></div></td>
+                               }
+        }
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td></td><td></td>
+                            @{if (!string.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_REGREVIEW))
+                              {
+                                  <td><input type="checkbox" checked="checked" onclick="showInputBox();" value="Bio" id="BioCheck2" /></td>
+                              }
+                              else
+                              {
+                                  <td><input type="checkbox" onclick="showInputBox();" value="Bio" id="BioCheck2" /></td>
+                              }
+        }
+                            <td>Biological Opinion</td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td></td><td></td>
+                            @{ if (!string.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_REGREVIEW))
+                               {
+                                   <td colspan="2"><div id="BioChoiceInput2" style="margin-left:13px"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput2" name="anAIPULA.BIOLOGICAL_OPINION_REGREVIEW">@Model.BIOLOGICAL_OPINION_REGREVIEW</textarea></div></td>
+                               }
+                               else
+                               {
+                                   <td colspan="2"><div id="BioChoiceInput2" style="margin-left:13px" class="hidden"><textarea class="bltTextInput ui-shadow-inset" rows="8" placeholder="Cite the Biological Opinion from which this PULA came." cols="30" rows="5" id="bioInput2" name="anAIPULA.BIOLOGICAL_OPINION_REGREVIEW"></textarea></div></td>
+                               }
+        }
+                        </tr>
+                        <tr><td></td></tr><tr><td></td></tr>
+                        <tr><td></td></tr><tr><td></td></tr>
+                        <tr><td></td></tr><tr><td></td></tr>
+                        <tr>
+                            <td colspan="2"><div class="ui-grid-a">
+                                    <div data-role="fieldcontain">
+	                                <div>Base Data:</div></div></div>
+                            </td>
+                            <td colspan="4"><div><textarea class="bltTextInput ui-shadow-inset" rows="8" id="bd" placeholder="Provide information regarding where the data came from (i.e., USFWS field office, NatureServe, etc. If possible, please provide a contact name, phone number, email, etc." name="anAIPULA.BASE_DATA">@Model.BASE_DATA</textarea></div></td>
+                        </tr>
+                        <tr><td></td></tr><tr><td></td></tr>
+                        <tr>
+                            <td colspan="2"><div class="ui-grid-a">
+                                    <div data-role="fieldcontain">
+	                                <div>Base Data Modifiers:</div></div></div>
+                            </td>
+                            <td colspan="4"><div><textarea class="bltTextInput ui-shadow-inset" rows="8" id="bdm" placeholder="Provide information regarding how the base data were modified (i.e., USFWS field office provided a buffer of X feet)." name="anAIPULA.BASE_DATA_MODIFIERS">@Model.BASE_DATA_MODIFIERS</textarea></div></td>
+                        </tr>
+                        <tr><td></td></tr><tr><td></td></tr>
+                        <tr>
+                            <td colspan="2"><div class="ui-grid-a">
+                                    <div data-role="fieldcontain">
+	                                <div>Additional Information:</div></div></div>
+                            </td>
+                            <td colspan="4"><div><textarea class="bltTextInput ui-shadow-inset" rows="8" id="addInfo" placeholder="Provide any necessary additional information in this text box." name="anAIPULA.ADDITIONAL_INFORMATION">@Model.ADDITIONAL_INFORMATION</textarea></div></td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            
+              <br clear="all" />
+
+        </div> @* end id="tabs2-Justification" div *@
+  
+        @*Species Tab*@
+        <div id="tabs3-Species">
+            <div style="margin-bottom:10px">Choose a Group to get a narrowed down Species list.</div>
+                      
+            @{List<SimpleSpecies> PULAsppList = ViewData["PULAspp"] as List<SimpleSpecies>; string speciesAdd = string.Empty;}
+            
+            @*<div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel">Taxonomic Group:</div>
+                    <div class="formValue">
+                        <select id="Grpdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		                    <option value="0">Choose a taxonomic group</option>
+                            @foreach (SPECIES_GROUP sppGrp in ViewData["SppGrpList"] as List<SPECIES_GROUP>)
+                            {
+                                <option value="@sppGrp.SPECIES_GROUP_ID">@sppGrp.SP_GROUP</option> 
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+*@
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel">Scientific Name:</div>
+                    <div class="formValue">
+                        <select id="Sppdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		                    <option value="0">Choose Species</option>
+                            @foreach (var spp in ViewData["SpeciesListScie"] as List<SimpleSpecies>)
+                            {
+                                <option value="@spp.ENTITY_ID">@spp.SCINAME</option> 
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+             <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel">Common Name:</div>
+                    <div class="formValue">
+                        <select id="Sppdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		                    <option value="0">Choose Species</option>
+                            @foreach (var spp in ViewData["SpeciesListCom"] as List<SimpleSpecies>)
+                            {
+                                <option value="@spp.ENTITY_ID">@spp.COMNAME</option> 
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel"><input type="button" value="Add" onclick="AddSpecies();" name="Copy_Spp" /></div>
+                </div>
+            </div>
+                
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel" style="width:100%">Species to add:
+                        <div id="addedSpp" class="">
+                            <ul>
+                @*@foreach (SPECIES sp in PULAsppList)
+                {
+                    <li id='@sp.SPECIES_ID'>@sp.COMMON_NAME<a onclick="RemoveSppLine(@sp.SPECIES_ID)"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></li>
+                    speciesAdd += sp.SPECIES_ID + ",";
+                    }*@
+            </ul>
+                        </div>
+                        </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="spIDsAdded" name="SpeciesToAdd" value="@speciesAdd"/> @* species IDs are stored here when spp is added to list above *@
+            <input type="hidden" id="spIDsRemoved" name="SpeciesToRemove" />
+            <br clear="all" />
+        </div> @* end id="tabs3-Species" div *@
+            
+      @*  <br clear="all" />*@
+            
+        @*PULA Tab*@
+        <div id="tabs4-PULA" style="padding:1em 0.5em">
+            <div style="margin-bottom:10px">Choose an Active Ingredient to get a list of Products.</div>            
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel">Active Ingredient:</div>
+                    <div class="formValue">
+                        <select id="AIdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		                    <option value="0">Choose an Active Ingredient</option>
+                            @if (ViewData.ContainsKey("AIList"))
+                            {
+                                foreach (ACTIVE_INGREDIENT ai in ViewData["AIList"] as List<ACTIVE_INGREDIENT>)
+                                {
+                                    <option value="@ai.ID">@ai.INGREDIENT_NAME</option> 
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>               
+
+            <div class="ui-grid-a">
+                <div data-role="fieldcontain">
+	                <div class="formLabel">Product:</div>
+                    <div class="formValue">
+                        <select id="Proddropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		                   @* populated from AI choice (filtered list)*@
+                        </select>
+                    </div>
+                </div>
+            </div>               
+
+            <table id="" style="width:100%">
+                <tr align="center">
+                    <td style="width:25%">
+                        <b><br />Use</b><br />
+                        <select id="Usedropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+                            <option value="0"></option>
+		                    @foreach (CROP_USE cu in ViewData["CUList"] as List<CROP_USE>)
+                      {
+                                <option value="@cu.CROP_USE_ID">@cu.USE</option> 
+                      }
+                        </select>
+                    </td>
+                    <td style="width:25%">
+                        <b>Application<br />Method</b><br />
+                        <select id="AMdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+                            <option value="0"></option>
+		                    @foreach (APPLICATION_METHOD am in ViewData["AppMethodsList"] as List<APPLICATION_METHOD>)
+                      {
+                                <option value="@am.APPLICATION_METHOD_ID">@am.METHOD</option> 
+                      }
+                        </select>
+                    </td>       
+                    <td style="width:25%">
+                        <b><br />Formulation</b><br />
+                        <select id="formdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+                            <option value="0"></option>
+		                    @foreach (FORMULATION f in ViewData["FormulationsList"] as List<FORMULATION>)
+                      {
+                                <option value="@f.FORMULATION_ID">@f.FORM</option> 
+                      }
+                        </select>
+                    </td>                      
+                    <td>
+                        <b><br />Code</b><br />
+                        <select id="Codedropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+                            <option value="0"></option>
+		                    @foreach (LIMITATION code in ViewData["CodeList"] as List<LIMITATION>)
+                      {
+                                <option value="@code.LIMITATION_ID" title="@code.LIMITATION1">@code.CODE</option> 
+                      }
+                        </select>
+                    </td>   
+                </tr>
+                <tr>
+                    <td></td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>            
+                </tr>
+                <tr>
+                    <td colspan="4" align="center">
+                        <input type="button" value="Add" onclick="AddLimitation();" />
+                    </td>
+                </tr>
+            </table>
+
+            <br /><br />
+            
+            @{ List<PublishedPULA> pubPULAModel = ViewData["PULAlimitationList"] as List<PublishedPULA>;
+               string ID_Row = string.Empty;
+               string LimitRow = string.Empty;
+               int rowID = 0;}
+            <table id="LimitTable" style="width:100% !important">
+                <thead>
+                    <tr>
+                        <td style="width:25%"><b>Active Ingredient/<br />Product</b></td>
+                        <td style="width:25%"><b>Use</b></td>
+                        <td style="width:25%"><b>Application<br />Method</b></td>
+                        <td style="width:25%"><b>Formulation</b></td>
+                        <td style="width:25%"><b>Code</b></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (PublishedPULA ppm in pubPULAModel)
+                 {
+                    rowID++;
+                    ID_Row = ppm.Product == null ? "[A" + ppm.AI_ID + "," + ppm.CropUse_ID + "," + ppm.AppMeth_ID + "," + ppm.Form_ID + "," + ppm.Code_ID + "]" : "[P" + ppm.Prod_ID + "," + ppm.CropUse_ID + "," + ppm.AppMeth_ID + "," + ppm.Form_ID + "," + ppm.Code_ID + "]";
+                    
+                    <tr id='tr@(rowID)'>
+                        @if (ppm.Product != null)
+                        { <td>@ppm.Product</td> }
+                        else { <td>@ppm.AI</td> }
+                        <td>@ppm.AppMethod</td>
+                        <td>@ppm.Formulation</td>
+                        <td>@ppm.CropUse</td>
+                        <td title="@ppm.Limitation">@ppm.Code</td>   
+                        <td><a onclick="RemoveLine(tr@(rowID), '@(ID_Row)')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td>                  
+                    </tr>
+                    LimitRow += ID_Row + ",";
+
+                  }
+                </tbody>
+            </table>
+
+            <input type="hidden" id="LimitationsAdded" name="LimitationsToAdd" value="@LimitRow" />
+            <input type="hidden" id="LimitationsRemoved" name="LimitationsToRemove" />
+
+            <br clear="all" />
+        </div> @* end id="tabs4-PULA" div*@
+        
+        <div id="tabs5-Summary">  
+        
+            <div style="margin-bottom:10px"><h3 style="margin-top:0;color:#59595C">General</h3></div>
+
+            <div>
+                <span class="summaryLabel">Effective Date:</span>
+                <label id="leffectDate" class="ui-block-b"></label>
+            </div>
+            
+            <div>
+                <span class="summaryLabel">Creation Date:</span>
+                <label id="lcreateDate" class="ui-block-b"></label>
+            </div>
+                
+            <div>
+                <span class="summaryLabel">Created By:</span>
+	            <label id="createBy" class="ui-block-b"></label>
+            </div>
+            
+            <div>
+                <span class="summaryLabel">Creator Organization:</span>
+	            <label id="createOrg" class="ui-block-b"></label>
+            </div>
+            
+            <div>
+                <span class="summaryLabel">Creator Division:</span>
+	            <label id="createDiv" class="ui-block-b"></label>
+            </div>
+
+            <div>
+                <span class="summaryLabel">Expiration Date:</span>
+                <label id="ExpireDate" class="ui-block-b"></label>
+            </div>
+
+            <br clear="all" />
+        
+            @*Justification*@
+            <h3 style="color:#59595C">Justification</h3>            
+            <div id="otherDiv" class="hidden ui-grid-a">
+                <span class="ui-block-a">Other:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="OtherInputInfo" class="textAreaDetails"></textarea>
+            </div>
+
+            <div id="bioDiv1" class="hidden ui-grid-a">
+                <span class="ui-block-a">Litigation, Biological Opinion:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="LbioInputInfo" class="textAreaDetails"></textarea>
+            </div>
+
+            <div id="focDiv" class="hidden ui-grid-a">
+                <span class="ui-block-a">Registration Review, Focus Meeting:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="focInputInfo" class="textAreaDetails"></textarea>
+            </div>
+            
+            <div id="intDiv" class="hidden ui-grid-a">
+                <span class="ui-block-a">Registration Review, Proposed Interim Decision:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="intInputInfo" class="textAreaDetails"></textarea>
+            </div>
+
+            <div id="propDiv" class="hidden ui-grid-a">
+                <span class="ui-block-a">Registration Review, Proposed Decision:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="propInputInfo" class="textAreaDetails"></textarea>
+            </div>
+            <div id="bioDiv2" class="hidden ui-grid-a">
+                <span class="ui-block-a">Registration Review, Biological Opinion:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="RRbioInputInfo" class="textAreaDetails"></textarea>
+            </div>
+            
+            <div class="ui-grid-a">
+                <span class="ui-block-a">Base Data:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="bData" class="textAreaDetails"></textarea>
+            </div>
+
+            <div class="ui-grid-a">
+                <span class="ui-block-a">Base Data Modifiers:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="bdMods" class="textAreaDetails"></textarea>
+            </div>
+            
+            <div class="ui-grid-a">
+                <span class="ui-block-a">Additional Information:</span>
+                <textarea readonly="readonly" rows="6" style="width:50%" id="additionalInfo" class="textAreaDetails"></textarea>
+            </div>          
+
+           
+            <h3 style="color:#59595C">Active Ingredient Limitations</h3>
+                
+            <table id="AILimitSum" style="width:100%">
+                <thead>
+                    <tr>
+                        <td><b>Active Ingredient/Product</b></td>
+                        <td><b>Use</b></td>
+                        <td><b>Appliction Method</b></td>
+                        <td><b>Formulation</b></td>
+                        <td><b>Code</b></td>                            
+                    </tr>
+                </thead>
+                <tbody>                
+                                  
+                </tbody>
+            </table>
+                 
+  
+            @*Species*@            
+            <h3 style="color:#59595C">Species</h3>
+            <ul id="species">
+                
+            </ul>
+        
+            <div id="formSubmitDiv">
+                <div class="leftSideSubmit">
+                    <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Save" name="Create" /></div></div>
+                    <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Publish" name="Create" /></div></div>
+                </div>
+            </div>
+             <br clear="all" />
+        </div> 
+        }    
+    </div>   
+       
+</body>
+</html>
+
+<script type="text/javascript">
+    function showInputBox() {
+        var checkOther = document.getElementById("OtherCheck");
+        var checkBio1 = document.getElementById("BioCheck1");
+        var checkFoc = document.getElementById("FocCheck");
+        var checkInt = document.getElementById("IntCheck");
+        var checkProp = document.getElementById("PropCheck");
+        var checkBio2 = document.getElementById("BioCheck2");
+
+        //determine which was checked and show corresponding input, ensure others are hidden
+        if (checkOther.checked == true) {
+            $("#OtherChoiceInput").show();
+            $("#otherInput").focus();
+        }
+        if (checkOther.checked == false) {
+            //$("#OtherChoiceInput").hide();
+            $("#OtherChoiceInput").css("display", "none");
+        }
+        if (checkBio1.checked == true) {
+            $("#BioChoiceInput1").show();
+            $("#bioInput1").focus();
+        }
+        if (checkBio1.checked == false) {
+            //$("#BioChoiceInput1").hide();
+            $("#BioChoiceInput1").css("display", "none");
+        }
+        if (checkFoc.checked == true) {
+            $("#FocChoiceInput").show();
+            $("#focInput").focus();
+        }
+        if (checkFoc.checked == false) {
+            //$("#FocChoiceInput").hide();
+            $("#FocChoiceInput").css("display", "none");
+        }
+        if (checkInt.checked == true) {
+            $("#IntChoiceInput").show();
+            $("#intInput").focus();
+        }
+        if (checkInt.checked == false) {
+            //$("#IntChoiceInput").hide();
+            $("#IntChoiceInput").css("display", "none");
+        }
+        if (checkProp.checked == true) {
+            $("#PropChoiceInput").show();
+            $("#propInput").focus();
+        }
+        if (checkProp.checked == false) {
+            //$("#PropChoiceInput").hide();
+            $("#PropChoiceInput").css("display", "none");
+        }
+        if (checkBio2.checked == true) {
+            //$("#BioChoiceInput2").show();
+            $("#BioChoiceInput2").css("display", "block");
+            $("#bioInput2").focus();
+        }
+        if (checkBio2.checked == false) {
+            //$("#BioChoiceInput2").hide();
+            $("#BioChoiceInput2").css("display", "none");
+        }
+    }
+
+    //Active Ingredient Tab: 
+    //get active ingredients based on product chosen
+    $("#AIdropdown").change(function () {
+        var thisAI = $("#AIdropdown").val();
+        //clear the dropdowns
+        $("#Proddropdown").val("");
+        //        $("#Usedropdown").val("");
+        //        $("#AMdropdown").val("");
+        //        $("#formdropdown").val("");
+        //        $("#Codedropdown").val("");
+
+        var url = "/BLTWeb/PULA/GetProductsByAI/";
+        $.post(url, { id: thisAI }, function (data) {
+            populateProdDropD($("#Proddropdown"), data);
+        });
+    });
+
+    //populate dropdown with returned AIs
+    function populateProdDropD(select, data) {
+        select.empty();
+        select.append('<option value="0">AI Products...</option>');
+        $.each(data, function (id, option) {
+            select.append($('<option>', {
+                value: option.PRODUCT_ID,
+                text: option.PRODUCT_NAME
+            }));
+        });
+    }
+
+    //selections made from dropdown, clicked Add, add to the table below (can have multiple adds)
+    var trID;
+    function AddLimitation() {
+        //get all IDs
+        var aiID = $("#AIdropdown").val();
+        var prodID = $("#Proddropdown").val();
+        var useID = $("#Usedropdown").val();
+        var amID = $("#AMdropdown").val();
+        var formID = $("#formdropdown").val();
+        var codeID = $("#Codedropdown").val();
+
+        //get all text names
+        var ai = $("#AIdropdown option:selected").text();
+        var prod = $("#Proddropdown option:selected").text();
+        var use = $("#Usedropdown option:selected").text();
+        var appMethod = $("#AMdropdown option:selected").text();
+        var form = $("#formdropdown option:selected").text();
+        var code = $("#Codedropdown option:selected").text();
+        var codeLimit = $("#Codedropdown :selected").attr('title');
+        //store the row count to use as row id (for RemoveRow())
+        var thisRow = $("#LimitTable tr").length;
+        trID = "tr" + thisRow;
+
+        //string for hidden input
+        var aLimitRow;
+
+        //see if there are Product ID
+        if (prodID >= 1) {
+            //var for hidden input
+            aLimitRow = "[P" + prodID + "," + useID + "," + amID + "," + formID + "," + codeID + "]";
+
+            //build a tr for prod (limit length of prod name
+            if (prod.length > 50) {
+                $("#LimitTable > tbody:last").append('<tr id=' + trID + '><td title =\'' + prod + '\'>' + prod.substring(0, 49) + '</td><td>' + use + '</td><td>' + appMethod + '</td><td>' + form + '</td><td title=\'' + codeLimit + '\'>' + code + '</td><td><a onclick="RemoveLine(' + trID + ',\'' + aLimitRow + '\')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td></tr>');
+            }
+            else {
+                $("#LimitTable > tbody:last").append('<tr id=' + trID + '><td>' + prod + '</td><td>' + use + '</td><td>' + appMethod + '</td><td>' + form + '</td><td title=\'' + codeLimit + '\'>' + code + '</td><td><a onclick="RemoveLine(' + trID + ',\'' + aLimitRow + '\')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td></tr>');
+            }
+        }
+        else {
+            //var for hidden input
+            aLimitRow = "[A" + aiID + "," + useID + "," + amID + "," + formID + "," + codeID + "]";
+
+            //build a tr for ai .. need to set max number of characters so it doesnt run out of the table = have hover for full name
+            if (ai.length > 50) {
+                $("#LimitTable > tbody:last").append('<tr id=' + trID + '><td title=\'' + ai + '\'>' + ai.substring(0, 49) + '</td><td>' + use + '</td><td>' + appMethod + '</td><td>' + form + '</td><td title=\'' + codeLimit + '\'>' + code + '</td><td><a onclick="RemoveLine(' + trID + ',\'' + aLimitRow + '\')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td></tr>');
+            }
+            else {
+                $("#LimitTable > tbody:last").append('<tr id=' + trID + '><td>' + ai + '</td><td>' + use + '</td><td>' + appMethod + '</td><td>' + form + '</td><td title=\'' + codeLimit + '\'>' + code + '</td><td><a onclick="RemoveLine(' + trID + ',\'' + aLimitRow + '\')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></td></tr>');
+            }
+        }
+
+        //store id's to pass to controller        
+        if ($("#LimitationsAdded").val() == "") {
+            $("#LimitationsAdded").val(aLimitRow);
+        }
+        else {
+            $("#LimitationsAdded").val($("#LimitationsAdded").val() + aLimitRow);
+        }
+
+    }
+
+    function RemoveLine(trID, aLimitRow) {
+        //remove the row
+        $("#" + trID.id + "").remove();
+
+        //remove ids from hidden fields
+        $("#LimitationsAdded").val($("#LimitationsAdded").val().replace(aLimitRow, ""));
+        if ($("#LimitationsRemoved").val() == "") {
+            $("#LimitationsRemoved").val(aLimitRow);
+        }
+        else {
+            $("#LimitationsRemoved").val($("#LimitationsRemoved").val() + ", " + aLimitRow);
+        }
+        
+    }
+    //species tab: chose a group, go get the species for that group to populate dropdown
+    $("#Grpdropdown").change(function () {
+        var thisGroup = $("#Grpdropdown").val();
+        var url = "/BLTWeb/PULA/GetSpeciesByGroup/";
+        $.post(url, { id: thisGroup }, function (data) {
+            populatesppDD($("#Sppdropdown"), data);
+        });
+    });
+
+    //populate dropdown with returned spp
+    function populatesppDD(select, data) {
+        select.empty();
+        $.each(data, function (id, option) {
+            select.append($('<option>', {
+                value: option.SPECIES_ID,
+                text: option.COMMON_NAME
+            }));
+        });
+    }
+
+    //Species tab: add was clicked to add the spp to the table
+    function AddSpecies() {
+        var species = $("#Sppdropdown option:selected").text();
+        var spID = $("#Sppdropdown").val();
+        //store id's to pass to controller
+        $("#addedSpp ul").append('<li id=' + spID + '>' + species + '     <a onclick="RemoveSppLine(' + spID + ')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></li>');
+        if ($("#spIDsAdded").val() == "") {
+            $("#spIDsAdded").val(spID);
+        }
+        else {
+            $("#spIDsAdded").val($("#spIDsAdded").val() + "," + spID);
+        }
+        $("#Grpdropdown").val("");
+        $("#Sppdropdown").text("");
+    }
+
+    function RemoveSppLine(spID) {
+        //remove the row
+        $("#" + spID + "").remove();
+        //remove ids from hidden fields
+        $("#spIDsAdded").val($("#spIDsAdded").val().replace(spID, ""));
+        if ($("#spIDsRemoved").val() == "") {
+            $("#spIDsRemoved").val(spID);
+        }
+        else {
+            $("#spIDsRemoved").val($("#spIDsRemoved").val() + ", " + spID);
+        }
+
+    }
+
+    //PULA tab: add was clicked to add the product to the table below
+    function AddProduct() {
+        var product = $("#Proddropdown option:selected").text();
+        var prodID = $("#Proddropdown").val();
+        $("#addedProd ul").append('<li id=' + prodID + '>' + product + '     <a onclick="RemoveProdLine(' + prodID + ')"><img src="@Url.Content("~/Assets/Images/Close.fw.png")"/></a></li>');
+        //store ids to send to controller
+        if ($("#prodIDs").val() == "") {
+            $("#prodIDs").val(prodID);
+        }
+        else {
+            $("#prodIDs").val($("#prodIDs").val() + "," + prodID);
+        }
+    }
+
+    function RemoveProdLine(prodID) {
+        //remove the row
+        $("#" + prodID + "").remove();
+        //remove ids from hidden fields
+        $("#prodIDs").val($("#prodIDs").val().replace(prodID, ""));
+    }
+
+    function Summary() {
+        //get all the values from the tabs to populate the summary tab
+
+        //general tab
+        //if they put an effective Date, show it formatted here
+        var effectiveDate = "";
+        if ($("#EffMonths option:selected").val() != "") {
+            effectiveDate = $("#EffMonths option:selected").val() + "/01/" + $("#EffYears option:selected").val();
+        }
+        var createDate = $("#createDate").text();
+        var CreatedBy = $("#createdBy").text();
+        var COrg = $("#COrg").text();
+        var CDiv = $("#CDiv").text();
+        var ExpirationDate = "";
+        if ($("#ExMonths option:selected").val() != "") {
+            ExpirationDate = $("#ExMonths option:selected").val() + "/01/" + $("#ExYears option:selected").val();
+        }
+
+        //Justification Tab
+        var otherInfo = $("#otherInput").val();
+        var LbioInfo = $("#bioInput1").val();
+        var focInfo = $("#focInput").val();
+        var intInfo = $("#intInput").val();
+        var propInfo = $("#propInput").val();
+        var bioInfo2 = $("#bioInput2").val();
+        var baseData = $("#bd").val();
+        var baseDataMods = $("#bdm").val();
+        var addInfo = $("#addInfo").val();
+
+        //Species Tab
+        //get the spp html (<li>... ) then remove the Remove img
+        var $addedSpp = $("#addedSpp").html();
+        var $spp = $($addedSpp).clone().find('img').remove().end();
+
+        //PULA tab
+        //get the limitation table tbody, then remove the Remove img
+        var $cells = $("#LimitTable tbody").html();
+        var $Limits = $($cells).clone().find('img').remove().end();
+
+        //now populate the summary tab with all this
+        $("#leffectDate").text(effectiveDate);
+        $("#lcreateDate").text(createDate);
+        $("#createBy").text(CreatedBy);
+        $("#createOrg").text(COrg);
+        $("#createDiv").text(CDiv);
+        $("#ExpireDate").text(ExpirationDate);
+
+        if (otherInfo != "") {
+            $("#OtherInputInfo").text(otherInfo);
+            $("#otherDiv").show();
+        }
+        else {
+            $("#OtherInputInfo").text("");
+            $("#otherDiv").hide();
+        }
+        if (LbioInfo != "") {
+            $("#LbioInputInfo").text(LbioInfo);
+            $("#bioDiv1").show();
+        }
+        else {
+            $("#LbioInputInfo").text("");
+            $("#bioDiv1").hide();
+        }
+        if (focInfo != "") {
+            $("#focInputInfo").text(focInfo);
+            $("#focDiv").show();
+        }
+        else {
+            $("#focInputInfo").text("");
+            $("#focDiv").hide();
+        }
+        if (intInfo != "") {
+            $("#intInputInfo").text(intInfo);
+            $("#intDiv").show();
+        }
+        else {
+            $("#intInputInfo").text("");
+            $("#intDiv").hide();
+        }
+        if (propInfo != "") {
+            $("#propInputInfo").text(propInfo);
+            $("#propDiv").show();
+        }
+        else {
+            $("#propInputInfo").text("");
+            $("#propDiv").hide();
+        }
+        if (bioInfo2 != "") {
+            $("#RRbioInputInfo").text(bioInfo2);
+            $("#bioDiv2").show();
+        }
+        else {
+            $("#RRbioInputInfo").text("");
+            $("#bioDiv2").hide();
+        }
+
+        $("#bData").text(baseData);
+        $("#bdMods").text(baseDataMods);
+        $("#additionalInfo").text(addInfo);
+
+        $("#species").html($spp);
+
+        $("#AILimitSum tbody").html(""); //clear it first
+        $("#AILimitSum tbody").append($Limits);
+
+
+    }
+
+    //    $(function () {
+    //        $("#createForm").submit(function () {
+    //            $.ajax({
+    //                url: this.action,
+    //                type: this.method,
+    //                data: $(this).serialize(),
+    //                success: function (result) {
+    //                    if (result) {
+    //                        $("#loading").fadeOut();
+    //                        $("#content").html(response);
+    //                    }
+    //                }
+    //            });
+    //            // it is important to return false in order to cancel the default submission of the form and perform the AJAX call
+    //            return false;
+    //        });
+    //    });
+</script>

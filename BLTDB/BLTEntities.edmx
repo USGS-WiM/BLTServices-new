@@ -1,0 +1,1023 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="bltModel.Store" Provider="Npgsql" ProviderManifestToken="9.5.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="active_ingredient">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+          <Property Name="ingredient_name" Type="varchar" MaxLength="500" />
+          <Property Name="pc_code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="cas_number" Type="varchar" MaxLength="20" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="active_ingredient_ai_class">
+          <Key>
+            <PropertyRef Name="active_ingredient_ai_class_id" />
+          </Key>
+          <Property Name="active_ingredient_ai_class_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+          <Property Name="ai_class_id" Type="int4" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+        </EntityType>
+        <EntityType Name="active_ingredient_pula">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="pula_id" Type="int4" Nullable="false" />
+          <Property Name="pula_shape_id" Type="int4" Nullable="false" />
+          <Property Name="other_justification" Type="varchar" MaxLength="1000" />
+          <Property Name="base_data" Type="varchar" MaxLength="1000" />
+          <Property Name="base_data_modifiers" Type="varchar" MaxLength="1000" />
+          <Property Name="interim_proposed_decision" Type="varchar" MaxLength="500" />
+          <Property Name="focus_meeting" Type="varchar" MaxLength="500" />
+          <Property Name="biological_opinion_regreview" Type="varchar" MaxLength="500" />
+          <Property Name="biological_opinion_lit" Type="varchar" MaxLength="500" />
+          <Property Name="proposed_decision" Type="varchar" MaxLength="500" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="is_published" Type="int4" Nullable="false" />
+          <Property Name="effective_date" Type="timestamp" />
+          <Property Name="event_id" Type="int4" />
+          <Property Name="comments" Type="varchar" MaxLength="500" />
+          <Property Name="sec3_newchem" Type="varchar" MaxLength="500" />
+          <Property Name="sec3_newuse" Type="varchar" MaxLength="500" />
+          <Property Name="sec24" Type="varchar" MaxLength="500" />
+          <Property Name="final_decision" Type="varchar" MaxLength="500" />
+          <Property Name="sec18" Type="varchar" MaxLength="500" />
+          <Property Name="interim_decision" Type="varchar" MaxLength="500" />
+          <Property Name="additional_information" Type="text" />
+        </EntityType>
+        <EntityType Name="ai_class">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="ai_class_id" Type="int4" Nullable="false" />
+          <Property Name="ai_class_name" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="application_method">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="application_method_id" Type="int4" Nullable="false" />
+          <Property Name="method" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="crop_use">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="crop_use_id" Type="int4" Nullable="false" />
+          <Property Name="use" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="divisions">
+          <Key>
+            <PropertyRef Name="division_id" />
+          </Key>
+          <Property Name="division_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="division_name" Type="varchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="event">
+          <Key>
+            <PropertyRef Name="event_id" />
+          </Key>
+          <Property Name="event_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <EntityType Name="formulation">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="formulation_id" Type="int4" Nullable="false" />
+          <Property Name="form" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="limitations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="limitation_id" Type="int4" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="5" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="limitation" Type="varchar" MaxLength="4000" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="organization">
+          <Key>
+            <PropertyRef Name="organization_id" />
+          </Key>
+          <Property Name="organization_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="product_id" Type="int4" Nullable="false" />
+          <Property Name="product_registration_number" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="product_name" Type="varchar" MaxLength="300" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="product_name_status" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="product_active_ingredient">
+          <Key>
+            <PropertyRef Name="product_active_ingredient_id" />
+          </Key>
+          <Property Name="product_active_ingredient_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="product_id" Type="int4" Nullable="false" />
+          <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+        </EntityType>
+        <EntityType Name="pula_limitations">
+          <Key>
+            <PropertyRef Name="pula_limitation_id" />
+          </Key>
+          <Property Name="pula_limitation_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="active_ingredient_id" Type="int4" />
+          <Property Name="limitation_id" Type="int4" />
+          <Property Name="crop_use_id" Type="int4" />
+          <Property Name="application_method_id" Type="int4" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+          <Property Name="pula_id" Type="int4" Nullable="false" />
+          <Property Name="formulation_id" Type="int4" />
+          <Property Name="product_id" Type="int4" />
+        </EntityType>
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="role_id" />
+          </Key>
+          <Property Name="role_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="role_name" Type="varchar" MaxLength="25" Nullable="false" />
+          <Property Name="role_description" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="species_active_ingredient_pula">
+          <Key>
+            <PropertyRef Name="species_activeingrepula_id" />
+          </Key>
+          <Property Name="species_activeingrepula_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="species_id" Type="int4" Nullable="false" />
+          <Property Name="pula_id" Type="int4" Nullable="false" />
+          <Property Name="version_id" Type="int4" Nullable="false" />
+        </EntityType>
+        <EntityType Name="user_">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="varchar" MaxLength="255" />
+          <Property Name="email" Type="varchar" MaxLength="255" />
+          <Property Name="phone" Type="varchar" MaxLength="20" />
+          <Property Name="organization_id" Type="int4" />
+          <Property Name="division_id" Type="int4" />
+          <Property Name="role_id" Type="int4" Nullable="false" />
+          <Property Name="fname" Type="varchar" MaxLength="25" />
+          <Property Name="lname" Type="varchar" MaxLength="25" />
+        </EntityType>
+        <EntityType Name="version">
+          <Key>
+            <PropertyRef Name="version_id" />
+          </Key>
+          <Property Name="version_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="creator_id" Type="int4" />
+          <Property Name="created_time_stamp" Type="timestamp" />
+          <Property Name="publisher_id" Type="int4" />
+          <Property Name="published_time_stamp" Type="timestamp" />
+          <Property Name="expirer_id" Type="int4" />
+          <Property Name="expired_time_stamp" Type="timestamp" />
+          <Property Name="reviewer_id" Type="int4" />
+          <Property Name="reviewed_time_stamp" Type="timestamp" />
+        </EntityType>
+        <EntityContainer Name="bltModelStoreContainer">
+          <EntitySet Name="active_ingredient" EntityType="Self.active_ingredient" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="active_ingredient_ai_class" EntityType="Self.active_ingredient_ai_class" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="active_ingredient_pula" EntityType="Self.active_ingredient_pula" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="ai_class" EntityType="Self.ai_class" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="application_method" EntityType="Self.application_method" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="crop_use" EntityType="Self.crop_use" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="divisions" EntityType="Self.divisions" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="event" EntityType="Self.event" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="formulation" EntityType="Self.formulation" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="limitations" EntityType="Self.limitations" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="organization" EntityType="Self.organization" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="product" EntityType="Self.product" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="product_active_ingredient" EntityType="Self.product_active_ingredient" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="pula_limitations" EntityType="Self.pula_limitations" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="role" EntityType="Self.role" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="species_active_ingredient_pula" EntityType="Self.species_active_ingredient_pula" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="user_" EntityType="Self.user_" Schema="bltadmin" store:Type="Tables" />
+          <EntitySet Name="version" EntityType="Self.version" Schema="bltadmin" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="bltModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityType Name="active_ingredient">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="active_ingredient_id" Type="Int32" Nullable="false" />
+          <Property Name="ingredient_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="pc_code" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="cas_number" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionactive_ingredient" FromRole="active_ingredient" ToRole="version" />
+        </EntityType>
+        <EntityType Name="active_ingredient_ai_class">
+          <Key>
+            <PropertyRef Name="active_ingredient_ai_class_id" />
+          </Key>
+          <Property Name="active_ingredient_ai_class_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="active_ingredient_id" Type="Int32" Nullable="false" />
+          <Property Name="ai_class_id" Type="Int32" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionactive_ingredient_ai_class" FromRole="active_ingredient_ai_class" ToRole="version" />
+        </EntityType>
+        <EntityType Name="active_ingredient_pula">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="pula_id" Type="Int32" Nullable="false" />
+          <Property Name="pula_shape_id" Type="Int32" Nullable="false" />
+          <Property Name="other_justification" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="base_data" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="base_data_modifiers" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="interim_proposed_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="focus_meeting" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="biological_opinion_regreview" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="biological_opinion_lit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="proposed_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="is_published" Type="Int32" Nullable="false" />
+          <Property Name="effective_date" Type="DateTime" Precision="6" />
+          <Property Name="event_id" Type="Int32" />
+          <Property Name="comments" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sec3_newchem" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sec3_newuse" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sec24" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="final_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="sec18" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="interim_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="additional_information" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionactive_ingredient_pula" FromRole="active_ingredient_pula" ToRole="version" />
+          <NavigationProperty Name="event" Relationship="bltModel.eventactive_ingredient_pula" FromRole="active_ingredient_pula" ToRole="event" />
+        </EntityType>
+        <EntityType Name="ai_class">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="ai_class_id" Type="Int32" Nullable="false" />
+          <Property Name="ai_class_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionai_class" FromRole="ai_class" ToRole="version" />
+        </EntityType>
+        <EntityType Name="application_method">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="application_method_id" Type="Int32" Nullable="false" />
+          <Property Name="method" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionapplication_method" FromRole="application_method" ToRole="version" />
+        </EntityType>
+        <EntityType Name="crop_use">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="crop_use_id" Type="Int32" Nullable="false" />
+          <Property Name="use" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versioncrop_use" FromRole="crop_use" ToRole="version" />
+        </EntityType>
+        <EntityType Name="division">
+          <Key>
+            <PropertyRef Name="division_id" />
+          </Key>
+          <Property Name="division_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="division_name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="user_" Relationship="bltModel.divisionuser_" FromRole="division" ToRole="user_" />
+        </EntityType>
+        <EntityType Name="event">
+          <Key>
+            <PropertyRef Name="event_id" />
+          </Key>
+          <Property Name="event_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="active_ingredient_pula" Relationship="bltModel.eventactive_ingredient_pula" FromRole="event" ToRole="active_ingredient_pula" />
+        </EntityType>
+        <EntityType Name="formulation">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="formulation_id" Type="Int32" Nullable="false" />
+          <Property Name="form" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionformulation" FromRole="formulation" ToRole="version" />
+        </EntityType>
+        <EntityType Name="limitation">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="limitation_id" Type="Int32" Nullable="false" />
+          <Property Name="code" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="limitation1" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionlimitation" FromRole="limitation" ToRole="version" />
+        </EntityType>
+        <EntityType Name="organization">
+          <Key>
+            <PropertyRef Name="organization_id" />
+          </Key>
+          <Property Name="organization_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="user_" Relationship="bltModel.organizationuser_" FromRole="organization" ToRole="user_" />
+        </EntityType>
+        <EntityType Name="product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="product_id" Type="Int32" Nullable="false" />
+          <Property Name="product_registration_number" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="product_name" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="product_name_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="versions" Relationship="bltModel.productversion" FromRole="product" ToRole="version" />
+        </EntityType>
+        <EntityType Name="product_active_ingredient">
+          <Key>
+            <PropertyRef Name="product_active_ingredient_id" />
+          </Key>
+          <Property Name="product_active_ingredient_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="product_id" Type="Int32" Nullable="false" />
+          <Property Name="active_ingredient_id" Type="Int32" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionproduct_active_ingredient" FromRole="product_active_ingredient" ToRole="version" />
+        </EntityType>
+        <EntityType Name="pula_limitations">
+          <Key>
+            <PropertyRef Name="pula_limitation_id" />
+          </Key>
+          <Property Name="pula_limitation_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="active_ingredient_id" Type="Int32" />
+          <Property Name="limitation_id" Type="Int32" />
+          <Property Name="crop_use_id" Type="Int32" />
+          <Property Name="application_method_id" Type="Int32" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <Property Name="pula_id" Type="Int32" Nullable="false" />
+          <Property Name="formulation_id" Type="Int32" />
+          <Property Name="product_id" Type="Int32" />
+          <NavigationProperty Name="version" Relationship="bltModel.versionpula_limitations" FromRole="pula_limitations" ToRole="version" />
+        </EntityType>
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="role_id" />
+          </Key>
+          <Property Name="role_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="role_name" Type="String" MaxLength="25" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="role_description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="user_" Relationship="bltModel.roleuser_" FromRole="role" ToRole="user_" />
+        </EntityType>
+        <EntityType Name="species_active_ingredient_pula">
+          <Key>
+            <PropertyRef Name="species_activeingrepula_id" />
+          </Key>
+          <Property Name="species_activeingrepula_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="species_id" Type="Int32" Nullable="false" />
+          <Property Name="pula_id" Type="Int32" Nullable="false" />
+          <Property Name="version_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="version" Relationship="bltModel.species_active_ingredient_pulaversion" FromRole="species_active_ingredient_pula" ToRole="version" />
+        </EntityType>
+        <EntityType Name="user_">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="organization_id" Type="Int32" />
+          <Property Name="division_id" Type="Int32" />
+          <Property Name="role_id" Type="Int32" Nullable="false" />
+          <Property Name="fname" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="lname" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="versions" Relationship="bltModel.user_version" FromRole="user_" ToRole="version" />
+          <NavigationProperty Name="versions1" Relationship="bltModel.user_version1" FromRole="user_" ToRole="version" />
+          <NavigationProperty Name="versions2" Relationship="bltModel.user_version2" FromRole="user_" ToRole="version" />
+          <NavigationProperty Name="organization" Relationship="bltModel.organizationuser_" FromRole="user_" ToRole="organization" />
+          <NavigationProperty Name="division" Relationship="bltModel.divisionuser_" FromRole="user_" ToRole="division" />
+          <NavigationProperty Name="role" Relationship="bltModel.roleuser_" FromRole="user_" ToRole="role" />
+        </EntityType>
+        <EntityType Name="version">
+          <Key>
+            <PropertyRef Name="version_id" />
+          </Key>
+          <Property Name="version_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="creator_id" Type="Int32" />
+          <Property Name="created_time_stamp" Type="DateTime" Precision="6" />
+          <Property Name="publisher_id" Type="Int32" />
+          <Property Name="published_time_stamp" Type="DateTime" Precision="6" />
+          <Property Name="expirer_id" Type="Int32" />
+          <Property Name="expired_time_stamp" Type="DateTime" Precision="6" />
+          <Property Name="reviewer_id" Type="Int32" />
+          <Property Name="reviewed_time_stamp" Type="DateTime" Precision="6" />
+          <NavigationProperty Name="active_ingredient_pula" Relationship="bltModel.versionactive_ingredient_pula" FromRole="version" ToRole="active_ingredient_pula" />
+          <NavigationProperty Name="pula_limitations" Relationship="bltModel.versionpula_limitations" FromRole="version" ToRole="pula_limitations" />
+          <NavigationProperty Name="formulations" Relationship="bltModel.versionformulation" FromRole="version" ToRole="formulation" />
+          <NavigationProperty Name="application_method" Relationship="bltModel.versionapplication_method" FromRole="version" ToRole="application_method" />
+          <NavigationProperty Name="crop_use" Relationship="bltModel.versioncrop_use" FromRole="version" ToRole="crop_use" />
+          <NavigationProperty Name="limitations" Relationship="bltModel.versionlimitation" FromRole="version" ToRole="limitation" />
+          <NavigationProperty Name="species_active_ingredient_pula" Relationship="bltModel.species_active_ingredient_pulaversion" FromRole="version" ToRole="species_active_ingredient_pula" />
+          <NavigationProperty Name="Publisher" Relationship="bltModel.user_version" FromRole="version" ToRole="user_" />
+          <NavigationProperty Name="Creator" Relationship="bltModel.user_version1" FromRole="version" ToRole="user_" />
+          <NavigationProperty Name="Expirer" Relationship="bltModel.user_version2" FromRole="version" ToRole="user_" />
+          <NavigationProperty Name="ai_class" Relationship="bltModel.versionai_class" FromRole="version" ToRole="ai_class" />
+          <NavigationProperty Name="active_ingredient_ai_class" Relationship="bltModel.versionactive_ingredient_ai_class" FromRole="version" ToRole="active_ingredient_ai_class" />
+          <NavigationProperty Name="product_active_ingredient" Relationship="bltModel.versionproduct_active_ingredient" FromRole="version" ToRole="product_active_ingredient" />
+          <NavigationProperty Name="product" Relationship="bltModel.productversion" FromRole="version" ToRole="product" />
+          <NavigationProperty Name="active_ingredient" Relationship="bltModel.versionactive_ingredient" FromRole="version" ToRole="active_ingredient" />
+        </EntityType>
+        <EntityContainer Name="bltEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="active_ingredient" EntityType="Self.active_ingredient" />
+          <EntitySet Name="active_ingredient_ai_class" EntityType="Self.active_ingredient_ai_class" />
+          <EntitySet Name="active_ingredient_pula" EntityType="Self.active_ingredient_pula" />
+          <EntitySet Name="ai_class" EntityType="Self.ai_class" />
+          <EntitySet Name="application_method" EntityType="Self.application_method" />
+          <EntitySet Name="crop_use" EntityType="Self.crop_use" />
+          <EntitySet Name="divisions" EntityType="Self.division" />
+          <EntitySet Name="events" EntityType="Self.event" />
+          <EntitySet Name="formulations" EntityType="Self.formulation" />
+          <EntitySet Name="limitations" EntityType="Self.limitation" />
+          <EntitySet Name="organizations" EntityType="Self.organization" />
+          <EntitySet Name="products" EntityType="Self.product" />
+          <EntitySet Name="product_active_ingredient" EntityType="Self.product_active_ingredient" />
+          <EntitySet Name="pula_limitations" EntityType="Self.pula_limitations" />
+          <EntitySet Name="roles" EntityType="Self.role" />
+          <EntitySet Name="species_active_ingredient_pula" EntityType="Self.species_active_ingredient_pula" />
+          <EntitySet Name="user_" EntityType="Self.user_" />
+          <EntitySet Name="versions" EntityType="Self.version" />
+          <AssociationSet Name="versionactive_ingredient_pula" Association="bltModel.versionactive_ingredient_pula">
+            <End Role="version" EntitySet="versions" />
+            <End Role="active_ingredient_pula" EntitySet="active_ingredient_pula" />
+          </AssociationSet>
+          <AssociationSet Name="versionpula_limitations" Association="bltModel.versionpula_limitations">
+            <End Role="version" EntitySet="versions" />
+            <End Role="pula_limitations" EntitySet="pula_limitations" />
+          </AssociationSet>
+          <AssociationSet Name="versionformulation" Association="bltModel.versionformulation">
+            <End Role="version" EntitySet="versions" />
+            <End Role="formulation" EntitySet="formulations" />
+          </AssociationSet>
+          <AssociationSet Name="versionapplication_method" Association="bltModel.versionapplication_method">
+            <End Role="version" EntitySet="versions" />
+            <End Role="application_method" EntitySet="application_method" />
+          </AssociationSet>
+          <AssociationSet Name="versioncrop_use" Association="bltModel.versioncrop_use">
+            <End Role="version" EntitySet="versions" />
+            <End Role="crop_use" EntitySet="crop_use" />
+          </AssociationSet>
+          <AssociationSet Name="versionlimitation" Association="bltModel.versionlimitation">
+            <End Role="version" EntitySet="versions" />
+            <End Role="limitation" EntitySet="limitations" />
+          </AssociationSet>
+          <AssociationSet Name="species_active_ingredient_pulaversion" Association="bltModel.species_active_ingredient_pulaversion">
+            <End Role="species_active_ingredient_pula" EntitySet="species_active_ingredient_pula" />
+            <End Role="version" EntitySet="versions" />
+          </AssociationSet>
+          <AssociationSet Name="user_version" Association="bltModel.user_version">
+            <End Role="user_" EntitySet="user_" />
+            <End Role="version" EntitySet="versions" />
+          </AssociationSet>
+          <AssociationSet Name="user_version1" Association="bltModel.user_version1">
+            <End Role="user_" EntitySet="user_" />
+            <End Role="version" EntitySet="versions" />
+          </AssociationSet>
+          <AssociationSet Name="user_version2" Association="bltModel.user_version2">
+            <End Role="user_" EntitySet="user_" />
+            <End Role="version" EntitySet="versions" />
+          </AssociationSet>
+          <AssociationSet Name="versionai_class" Association="bltModel.versionai_class">
+            <End Role="version" EntitySet="versions" />
+            <End Role="ai_class" EntitySet="ai_class" />
+          </AssociationSet>
+          <AssociationSet Name="versionactive_ingredient_ai_class" Association="bltModel.versionactive_ingredient_ai_class">
+            <End Role="version" EntitySet="versions" />
+            <End Role="active_ingredient_ai_class" EntitySet="active_ingredient_ai_class" />
+          </AssociationSet>
+          <AssociationSet Name="versionproduct_active_ingredient" Association="bltModel.versionproduct_active_ingredient">
+            <End Role="version" EntitySet="versions" />
+            <End Role="product_active_ingredient" EntitySet="product_active_ingredient" />
+          </AssociationSet>
+          <AssociationSet Name="productversion" Association="bltModel.productversion">
+            <End Role="product" EntitySet="products" />
+            <End Role="version" EntitySet="versions" />
+          </AssociationSet>
+          <AssociationSet Name="versionactive_ingredient" Association="bltModel.versionactive_ingredient">
+            <End Role="version" EntitySet="versions" />
+            <End Role="active_ingredient" EntitySet="active_ingredient" />
+          </AssociationSet>
+          <AssociationSet Name="eventactive_ingredient_pula" Association="bltModel.eventactive_ingredient_pula">
+            <End Role="event" EntitySet="events" />
+            <End Role="active_ingredient_pula" EntitySet="active_ingredient_pula" />
+          </AssociationSet>
+          <AssociationSet Name="organizationuser_" Association="bltModel.organizationuser_">
+            <End Role="organization" EntitySet="organizations" />
+            <End Role="user_" EntitySet="user_" />
+          </AssociationSet>
+          <AssociationSet Name="divisionuser_" Association="bltModel.divisionuser_">
+            <End Role="division" EntitySet="divisions" />
+            <End Role="user_" EntitySet="user_" />
+          </AssociationSet>
+          <AssociationSet Name="roleuser_" Association="bltModel.roleuser_">
+            <End Role="role" EntitySet="roles" />
+            <End Role="user_" EntitySet="user_" />
+          </AssociationSet>
+        </EntityContainer>
+        <Association Name="versionactive_ingredient_pula">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.active_ingredient_pula" Role="active_ingredient_pula" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="active_ingredient_pula">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionpula_limitations">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.pula_limitations" Role="pula_limitations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="pula_limitations">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionformulation">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.formulation" Role="formulation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="formulation">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionapplication_method">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.application_method" Role="application_method" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="application_method">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versioncrop_use">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.crop_use" Role="crop_use" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="crop_use">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionlimitation">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.limitation" Role="limitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="limitation">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="species_active_ingredient_pulaversion">
+          <End Type="bltModel.species_active_ingredient_pula" Role="species_active_ingredient_pula" Multiplicity="*" />
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="species_active_ingredient_pula">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="user_version">
+          <End Type="bltModel.user_" Role="user_" Multiplicity="0..1" />
+          <End Type="bltModel.version" Role="version" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_">
+              <PropertyRef Name="user_id" />
+            </Principal>
+            <Dependent Role="version">
+              <PropertyRef Name="publisher_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="user_version1">
+          <End Type="bltModel.user_" Role="user_" Multiplicity="0..1" />
+          <End Type="bltModel.version" Role="version" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_">
+              <PropertyRef Name="user_id" />
+            </Principal>
+            <Dependent Role="version">
+              <PropertyRef Name="creator_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="user_version2">
+          <End Type="bltModel.user_" Role="user_" Multiplicity="0..1" />
+          <End Type="bltModel.version" Role="version" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user_">
+              <PropertyRef Name="user_id" />
+            </Principal>
+            <Dependent Role="version">
+              <PropertyRef Name="expirer_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionai_class">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.ai_class" Role="ai_class" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="ai_class">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionactive_ingredient_ai_class">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.active_ingredient_ai_class" Role="active_ingredient_ai_class" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="active_ingredient_ai_class">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionproduct_active_ingredient">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.product_active_ingredient" Role="product_active_ingredient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="product_active_ingredient">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="productversion">
+          <End Type="bltModel.product" Role="product" Multiplicity="*" />
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="product">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="versionactive_ingredient">
+          <End Type="bltModel.version" Role="version" Multiplicity="1" />
+          <End Type="bltModel.active_ingredient" Role="active_ingredient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="version">
+              <PropertyRef Name="version_id" />
+            </Principal>
+            <Dependent Role="active_ingredient">
+              <PropertyRef Name="version_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="eventactive_ingredient_pula">
+          <End Type="bltModel.event" Role="event" Multiplicity="0..1" />
+          <End Type="bltModel.active_ingredient_pula" Role="active_ingredient_pula" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="event">
+              <PropertyRef Name="event_id" />
+            </Principal>
+            <Dependent Role="active_ingredient_pula">
+              <PropertyRef Name="event_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="organizationuser_">
+          <End Type="bltModel.organization" Role="organization" Multiplicity="0..1" />
+          <End Type="bltModel.user_" Role="user_" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="organization">
+              <PropertyRef Name="organization_id" />
+            </Principal>
+            <Dependent Role="user_">
+              <PropertyRef Name="organization_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="divisionuser_">
+          <End Type="bltModel.division" Role="division" Multiplicity="0..1" />
+          <End Type="bltModel.user_" Role="user_" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="division">
+              <PropertyRef Name="division_id" />
+            </Principal>
+            <Dependent Role="user_">
+              <PropertyRef Name="division_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="roleuser_">
+          <End Type="bltModel.role" Role="role" Multiplicity="1" />
+          <End Type="bltModel.user_" Role="user_" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="role">
+              <PropertyRef Name="role_id" />
+            </Principal>
+            <Dependent Role="user_">
+              <PropertyRef Name="role_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="bltModelStoreContainer" CdmEntityContainer="bltEntities">
+          <EntitySetMapping Name="active_ingredient">
+            <EntityTypeMapping TypeName="bltModel.active_ingredient">
+              <MappingFragment StoreEntitySet="active_ingredient">
+                <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+                <ScalarProperty Name="ingredient_name" ColumnName="ingredient_name" />
+                <ScalarProperty Name="pc_code" ColumnName="pc_code" />
+                <ScalarProperty Name="cas_number" ColumnName="cas_number" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="active_ingredient_ai_class">
+            <EntityTypeMapping TypeName="bltModel.active_ingredient_ai_class">
+              <MappingFragment StoreEntitySet="active_ingredient_ai_class">
+                <ScalarProperty Name="active_ingredient_ai_class_id" ColumnName="active_ingredient_ai_class_id" />
+                <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+                <ScalarProperty Name="ai_class_id" ColumnName="ai_class_id" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="active_ingredient_pula">
+            <EntityTypeMapping TypeName="bltModel.active_ingredient_pula">
+              <MappingFragment StoreEntitySet="active_ingredient_pula">
+                <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+                <ScalarProperty Name="pula_shape_id" ColumnName="pula_shape_id" />
+                <ScalarProperty Name="other_justification" ColumnName="other_justification" />
+                <ScalarProperty Name="base_data" ColumnName="base_data" />
+                <ScalarProperty Name="base_data_modifiers" ColumnName="base_data_modifiers" />
+                <ScalarProperty Name="interim_proposed_decision" ColumnName="interim_proposed_decision" />
+                <ScalarProperty Name="focus_meeting" ColumnName="focus_meeting" />
+                <ScalarProperty Name="biological_opinion_regreview" ColumnName="biological_opinion_regreview" />
+                <ScalarProperty Name="biological_opinion_lit" ColumnName="biological_opinion_lit" />
+                <ScalarProperty Name="proposed_decision" ColumnName="proposed_decision" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="is_published" ColumnName="is_published" />
+                <ScalarProperty Name="effective_date" ColumnName="effective_date" />
+                <ScalarProperty Name="event_id" ColumnName="event_id" />
+                <ScalarProperty Name="comments" ColumnName="comments" />
+                <ScalarProperty Name="sec3_newchem" ColumnName="sec3_newchem" />
+                <ScalarProperty Name="sec3_newuse" ColumnName="sec3_newuse" />
+                <ScalarProperty Name="sec24" ColumnName="sec24" />
+                <ScalarProperty Name="final_decision" ColumnName="final_decision" />
+                <ScalarProperty Name="sec18" ColumnName="sec18" />
+                <ScalarProperty Name="interim_decision" ColumnName="interim_decision" />
+                <ScalarProperty Name="additional_information" ColumnName="additional_information" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ai_class">
+            <EntityTypeMapping TypeName="bltModel.ai_class">
+              <MappingFragment StoreEntitySet="ai_class">
+                <ScalarProperty Name="ai_class_id" ColumnName="ai_class_id" />
+                <ScalarProperty Name="ai_class_name" ColumnName="ai_class_name" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="application_method">
+            <EntityTypeMapping TypeName="bltModel.application_method">
+              <MappingFragment StoreEntitySet="application_method">
+                <ScalarProperty Name="application_method_id" ColumnName="application_method_id" />
+                <ScalarProperty Name="method" ColumnName="method" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="crop_use">
+            <EntityTypeMapping TypeName="bltModel.crop_use">
+              <MappingFragment StoreEntitySet="crop_use">
+                <ScalarProperty Name="crop_use_id" ColumnName="crop_use_id" />
+                <ScalarProperty Name="use" ColumnName="use" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="divisions">
+            <EntityTypeMapping TypeName="bltModel.division">
+              <MappingFragment StoreEntitySet="divisions">
+                <ScalarProperty Name="division_id" ColumnName="division_id" />
+                <ScalarProperty Name="division_name" ColumnName="division_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="events">
+            <EntityTypeMapping TypeName="bltModel.event">
+              <MappingFragment StoreEntitySet="event">
+                <ScalarProperty Name="event_id" ColumnName="event_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="formulations">
+            <EntityTypeMapping TypeName="bltModel.formulation">
+              <MappingFragment StoreEntitySet="formulation">
+                <ScalarProperty Name="formulation_id" ColumnName="formulation_id" />
+                <ScalarProperty Name="form" ColumnName="form" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="limitations">
+            <EntityTypeMapping TypeName="bltModel.limitation">
+              <MappingFragment StoreEntitySet="limitations">
+                <ScalarProperty Name="limitation_id" ColumnName="limitation_id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="limitation1" ColumnName="limitation" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="organizations">
+            <EntityTypeMapping TypeName="bltModel.organization">
+              <MappingFragment StoreEntitySet="organization">
+                <ScalarProperty Name="organization_id" ColumnName="organization_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="products">
+            <EntityTypeMapping TypeName="bltModel.product">
+              <MappingFragment StoreEntitySet="product">
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="product_registration_number" ColumnName="product_registration_number" />
+                <ScalarProperty Name="product_name" ColumnName="product_name" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="product_name_status" ColumnName="product_name_status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="product_active_ingredient">
+            <EntityTypeMapping TypeName="bltModel.product_active_ingredient">
+              <MappingFragment StoreEntitySet="product_active_ingredient">
+                <ScalarProperty Name="product_active_ingredient_id" ColumnName="product_active_ingredient_id" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="pula_limitations">
+            <EntityTypeMapping TypeName="bltModel.pula_limitations">
+              <MappingFragment StoreEntitySet="pula_limitations">
+                <ScalarProperty Name="pula_limitation_id" ColumnName="pula_limitation_id" />
+                <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+                <ScalarProperty Name="limitation_id" ColumnName="limitation_id" />
+                <ScalarProperty Name="crop_use_id" ColumnName="crop_use_id" />
+                <ScalarProperty Name="application_method_id" ColumnName="application_method_id" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+                <ScalarProperty Name="formulation_id" ColumnName="formulation_id" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="roles">
+            <EntityTypeMapping TypeName="bltModel.role">
+              <MappingFragment StoreEntitySet="role">
+                <ScalarProperty Name="role_id" ColumnName="role_id" />
+                <ScalarProperty Name="role_name" ColumnName="role_name" />
+                <ScalarProperty Name="role_description" ColumnName="role_description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="species_active_ingredient_pula">
+            <EntityTypeMapping TypeName="bltModel.species_active_ingredient_pula">
+              <MappingFragment StoreEntitySet="species_active_ingredient_pula">
+                <ScalarProperty Name="species_activeingrepula_id" ColumnName="species_activeingrepula_id" />
+                <ScalarProperty Name="species_id" ColumnName="species_id" />
+                <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user_">
+            <EntityTypeMapping TypeName="bltModel.user_">
+              <MappingFragment StoreEntitySet="user_">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="organization_id" ColumnName="organization_id" />
+                <ScalarProperty Name="division_id" ColumnName="division_id" />
+                <ScalarProperty Name="role_id" ColumnName="role_id" />
+                <ScalarProperty Name="fname" ColumnName="fname" />
+                <ScalarProperty Name="lname" ColumnName="lname" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="versions">
+            <EntityTypeMapping TypeName="bltModel.version">
+              <MappingFragment StoreEntitySet="version">
+                <ScalarProperty Name="version_id" ColumnName="version_id" />
+                <ScalarProperty Name="creator_id" ColumnName="creator_id" />
+                <ScalarProperty Name="created_time_stamp" ColumnName="created_time_stamp" />
+                <ScalarProperty Name="publisher_id" ColumnName="publisher_id" />
+                <ScalarProperty Name="published_time_stamp" ColumnName="published_time_stamp" />
+                <ScalarProperty Name="expirer_id" ColumnName="expirer_id" />
+                <ScalarProperty Name="expired_time_stamp" ColumnName="expired_time_stamp" />
+                <ScalarProperty Name="reviewer_id" ColumnName="reviewer_id" />
+                <ScalarProperty Name="reviewed_time_stamp" ColumnName="reviewed_time_stamp" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

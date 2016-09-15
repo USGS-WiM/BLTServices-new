@@ -1,0 +1,577 @@
+﻿//------------------------------------------------------------------------------
+//----- PULALimitationsHandler ---------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 11.09.12 - TR - Changed class name from SiteHandler to PULALimitationsHandler and removed ForUriName "Sites" references
+// 10.19.12 - JB - Created from STN
+#endregion
+
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+
+namespace BLTServices.Handlers
+{
+    public class PULALimitationsHandler: HandlerBase
+    {
+
+        #region Properties
+        public override string entityName
+        {
+            get { return "PULA_LIMITATIONS"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        //---------------------Returns List of objects---------------------
+        // returns all PULA_LIMITATIONS
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<PULA_LIMITATIONS> pulaLimit;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        pulaLimit = GetEntities<PULA_LIMITATIONS>(aBLTE).ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<PULA_LIMITATIONS>(pulaLimit);
+
+                return new OperationResult.OK { ResponseResource = pulaLimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns all active PULA_LIMITATIONS
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(string date)
+        {
+            List<PULA_LIMITATIONS> pulaLimit = null;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now; 
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+              
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    pulaLimit = GetActive(GetEntities<PULA_LIMITATIONS>(aBLTE), thisDate.Value).ToList();
+                }//end using
+
+                activateLinks<PULA_LIMITATIONS>(pulaLimit);
+
+                return new OperationResult.OK { ResponseResource = pulaLimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+
+        }//end HttpMethod.GET
+
+        // returns all PULALimitations (active if date is supplied)
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 PULALimitationsID, [Optional] string date)
+        {
+            try
+            {
+                List<PULA_LIMITATIONS> pulaLimitationList;
+                DateTime? thisDate = ValidDate(date);
+
+                if (PULALimitationsID < 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        IQueryable<PULA_LIMITATIONS> query;
+                        query = GetEntities<PULA_LIMITATIONS>(aBLTE).Where(ai => ai.PULA_LIMITATION_ID == PULALimitationsID);
+
+                        if (thisDate.HasValue)
+                            query = GetActive(query, thisDate.Value);
+
+                        //process
+                        pulaLimitationList = query.ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<PULA_LIMITATIONS>(pulaLimitationList);
+
+                return new OperationResult.OK { ResponseResource = pulaLimitationList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns active Active PULA_LIMITATIONS for the given pulaID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetPULALimitations")]
+        public OperationResult GetPULAactiveLimitations(Int32 pulaId, [Optional]string date)
+        {
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                List<PULA_LIMITATIONS> pulaLimitationList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    IQueryable<PULA_LIMITATIONS> query1 = GetEntities<PULA_LIMITATIONS>(aBLTE).Where(a => a.PULA_ID == pulaId);
+
+                    pulaLimitationList = GetActive(query1, thisDate.Value).ToList();
+
+                    activateLinks<PULA_LIMITATIONS>(pulaLimitationList);
+
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = pulaLimitationList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns Saved (not published) PULA_LIMITATIONS for the given pulaID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetSavedPULALimitations")]
+        public OperationResult GetPULAactiveLimitations(Int32 pulaID)
+        {
+            try
+            {
+                List<PULA_LIMITATIONS> pulaLimitationList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    pulaLimitationList = GetEntities<PULA_LIMITATIONS>(aBLTE).Where(a => a.PULA_ID == pulaID).ToList();
+
+                    activateLinks<PULA_LIMITATIONS>(pulaLimitationList);
+
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = pulaLimitationList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        //---------------------Returns individual objects---------------------
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]
+        public OperationResult GetEntity(Int32 entityID)
+        {
+            PULA_LIMITATIONS aPULALimit;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aPULALimit = GetEntities<PULA_LIMITATIONS>(aBLTE).SingleOrDefault(ai => ai.PULA_LIMITATION_ID == entityID);
+
+                    }//end using
+                }//end using
+
+                activateLinks<PULA_LIMITATIONS>(aPULALimit);
+
+                return new OperationResult.OK { ResponseResource = aPULALimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        #endregion
+        #region POST Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(PULA_LIMITATIONS anEntity)
+        {
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        if (!Exists(aBLTE, ref anEntity))
+                        {
+                            //create version - do not version yet. Set create on activation
+                            //anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                            //assign version
+                            anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+
+                            aBLTE.PULA_LIMITATIONS.AddObject(anEntity);
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region Activate Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Activate")]
+        public OperationResult Activate(Int32 entityID, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            PULA_LIMITATIONS aPULALimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        aPULALimit = aBLTE.PULA_LIMITATIONS.FirstOrDefault(ai => ai.PULA_LIMITATION_ID == entityID);
+
+                        if (aPULALimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //assign version
+                        aPULALimit.VERSION_ID = SetVersion(aBLTE, aPULALimit.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                       
+                        aBLTE.SaveChanges();
+
+                        activateLinks<PULA_LIMITATIONS>(aPULALimit);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aPULALimit };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EDIT Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="Edit")]
+        public OperationResult Edit(Int32 entityID, PULA_LIMITATIONS anEntity, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            PULA_LIMITATIONS aPULALimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+                
+                if (entityID >= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        aPULALimit = aBLTE.PULA_LIMITATIONS.FirstOrDefault(ai => ai.PULA_LIMITATION_ID == entityID);
+                        if (aPULALimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire 
+                        aPULALimit.VERSION_ID = SetVersion(aBLTE, aPULALimit.VERSION_ID, loggedInUser.USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        //assign version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                        //activate version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+
+                        aBLTE.PULA_LIMITATIONS.AddObject(anEntity);
+                        aBLTE.SaveChanges();
+
+                        activateLinks<PULA_LIMITATIONS>(anEntity);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.PUT)]
+        public OperationResult Put(Int32 entityID, PULA_LIMITATIONS anEntity)
+        {
+            PULA_LIMITATIONS updatedPULALimitations;
+
+            //Return BadRequest if missing required fields
+            if ((entityID <= 0 || anEntity.PULA_ID <=0))
+                return new OperationResult.BadRequest();
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = GetSecuredPassword())
+            {
+                using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                {
+                    updatedPULALimitations = aBLTE.PULA_LIMITATIONS.FirstOrDefault(ail => ail.PULA_LIMITATION_ID == entityID);
+                    if (updatedPULALimitations == null || updatedPULALimitations.VERSION.PUBLISHED_TIME_STAMP.HasValue)
+                    { return new OperationResult.BadRequest(); }
+
+                    //NOTE: PULAID can not be changed
+                    if (!updatedPULALimitations.PULA_ID.Equals(anEntity.PULA_ID))
+                        return new OperationResult.BadRequest { Description = "PULA ID cannot be edited" };
+
+                    //Update fields
+                    updatedPULALimitations.ACTIVE_INGREDIENT_ID = anEntity.ACTIVE_INGREDIENT_ID;
+                    updatedPULALimitations.LIMITATION_ID = anEntity.LIMITATION_ID;
+                    updatedPULALimitations.CROP_USE_ID = anEntity.CROP_USE_ID;
+                    updatedPULALimitations.APPLICATION_METHOD_ID = anEntity.APPLICATION_METHOD_ID;
+                    updatedPULALimitations.FORMULATION_ID = anEntity.FORMULATION_ID;
+                    updatedPULALimitations.PRODUCT_ID = anEntity.PRODUCT_ID;
+
+                    aBLTE.SaveChanges();
+
+                    activateLinks<PULA_LIMITATIONS>(updatedPULALimitations);
+
+                }//end using
+            }//end using
+
+            return new OperationResult.OK { ResponseResource = updatedPULALimitations };
+        }//end HttpMethod.PUT
+        #endregion
+        #region EXPIRE Methods
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreatorRole })]
+        [HttpOperation(HttpMethod.DELETE)]
+        public OperationResult Delete(Int32 entityID)
+        {
+            PULA_LIMITATIONS aPULALimit;
+            try
+            {
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+
+                        aPULALimit = aBLTE.PULA_LIMITATIONS.FirstOrDefault(ai => ai.PULA_LIMITATION_ID == entityID);
+                        if (aPULALimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        if (aPULALimit.VERSION_ID > 0 || aPULALimit.VERSION.CREATED_TIME_STAMP.HasValue)
+                            return new OperationResult.Forbidden { Description = "Object has been set to versioning. Cannot delete" };
+
+                        //Delete 
+                        aBLTE.PULA_LIMITATIONS.DeleteObject(aPULALimit);
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<PULA_LIMITATIONS>(aPULALimit);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aPULALimit };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.DELETE, ForUriName = "Expire")]
+        public OperationResult Expire(Int32 entityID, [Optional ]string date)
+        {
+            PULA_LIMITATIONS aPULALimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+
+                        aPULALimit = aBLTE.PULA_LIMITATIONS.FirstOrDefault(ai => ai.PULA_LIMITATION_ID == entityID);
+                        if (aPULALimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire current 
+                        aPULALimit.VERSION_ID = SetVersion(aBLTE, aPULALimit.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<PULA_LIMITATIONS>(aPULALimit);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aPULALimit };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "ExpirePULALimitations")]
+        public OperationResult ExpirePULALimitations(Int32 pulaID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            List<PULA_LIMITATIONS> pulaLimitationList;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (pulaID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        pulaLimitationList = GetEntities<PULA_LIMITATIONS>(aBLTE).Where(l => l.PULA_ID == pulaID &&
+                                                                              l.VERSION.PUBLISHED_TIME_STAMP >= thisDate.Value).ToList();
+                        USER_ loggedInUser =LoggedInUser(aBLTE);
+                        if (pulaLimitationList != null)
+                        {
+                            foreach (var p in pulaLimitationList)
+                            {
+                                p.VERSION = SetVersion(aBLTE, p.VERSION_ID, loggedInUser.USER_ID, StatusType.Expired, thisDate.Value);
+                            }//next
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK();
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #endregion
+        #region Helper Methods
+        private bool Exists(BLTRDSEntities aBLTE, ref PULA_LIMITATIONS anEntity)
+        {
+            PULA_LIMITATIONS existingEntity;
+            PULA_LIMITATIONS thisEntity = anEntity;
+            //check if it exists
+            try
+            {
+                existingEntity = aBLTE.PULA_LIMITATIONS.FirstOrDefault(mt => mt.PULA_ID == thisEntity.PULA_ID &&
+                                                                            (mt.ACTIVE_INGREDIENT_ID == thisEntity.ACTIVE_INGREDIENT_ID || thisEntity.ACTIVE_INGREDIENT_ID <= 0 || thisEntity.ACTIVE_INGREDIENT_ID == null) &&
+                                                                            (mt.LIMITATION_ID == thisEntity.LIMITATION_ID || thisEntity.LIMITATION_ID <= 0 || thisEntity.LIMITATION_ID == null) &&
+                                                                            (mt.CROP_USE_ID == thisEntity.CROP_USE_ID || thisEntity.CROP_USE_ID <= 0 || thisEntity.CROP_USE_ID == null) &&
+                                                                            (mt.APPLICATION_METHOD_ID == thisEntity.APPLICATION_METHOD_ID || thisEntity.APPLICATION_METHOD_ID <= 0 || thisEntity.APPLICATION_METHOD_ID == null) &&
+                                                                            (mt.FORMULATION_ID == thisEntity.FORMULATION_ID || thisEntity.FORMULATION_ID <= 0 || thisEntity.FORMULATION_ID == null)
+                                                                            );
+            
+                if (existingEntity == null)
+                    return false;
+
+                //if exists then update ref
+                anEntity = existingEntity;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }//end Exists
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+        
+    }//end class PULALimitationsHandler
+
+}//end namespace

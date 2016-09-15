@@ -1,0 +1,195 @@
+﻿@* Comments:
+05.28.13 - TR - Hooked into services
+05.03.12 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked 
+ */
+ *@
+
+@using BLTServices;
+
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+
+<link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+
+@*<link rel="stylesheet" href="/resources/demos/style.css" />*@
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab1-Gen">General</a></li>
+            <li><a href="#tabs2-AIs">Active Ingredient</a></li>
+            <li><a href="#tabs3-Species">Species</a></li>
+            <li><a href="#tabs4-Product">Product</a></li>
+@*            @using (Html.BeginForm("PULA_New", "PULA", *@
+            <input style="background-color:#4B6C9E;color:white" type="button" onclick="PULA_NEW();" value="Copy To New" class="popup-button" />
+@*            @Html.ActionLink("Copy To New", "PULA_New", "PULA", new {@class="BLTButton blue"})*@
+        </ul>
+
+        @*General Detail Tab*@
+        @{VERSION thisVersion = ViewData["Version"] as VERSION; 
+          USER_ Creator = ViewData["creator"] as USER_;
+          USER_ Publisher = ViewData["publisher"] as USER_;
+          }
+
+        <div id="tab1-Gen"> 
+            <div>
+                <span class="bold popup-label-a">Effective Date:</span>
+                <label class="inline">@( thisVersion.PUBLISHED_TIME_STAMP != null ? ((DateTime)thisVersion.PUBLISHED_TIME_STAMP).ToShortDateString() : "")</label>
+            </div>
+            
+             <div>
+                <span class="bold popup-label-a">Creation Date:</span>
+                <label class="inline">@( thisVersion.CREATED_TIME_STAMP != null ? ((DateTime)thisVersion.CREATED_TIME_STAMP).ToShortDateString() : "" )</label>
+             </div>
+                
+            <div>
+                <span class="bold popup-label-a">Created By:</span>
+	            <label class="inline">@( Creator != null ? string.Format("{0} {1}", Creator.FNAME, Creator.LNAME) : "" )</label>
+            </div>
+            
+            <div>
+                <span class="bold popup-label-a">Creator Organization and Division:</span>
+	            <label class="inline">@ViewData["creatorOrg"] @ViewData["creatorDiv"]</label>
+            </div>
+            
+            <div>
+	            <span class="bold popup-label-a">Published Date:</span>
+	            <label class="inline">@(thisVersion.PUBLISHED_TIME_STAMP != null ? ((DateTime)thisVersion.PUBLISHED_TIME_STAMP).ToShortDateString():"")</label>
+	        </div>
+            
+            <div>
+                <span class="bold popup-label-a">Published By:</span>
+	            <label class="inline">@(Publisher != null ? string.Format("{0} {1}", Publisher.FNAME, Publisher.LNAME) : "")</label>
+	        </div>
+
+            <div>
+                <span class="bold popup-label-a">Publisher Organization and Division:</span>
+	            <label class="inline">@ViewData["publisherOrg"] @ViewData["publisherDiv"]</label>
+            </div>
+            
+            <div>
+                 <span class="bold popup-label-a">Expiration Date:</span>
+                 <label class="inline">@(thisVersion.EXPIRED_TIME_STAMP != null ? ((DateTime)thisVersion.EXPIRED_TIME_STAMP).ToShortDateString() : "")</label>
+            </div>
+
+            <br clear="all" />
+        
+        </div> @* end id="tab1-Gen" div *@
+
+        @*AIs Tab*@
+        @{ ACTIVE_INGREDIENT_PULA thisAIPULA = ViewData["AIPULA"] as ACTIVE_INGREDIENT_PULA;  }
+        <div id="tabs2-AIs">
+
+            <div>
+                <span style="width:50%" class="bold ui-label-a">How this Pula came to be (Meetings, litigation, etc):</span>
+                <label class="inline">@thisAIPULA.BASE_DATA</label>
+            </div>
+            
+             <div>
+                <span style="width:50%" class="bold ui-label-a">PULA Justification:</span>
+                <textarea readonly="readonly" class="textAreaDetails">@thisAIPULA.JUSTIFICATION</textarea>
+             </div>
+                
+            @{ List<PublishedPULA> pubPULAModel = ViewData["PulaModel"] as List<PublishedPULA>; }
+
+            <table id="peak-table-a">
+                <thead>
+                    <tr>
+                        <th scope="col">Active Ingredient</th>
+                        <th scope="col">Modifier</th>
+                        <th scope="col">Crop Use</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">AI Class</th>
+                        <th scope="col">CAS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (PublishedPULA ppm in pubPULAModel)
+                 {
+                    <tr>
+                        <td>@ppm.AI</td> 
+                        <td>@ppm.Modifier</td>
+                        <td>@ppm.CropUse</td>
+                        <td>@ppm.Code</td>
+                        <td>@ppm.AIClass</td>
+                        <td>@ppm.CAS</td>                      
+                    </tr>
+                  }
+                </tbody>
+            </table>
+
+        </div> @* end id="tabs2-AIs" div *@
+  
+        @*Species Tab*@
+        <div id="tabs3-Species">            
+             <div></div>
+             <ul>
+                <li>Species 1</li>
+                <li>Species 2</li>
+             </ul>
+        </div> @* end id="tabs3-Species" div *@
+
+        @*Product Tab*@
+        <div id="tabs4-Product">
+             
+                <div></div>
+             <ul>
+                <li>Product 1</li>
+                <li>Product 2</li>
+             </ul>      
+        </div> @* end id="tabs4-Product" div*@
+
+    </div>
+    
+        
+</body>
+</html>
+
+<script type="text/javascript">
+    function PULA_NEW() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("PULA_New", "Members")',
+            data: { userName: $("#userName").val() },
+            success: function (response) {
+                if (response.dir == "") {
+                    alert("User name does not exist");
+                }
+                else {
+                    alert("Member: " + response);
+                }
+            }
+        });
+    }
+</script>

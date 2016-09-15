@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<h2>
+    Mapper will be here for EPA personnel to choose their polygon to add attribute information to.
+</h2>

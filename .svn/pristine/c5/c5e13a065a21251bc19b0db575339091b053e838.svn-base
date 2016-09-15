@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRasta.Codecs.WebForms", "..\openrasta-2.1\src\openrasta-aspnet\src\OpenRasta.Codecs.WebForms\OpenRasta.Codecs.WebForms.csproj", "{B4EC606E-48A7-4653-AD88-3614A5FF360A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRasta.Hosting.AspNet", "..\openrasta-2.1\src\openrasta-aspnet\src\OpenRasta.Hosting.AspNet\OpenRasta.Hosting.AspNet.csproj", "{FE290BB8-9CB4-454E-89BE-E047674BB34F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRasta", "..\openrasta-2.1\src\openrasta-core\src\OpenRasta\OpenRasta.csproj", "{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLTServices", "BLTServices\BLTServices.csproj", "{E05B1763-D216-43A8-B48A-3FAB0BBECD3E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F} = {CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLTWeb", "BLTWeb\BLTWeb.csproj", "{F4D257EB-CD94-46BE-A7C5-4511F63ED0EE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E05B1763-D216-43A8-B48A-3FAB0BBECD3E} = {E05B1763-D216-43A8-B48A-3FAB0BBECD3E}
+		{B4EC606E-48A7-4653-AD88-3614A5FF360A} = {B4EC606E-48A7-4653-AD88-3614A5FF360A}
+		{FE290BB8-9CB4-454E-89BE-E047674BB34F} = {FE290BB8-9CB4-454E-89BE-E047674BB34F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLT_Map", "..\EPA\Mapper\BLT_Map\BLT_Map.csproj", "{B6D3E34F-36CC-473A-98A4-7D574E4B79C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4EC606E-48A7-4653-AD88-3614A5FF360A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4EC606E-48A7-4653-AD88-3614A5FF360A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4EC606E-48A7-4653-AD88-3614A5FF360A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4EC606E-48A7-4653-AD88-3614A5FF360A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE290BB8-9CB4-454E-89BE-E047674BB34F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE290BB8-9CB4-454E-89BE-E047674BB34F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE290BB8-9CB4-454E-89BE-E047674BB34F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE290BB8-9CB4-454E-89BE-E047674BB34F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF1F67E2-7E23-4449-B4EF-9D6AF8BDFE4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05B1763-D216-43A8-B48A-3FAB0BBECD3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05B1763-D216-43A8-B48A-3FAB0BBECD3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05B1763-D216-43A8-B48A-3FAB0BBECD3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05B1763-D216-43A8-B48A-3FAB0BBECD3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4D257EB-CD94-46BE-A7C5-4511F63ED0EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4D257EB-CD94-46BE-A7C5-4511F63ED0EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4D257EB-CD94-46BE-A7C5-4511F63ED0EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4D257EB-CD94-46BE-A7C5-4511F63ED0EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D3E34F-36CC-473A-98A4-7D574E4B79C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D3E34F-36CC-473A-98A4-7D574E4B79C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D3E34F-36CC-473A-98A4-7D574E4B79C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D3E34F-36CC-473A-98A4-7D574E4B79C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

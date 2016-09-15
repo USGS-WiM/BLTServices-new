@@ -1,0 +1,6 @@
+﻿@{
+    ViewBag.Title = "Codes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Codes</h2>

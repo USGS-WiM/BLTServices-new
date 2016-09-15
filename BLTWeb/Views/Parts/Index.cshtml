@@ -1,0 +1,372 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page for parts 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTServices.Resources;
+@using BLTWeb.Models;
+@using BLTWeb.Assets.Resources;
+
+@{
+    ViewBag.Title = "Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="dataTitle">
+    <div class="title">Parts</div>    
+</div>
+<br clear="all" />
+
+<hr class="headerUnderline" />
+
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui-1.8.11.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+@*<script src="@Url.Content("~/Assets/Scripts/jquery-1.4.1.js")" type="text/javascript"></script>
+*@
+
+<div class="dashboardColumn" style="width:50%">
+
+    
+    <div class="subSection">@*Left 1*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexAI)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("AI", "Parts", FormMethod.Post, null))
+            {                
+                <select id="AIUsedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an Active Ingredients to Edit or Copy</option>
+                    @foreach (ACTIVE_INGREDIENT ai in ViewData["AIList"] as List<ACTIVE_INGREDIENT>)
+                    {
+                        <option title="@ai.INGREDIENT_NAME" value='@ai.ID'>@(ai.INGREDIENT_NAME.Length >= 41 ? ai.INGREDIENT_NAME.Substring(0, 40) : ai.INGREDIENT_NAME)</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />
+            }
+        </div>
+    </div>
+    
+    <br />	<br />
+
+    <div class="subSection">@*Left 2*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexAIClass)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("AI_Class", "Parts", FormMethod.Post, null))
+            {                
+                <select id="AIClassdropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an AI Class to Edit</option>
+                    @foreach (AI_CLASS aiCl in ViewData["AIClassList"] as List<AI_CLASS>)
+                    {
+                        <option value='@aiCl.ID'>@aiCl.AI_CLASS_NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                @*<input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div> 
+
+     <br />	<br />
+
+    <div class="subSection">@*Left 3*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexCropUse)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("CropUse", "Parts", FormMethod.Post, null))
+            {                
+                <select id="CropUsedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Crop Use to Edit</option>
+                    @foreach (CROP_USE cu in ViewData["CropUseList"] as List<CROP_USE>)
+                    {
+                        <option value='@cu.ID'>@cu.USE</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div> 
+
+    <br />	<br />
+
+    
+    <div class="subSection">@*Left 4*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexAppMethod)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("ApplicationMethods", "Parts", FormMethod.Post, null))
+            {                
+                <select id="AMdropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an Application Method to Edit</option>
+                    @foreach (APPLICATION_METHOD appMethod in ViewData["AppMethodsList"] as List<APPLICATION_METHOD>)
+                    {
+                        <option value='@appMethod.ID'>@appMethod.METHOD</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+               @* <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div> 
+    
+     <br />	<br />    
+
+    <div class="subSection">@*Left 5*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexOrganization)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Organizations", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Orgdropdown" class="bltSelectInput ui-shadow-inset" name="ORGANIZATION_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an Organization to Edit</option>
+                    @foreach (ORGANIZATION org in ViewData["OrganizationList"] as List<ORGANIZATION>)
+                    {
+                        <option value='@org.ORGANIZATION_ID'>@org.NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div>    
+</div> @* end Dashboard *@
+
+<div class="dashboardColumn" style="width:50%">
+
+    <div class="subSection">@* Product: Right 1*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexProduct)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Product", "Parts", FormMethod.Post, null))
+            {                
+                <div class="ui-widget">
+                        <input type="text" placeholder="Start typing name or Reg # to begin search" id="prods" />
+                        <input type="hidden" name="ID" id="hiddenProdID" />
+                </div>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div> 
+    
+    <br />	<br />
+    
+    <div class="subSection">@* Events: Right 2*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexEvent)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Events", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Evdropdown" class="bltSelectInput ui-shadow-inset" name="EVENT_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an Event to Edit</option>
+                    @foreach (EVENT ev in ViewData["EventList"] as List<EVENT>)
+                    {
+                        <option value='@ev.EVENT_ID'>@ev.NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                    if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                    {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                    }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div>
+    
+    <br />	<br />
+
+    <div class="subSection">@* Codes: Right 3*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexLimitCode)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Codes", "Parts", FormMethod.Post, null))
+            {                
+                <select id="CodeDD" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Code to Edit or Copy</option>
+                    @foreach (LIMITATION code in ViewData["LimitationList"] as List<LIMITATION>)
+                    { 
+                        <option title="@code.LIMITATION1" value='@code.ID'>@code.CODE | @(code.LIMITATION1.Length >= 61 ? code.LIMITATION1.Substring(0,60) : code.LIMITATION1)</option> 
+                    }
+                </select>
+                <br />	<br />
+                    if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                    {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                    }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />
+            }
+        </div>
+    </div>
+     
+       <br />	<br />
+
+    
+    <div class="subSection">@* Formulations: Right 4*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexFormulation)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Formulations", "Parts", FormMethod.Post, null))
+            {                
+                <select id="formdropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Formulation to Edit</option>
+                    @foreach (FORMULATION f in ViewData["FormulationsList"] as List<FORMULATION>)
+                    {
+                        <option value='@f.ID'>@f.FORM</option> 
+                    }
+                </select>
+                <br />	<br />
+                    if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                    {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                    }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+               @* <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+
+    </div> 
+    
+       <br />	<br />
+
+    
+
+    <div class="subSection">@* Divisions: Right 5*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexDivision)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Divisions", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Divdropdown" class="bltSelectInput ui-shadow-inset" name="DIVISION_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Division to Edit</option>
+                    @foreach (DIVISION div in ViewData["DivisionList"] as List<DIVISION>)
+                    {
+                        <option value='@div.DIVISION_ID'>@div.DIVISION_NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                    if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                    {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                    }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div>    
+</div> @* End Dashboard *@
+
+<br clear="all" />
+
+<script type="text/javascript">
+    $(function () {
+        Date.prototype.today = function () {
+            return (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear()
+        };
+        var newDate = new Date();
+        var datetime = newDate.today();
+
+        var cache = {};
+
+        $("#prods").autocomplete({
+            minLength: 3,
+            source: function (request, response) {
+                var product = request.term;
+                if (product in cache) {
+                    response(cache[product]);
+                    return;
+                }
+                $.get("https://blt.wim.usgs.gov/BLTProxy/proxy.ashx?https://blt.wim.usgs.gov/BLTServices/Products?publishedDate=" + datetime, request, function (data, status, xhr) {
+               // $.get("https://blt.wim.usgs.gov/BLTServices/Products?publishedDate=" + datetime, request, function (data, status, xhr) {
+                    var dataTest = $("PRODUCT", data).map(function () {
+                        return {
+                            value: $("PRODUCT_REGISTRATION_NUMBER", this).text(),
+                            label: $("PRODUCT_NAME", this).text(),
+                            id: $("ID", this).text()
+                        };
+                    });
+                    cache[product] = dataTest;
+                    response(dataTest);
+                }
+                , "xml");
+            },
+            select: function (event, ui) {
+                var name = ui.item.label;
+                $("#prods").val(name);
+
+                $("#hiddenProdID").val(ui.item.id);
+                return false;
+            }
+        });
+        $("#prods").data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li></li>")
+                            .data("item.autocomplete", item)
+                            .append($("<a/>").html(item.label).attr("title", "RegNum: " + item.value))
+                            .appendTo(ul);
+        };
+    });
+
+</script>
+
+<style type="text/css">
+   
+    .ui-autocomplete-loading 
+    {
+        background: white url('Assets/Images/ui-anim_basic_16x16.gif') right center no-repeat;
+    }
+    .ui-autocomplete 
+    {
+        max-height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .ui-autocomplete-input
+    {
+        width: 95%;
+    }
+   ul.ui-autocomplete.ui-menu 
+    {
+         @*left: 353px !important;*@
+        width: 244px !important;
+    }
+    html .ui-autocomplete 
+    {
+        height: 100px;
+    }
+</style>
+
+
+
+
+
+
+

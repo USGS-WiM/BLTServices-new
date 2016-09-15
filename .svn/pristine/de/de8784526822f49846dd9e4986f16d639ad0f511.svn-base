@@ -1,0 +1,504 @@
+﻿//------------------------------------------------------------------------------
+//----- ActiveIngredientHander -------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Peak summary resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//              
+
+#region Comments
+// 05.14.13 - JKN- Redesigned handler and updated methods
+// 11.09.12 - TR - Changed class name from SiteHandler to AILimitationsHandler and removed ForUriName "Sites" references
+// 10.19.12 - JB - Created from STN
+#endregion
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+using OpenRasta.Diagnostics;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.ServiceModel.Syndication;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+
+namespace BLTServices.Handlers
+{
+    public class ActiveIngredientHandler : HandlerBase
+    {
+
+        #region Properties
+        public override string entityName
+        {
+            get { return "ACTIVE_INGREDIENT"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        //---------------------Returns List of objects---------------------
+        // returns all PULAs
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<ACTIVE_INGREDIENT> aiList;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aiList = GetEntities<ACTIVE_INGREDIENT>(aBLTE).ToList();
+                                          
+                    }//end using
+                }//end using
+
+                activateLinks<ACTIVE_INGREDIENT>(aiList);
+
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        
+        // returns all active Ingredients
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(string date)
+        {
+            List<ACTIVE_INGREDIENT> aiList = null;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now; 
+                
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aiList = GetActive(GetEntities<ACTIVE_INGREDIENT>(aBLTE), thisDate.Value).ToList();
+
+                }//end using
+                activateLinks<ACTIVE_INGREDIENT>(aiList);
+
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+               return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 activeIngredientID, [Optional] string date)
+        {
+            try
+            {
+                List<ACTIVE_INGREDIENT> aiList;
+                DateTime? thisDate = ValidDate(date);
+                if (activeIngredientID < 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        IQueryable<ACTIVE_INGREDIENT> query;
+                        query = GetEntities<ACTIVE_INGREDIENT>(aBLTE).Where(ai => ai.ACTIVE_INGREDIENT_ID == activeIngredientID);
+        
+                        if (thisDate.HasValue)
+                            query = GetActive(query, thisDate.Value);
+
+                        //process
+                        aiList = query.ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<ACTIVE_INGREDIENT>(aiList);
+
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns active Active Ingredients for the given pulaID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetPULAactiveIngredients")]
+        public OperationResult GetPULAactiveIngredients(Int32 pulaId, [Optional]string date)
+        {
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+                
+                List<ACTIVE_INGREDIENT> aiList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    //active AI_LIMITATION.. get all AILimitation with pula id = and activedate = .. 
+                    //then join ai (get all of them activeingredient table)..on matching ids, select distinct
+                    IQueryable<ACTIVE_INGREDIENT> query1 =
+                            (from AILimit in GetActive(aBLTE.AI_LIMITATIONS.Where(p => p.PULA_ID == pulaId), thisDate.Value)
+                            join AI in aBLTE.ACTIVE_INGREDIENT
+                            on AILimit.ACTIVE_INGREDIENT_ID equals AI.ACTIVE_INGREDIENT_ID
+                            select AI).Distinct();
+
+                    aiList = GetActive(query1,thisDate.Value).ToList();
+
+                    activateLinks<ACTIVE_INGREDIENT>(aiList);
+
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        //---------------------Returns individual objects---------------------
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="GetEntity")]
+        public OperationResult GetEntity(Int32 entityID)
+        {
+            ACTIVE_INGREDIENT anAI;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        anAI = GetEntities<ACTIVE_INGREDIENT>(aBLTE).SingleOrDefault(ai => ai.ID == entityID);
+
+                    }//end using
+                }//end using
+
+                activateLinks<ACTIVE_INGREDIENT>(anAI);
+
+                return new OperationResult.OK { ResponseResource = anAI };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        #endregion
+        #region POST Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(ACTIVE_INGREDIENT anEntity)
+        {
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        if (!Exists(aBLTE, ref anEntity))
+                        {
+                            //create version
+                            anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+
+                            anEntity.ACTIVE_INGREDIENT_ID = GetNextID(aBLTE);
+
+                            aBLTE.ACTIVE_INGREDIENT.AddObject(anEntity);
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                        activateLinks<ACTIVE_INGREDIENT>(anEntity);                       
+                    }//end using
+                }//end using
+
+                
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region Activate Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Activate")]
+        public OperationResult Activate(Int32 entityID, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            ACTIVE_INGREDIENT anAI;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        anAI = aBLTE.ACTIVE_INGREDIENT.FirstOrDefault(ai => ai.ID == entityID);
+
+                        if (anAI == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //assign version
+                        anAI.VERSION_ID = SetVersion(aBLTE, anAI.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                        ExpireOtherEntities(aBLTE, loggedInUser.USER_ID, anAI, thisDate.Value);
+                        
+                        aBLTE.SaveChanges();
+
+                        activateLinks<ACTIVE_INGREDIENT>(anAI);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anAI };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EDIT Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.POST,ForUriName="Edit")]
+        public OperationResult Edit(Int32 entityID, ACTIVE_INGREDIENT anEntity, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            ACTIVE_INGREDIENT anAILimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+               
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        anAILimit = aBLTE.ACTIVE_INGREDIENT.FirstOrDefault(ai => ai.ID == entityID);
+
+                        if (anAILimit == null)
+                        { return new OperationResult.BadRequest(); }
+                        
+                        //assign version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                        //expire previous version
+                        ExpireEntities(aBLTE, loggedInUser.USER_ID, anEntity.ACTIVE_INGREDIENT_ID, thisDate.Value);
+
+                        aBLTE.ACTIVE_INGREDIENT.AddObject(anEntity);
+                        aBLTE.SaveChanges();
+
+                        activateLinks<ACTIVE_INGREDIENT>(anEntity);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EXPIRE Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Expire")]
+        public OperationResult Expire(Int32 entityID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            ACTIVE_INGREDIENT anAI;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+
+                        anAI = aBLTE.ACTIVE_INGREDIENT.FirstOrDefault(ai => ai.ID == entityID);
+                        if (anAI == null)
+                        { return new OperationResult.BadRequest(); }
+                        
+                        //expire current 
+                        anAI.VERSION_ID = SetVersion(aBLTE, anAI.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<ACTIVE_INGREDIENT>(anAI);
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anAI };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] {AdminRole, PublisherRole})]
+        [HttpOperation(HttpMethod.GET, ForUriName = "ExpireActiveIngredient")]
+        public OperationResult ExpireActiveIngredient(Int32 activeIngredientID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (activeIngredientID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        ExpireEntities(aBLTE, LoggedInUser(aBLTE).USER_ID, activeIngredientID, thisDate.Value);
+
+                        aBLTE.SaveChanges();
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK ();
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #endregion
+        #region Helper Methods
+        private bool Exists(BLTRDSEntities aBLTE, ref ACTIVE_INGREDIENT anEntity)
+        {
+            ACTIVE_INGREDIENT existingEntity;
+            ACTIVE_INGREDIENT thisEntity = anEntity;
+            //check if it exists
+            try
+            {
+
+                existingEntity = aBLTE.ACTIVE_INGREDIENT.FirstOrDefault(mt => string.Equals(mt.INGREDIENT_NAME.ToUpper(), thisEntity.INGREDIENT_NAME.ToUpper()) &&
+                                                                            (string.Equals(mt.PC_CODE.ToUpper(),thisEntity.PC_CODE.ToUpper())) &&
+                                                                            (string.Equals(mt.CAS_NUMBER.ToUpper(), thisEntity.CAS_NUMBER.ToUpper()) || string.IsNullOrEmpty(thisEntity.CAS_NUMBER)) &&
+                                                                            (mt.AI_CLASS_ID == thisEntity.AI_CLASS_ID || thisEntity.AI_CLASS_ID <= 0 || thisEntity.AI_CLASS_ID == null));
+               
+
+                if (existingEntity == null)
+                    return false;
+
+                //if exists then update ref contact
+                anEntity = existingEntity;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }//end Exists
+
+        private decimal GetNextID(BLTRDSEntities aBLTE)
+        {
+                //create pulaID
+                Decimal nextID = 1;
+                if (aBLTE.ACTIVE_INGREDIENT.Count() > 0)
+                    nextID = aBLTE.ACTIVE_INGREDIENT.OrderByDescending(p => p.ACTIVE_INGREDIENT_ID).First().ACTIVE_INGREDIENT_ID + 1;
+                
+                return nextID;
+        }
+
+        private void ExpireOtherEntities(BLTRDSEntities aBLTE, decimal userId, ACTIVE_INGREDIENT ai, DateTime dt)
+        {
+            //get all published, should only be 1
+            List<ACTIVE_INGREDIENT> aiList = aBLTE.ACTIVE_INGREDIENT.Where(p => p.ACTIVE_INGREDIENT_ID == ai.ACTIVE_INGREDIENT_ID && 
+                                                                                p.VERSION.PUBLISHED_TIME_STAMP >= dt).ToList();
+            if (aiList == null) return;
+
+            foreach (var p in aiList)
+            {
+                if(!p.Equals(ai))
+                    p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+            }//next
+        }//end ExpireOtherEntities
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            //get all published, should only be 1
+            List<ACTIVE_INGREDIENT> aiList = aBLTE.ACTIVE_INGREDIENT.Where(p => p.ACTIVE_INGREDIENT_ID == Id &&
+                                                                                p.VERSION.PUBLISHED_TIME_STAMP >= dt).ToList();
+            if (aiList == null) return;
+
+            foreach (var p in aiList)
+            {
+                    p.VERSION = SetVersion(aBLTE, p.VERSION_ID, userId, StatusType.Expired, dt);
+            }//next
+        }//end ExpireEntities
+        
+       #endregion
+
+    }//end class ActiveIngredientHandler
+
+}//end namespace

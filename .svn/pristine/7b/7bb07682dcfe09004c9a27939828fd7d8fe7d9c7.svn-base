@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+using OpenRasta.Web;
+
+namespace BLTServices.Handlers
+{
+   public abstract class HandlerBase
+   {
+       #region Constants
+       protected const string AdminRole = "Admin";
+       protected const string ManagerRole = "Manager";
+       protected const string FieldRole = "Field";
+       protected const string PublicRole = "Public";
+
+       #endregion
+       #region "Base Properties"
+       protected String connectionString = @"metadata=res://*/BLTRDSModel.csdl|res://*/BLTRDSModel.ssdl|res://*/BLTRDSModel.msl;provider=Oracle.DataAccess.Client;provider connection string=""DATA SOURCE=BLTRDS;USER ID={0};PASSWORD={1}""";
+
+       // will be automatically injected by DI in OpenRasta
+       public ICommunicationContext Context { get; set; }
+
+        #endregion
+        #region "Base Methods"
+
+        #endregion
+
+    }//end class HandlerBase
+
+}//end namespace

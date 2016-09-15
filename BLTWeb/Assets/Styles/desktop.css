@@ -1,0 +1,27 @@
+﻿body 
+{
+	background: #fff !important;
+}
+
+.page 
+{
+	margin-top:0 !important;
+	width: auto !important;
+	border: 0px !important;
+}
+
+.header 
+{
+  display: none !important;	
+}
+
+.ui-body-c, .ui-overlay-c 
+{
+	background: #fff !important;
+}
+
+.leftSideSubmit 
+{
+	padding: 1em 1em 1em 61.3em !important;
+	width:40%;
+}
