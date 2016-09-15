@@ -1,0 +1,5 @@
+﻿@{
+    ViewBag.Title = "PULA_Edit";
+}
+
+<h2>PULA_Edit</h2>

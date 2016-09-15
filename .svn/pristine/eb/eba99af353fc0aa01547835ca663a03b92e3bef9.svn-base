@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BLTModelStoreContainer" CdmEntityContainer="BLTRDSEntities">
+    <EntitySetMapping Name="SPECIES">
+      <EntityTypeMapping TypeName="BLTModel.SPECIES">
+        <MappingFragment StoreEntitySet="SPECIES">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="CLASSID" ColumnName="CLASSID" />
+          <ScalarProperty Name="FEDERALREGISTRATIONNUMBER" ColumnName="FEDERALREGISTRATIONNUMBER" />
+          <ScalarProperty Name="FACTSHEETURL" ColumnName="FACTSHEETURL" />
+          <ScalarProperty Name="DESCRIPTIONTEXT" ColumnName="DESCRIPTIONTEXT" />
+          <ScalarProperty Name="ITIS_TSN" ColumnName="ITIS_TSN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SPECIES_ACTIVEINGREDIENTPULA">
+      <EntityTypeMapping TypeName="BLTModel.SPECIES_ACTIVEINGREDIENTPULA">
+        <MappingFragment StoreEntitySet="SPECIES_ACTIVEINGREDIENTPULA">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="CRITICALHABITATINPULA" ColumnName="CRITICALHABITATINPULA" />
+          <ScalarProperty Name="ITIS_TSN" ColumnName="ITIS_TSN" />
+          <ScalarProperty Name="PULAID" ColumnName="PULAID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ACTIVEINGREDIENTs">
+      <EntityTypeMapping TypeName="BLTModel.ACTIVEINGREDIENT">
+        <MappingFragment StoreEntitySet="ACTIVEINGREDIENT">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="AICLASSID" ColumnName="AICLASSID" />
+          <ScalarProperty Name="PCCODE" ColumnName="PCCODE" />
+          <ScalarProperty Name="CAS" ColumnName="CAS" />
+          <ScalarProperty Name="INGREDIENTNAME" ColumnName="INGREDIENTNAME" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PRODUCTs">
+      <EntityTypeMapping TypeName="BLTModel.PRODUCT">
+        <MappingFragment StoreEntitySet="PRODUCT">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="PRODUCTREGISTRATIONNUMBER" ColumnName="PRODUCTREGISTRATIONNUMBER" />
+          <ScalarProperty Name="PRODUCTNAME" ColumnName="PRODUCTNAME" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PRODUCT_ACTIVEINGREDIENT">
+      <EntityTypeMapping TypeName="BLTModel.PRODUCT_ACTIVEINGREDIENT">
+        <MappingFragment StoreEntitySet="PRODUCT_ACTIVEINGREDIENT">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="PCCODE" ColumnName="PCCODE" />
+          <ScalarProperty Name="PRODUCTREGISTRATIONNUMBER" ColumnName="PRODUCTREGISTRATIONNUMBER" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AICLASSes">
+      <EntityTypeMapping TypeName="BLTModel.AICLASS">
+        <MappingFragment StoreEntitySet="AICLASS">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="AICLASSNAME" ColumnName="AICLASSNAME" />
+          <ScalarProperty Name="AICLASSID" ColumnName="AICLASSID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CROPUSEs">
+      <EntityTypeMapping TypeName="BLTModel.CROPUSE">
+        <MappingFragment StoreEntitySet="CROPUSE">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="FORMULATION" ColumnName="FORMULATION" />
+          <ScalarProperty Name="USE" ColumnName="USE" />
+          <ScalarProperty Name="CROPUSEID" ColumnName="CROPUSEID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LIMITATIONS">
+      <EntityTypeMapping TypeName="BLTModel.LIMITATION">
+        <MappingFragment StoreEntitySet="LIMITATIONS">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="LIMITATION1" ColumnName="LIMITATION" />
+          <ScalarProperty Name="CODE" ColumnName="CODE" />
+          <ScalarProperty Name="LIMITATIONID" ColumnName="LIMITATIONID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MODIFIERs">
+      <EntityTypeMapping TypeName="BLTModel.MODIFIER">
+        <MappingFragment StoreEntitySet="MODIFIER">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="MODIFIER1" ColumnName="MODIFIER" />
+          <ScalarProperty Name="MODIFIERID" ColumnName="MODIFIERID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DIVISIONS">
+      <EntityTypeMapping TypeName="BLTModel.DIVISION">
+        <MappingFragment StoreEntitySet="DIVISIONS">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="DIVISIONNAME" ColumnName="DIVISIONNAME" />
+          <ScalarProperty Name="DIVISIONID" ColumnName="DIVISIONID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SPECIES_SPECIESIMAGES">
+      <EntityTypeMapping TypeName="BLTModel.SPECIES_SPECIESIMAGES">
+        <MappingFragment StoreEntitySet="SPECIES_SPECIESIMAGES">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="IMAGEID" ColumnName="IMAGEID" />
+          <ScalarProperty Name="ITIS_TSN" ColumnName="ITIS_TSN" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SPECIESFWSINFOes">
+      <EntityTypeMapping TypeName="BLTModel.SPECIESFWSINFO">
+        <MappingFragment StoreEntitySet="SPECIESFWSINFO">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="WHERE_LISTED" ColumnName="WHERE_LISTED" />
+          <ScalarProperty Name="VERTEBRATE__INVERTEBRATE_PLANT" ColumnName="VERTEBRATE__INVERTEBRATE_PLANT" />
+          <ScalarProperty Name="LISTING_STATUS" ColumnName="LISTING_STATUS" />
+          <ScalarProperty Name="LEAD_REGION" ColumnName="LEAD_REGION" />
+          <ScalarProperty Name="SPECIES_GROUP" ColumnName="SPECIES_GROUP" />
+          <ScalarProperty Name="FAMILY" ColumnName="FAMILY" />
+          <ScalarProperty Name="CURRENT_DISTRIBUTION" ColumnName="CURRENT_DISTRIBUTION" />
+          <ScalarProperty Name="CRITICAL_HABITAT" ColumnName="CRITICAL_HABITAT" />
+          <ScalarProperty Name="INVERTED_COMMON_NAME" ColumnName="INVERTED_COMMON_NAME" />
+          <ScalarProperty Name="SCIENTIFIC_NAME" ColumnName="SCIENTIFIC_NAME" />
+          <ScalarProperty Name="COMMON_NAME" ColumnName="COMMON_NAME" />
+          <ScalarProperty Name="SPECIES_CODE" ColumnName="SPECIES_CODE" />
+          <ScalarProperty Name="ITIS_TSN" ColumnName="ITIS_TSN" />
+          <ScalarProperty Name="FWSINFOID" ColumnName="FWSINFOID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SPECIESIMAGES">
+      <EntityTypeMapping TypeName="BLTModel.SPECIESIMAGE">
+        <MappingFragment StoreEntitySet="SPECIESIMAGES">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="IMAGE" ColumnName="IMAGE" />
+          <ScalarProperty Name="IMAGEID" ColumnName="IMAGEID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TAXONOMICCLASSes">
+      <EntityTypeMapping TypeName="BLTModel.TAXONOMICCLASS">
+        <MappingFragment StoreEntitySet="TAXONOMICCLASS">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="TYPEID" ColumnName="TYPEID" />
+          <ScalarProperty Name="PARENTID" ColumnName="PARENTID" />
+          <ScalarProperty Name="CLASSNAME" ColumnName="CLASSNAME" />
+          <ScalarProperty Name="CLASSID" ColumnName="CLASSID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TAXONOMICTYPEs">
+      <EntityTypeMapping TypeName="BLTModel.TAXONOMICTYPE">
+        <MappingFragment StoreEntitySet="TAXONOMICTYPE">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="TYPE" ColumnName="TYPE" />
+          <ScalarProperty Name="TYPEID" ColumnName="TYPEID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="USER_">
+      <EntityTypeMapping TypeName="BLTModel.USER_">
+        <MappingFragment StoreEntitySet="USER_">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="DIVISIONID" ColumnName="DIVISIONID" />
+          <ScalarProperty Name="ORGANIZATION" ColumnName="ORGANIZATION" />
+          <ScalarProperty Name="PHONE" ColumnName="PHONE" />
+          <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
+          <ScalarProperty Name="USERNAME" ColumnName="USERNAME" />
+          <ScalarProperty Name="USERID" ColumnName="USERID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="VERSIONs">
+      <EntityTypeMapping TypeName="BLTModel.VERSION">
+        <MappingFragment StoreEntitySet="VERSION">
+          <ScalarProperty Name="USERID" ColumnName="USERID" />
+          <ScalarProperty Name="PUBLISHED" ColumnName="PUBLISHED" />
+          <ScalarProperty Name="EXPIRES" ColumnName="EXPIRES" />
+          <ScalarProperty Name="CREATED" ColumnName="CREATED" />
+          <ScalarProperty Name="AUTHORID" ColumnName="AUTHORID" />
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AI_LIMITATIONS">
+      <EntityTypeMapping TypeName="BLTModel.AI_LIMITATIONS">
+        <MappingFragment StoreEntitySet="AI_LIMITATIONS">
+          <ScalarProperty Name="PULAID" ColumnName="PULAID" />
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="MODIFIERID" ColumnName="MODIFIERID" />
+          <ScalarProperty Name="CROPUSEID" ColumnName="CROPUSEID" />
+          <ScalarProperty Name="LIMITATIONID" ColumnName="LIMITATIONID" />
+          <ScalarProperty Name="PCCODE" ColumnName="PCCODE" />
+          <ScalarProperty Name="APPID" ColumnName="APPID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ACTIVEINGREDIENTPULAs">
+      <EntityTypeMapping TypeName="BLTModel.ACTIVEINGREDIENTPULA">
+        <MappingFragment StoreEntitySet="ACTIVEINGREDIENTPULA">
+          <ScalarProperty Name="VERSIONID" ColumnName="VERSIONID" />
+          <ScalarProperty Name="PRODUCTID" ColumnName="PRODUCTID" />
+          <ScalarProperty Name="APPID" ColumnName="APPID" />
+          <ScalarProperty Name="PULASHAPEID" ColumnName="PULASHAPEID" />
+          <ScalarProperty Name="OTHERCREATIONREASONS" ColumnName="OTHERCREATIONREASONS" />
+          <ScalarProperty Name="REGISTRATIONREVIEWDOCDATE" ColumnName="REGISTRATIONREVIEWDOCDATE" />
+          <ScalarProperty Name="BIOPDATE" ColumnName="BIOPDATE" />
+          <ScalarProperty Name="BASEMAP" ColumnName="BASEMAP" />
+          <ScalarProperty Name="MODIFIERS" ColumnName="MODIFIERS" />
+          <ScalarProperty Name="BASIS" ColumnName="BASIS" />
+          <ScalarProperty Name="PULAID" ColumnName="PULAID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

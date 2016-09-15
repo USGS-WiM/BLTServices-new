@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BLTRDSModelStoreContainer" CdmEntityContainer="BLTRDSEntities">
+    <EntitySetMapping Name="ACTIVE_INGREDIENT">
+      <EntityTypeMapping TypeName="BLTRDSModel.ACTIVE_INGREDIENT">
+        <MappingFragment StoreEntitySet="ACTIVE_INGREDIENT">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="ACTIVE_INGREDIENT_ID" ColumnName="ACTIVE_INGREDIENT_ID" />
+          <ScalarProperty Name="INGREDIENT_NAME" ColumnName="INGREDIENT_NAME" />
+          <ScalarProperty Name="PC_CODE" ColumnName="PC_CODE" />
+          <ScalarProperty Name="CAS_NUMBER" ColumnName="CAS_NUMBER" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CROP_USE">
+      <EntityTypeMapping TypeName="BLTRDSModel.CROP_USE">
+        <MappingFragment StoreEntitySet="CROP_USE">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="CROP_USE_ID" ColumnName="CROP_USE_ID" />
+          <ScalarProperty Name="USE" ColumnName="USE" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DIVISIONS">
+      <EntityTypeMapping TypeName="BLTRDSModel.DIVISION">
+        <MappingFragment StoreEntitySet="DIVISIONS">
+          <ScalarProperty Name="DIVISION_ID" ColumnName="DIVISION_ID" />
+          <ScalarProperty Name="DIVISION_NAME" ColumnName="DIVISION_NAME" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LIMITATIONS">
+      <EntityTypeMapping TypeName="BLTRDSModel.LIMITATION">
+        <MappingFragment StoreEntitySet="LIMITATIONS">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="LIMITATION_ID" ColumnName="LIMITATION_ID" />
+          <ScalarProperty Name="CODE" ColumnName="CODE" />
+          <ScalarProperty Name="LIMITATION1" ColumnName="LIMITATION" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PRODUCT_ACTIVE_INGREDIENT">
+      <EntityTypeMapping TypeName="BLTRDSModel.PRODUCT_ACTIVE_INGREDIENT">
+        <MappingFragment StoreEntitySet="PRODUCT_ACTIVE_INGREDIENT">
+          <ScalarProperty Name="PRODUCT_ACTIVE_INGREDIENT_ID" ColumnName="PRODUCT_ACTIVE_INGREDIENT_ID" />
+          <ScalarProperty Name="PRODUCT_ID" ColumnName="PRODUCT_ID" />
+          <ScalarProperty Name="ACTIVE_INGREDIENT_ID" ColumnName="ACTIVE_INGREDIENT_ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="USER_">
+      <EntityTypeMapping TypeName="BLTRDSModel.USER_">
+        <MappingFragment StoreEntitySet="USER_">
+          <ScalarProperty Name="LNAME" ColumnName="LNAME" />
+          <ScalarProperty Name="FNAME" ColumnName="FNAME" />
+          <ScalarProperty Name="ROLE_ID" ColumnName="ROLE_ID" />
+          <ScalarProperty Name="ORGANIZATION_ID" ColumnName="ORGANIZATION_ID" />
+          <ScalarProperty Name="USER_ID" ColumnName="USER_ID" />
+          <ScalarProperty Name="USERNAME" ColumnName="USERNAME" />
+          <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
+          <ScalarProperty Name="PHONE" ColumnName="PHONE" />
+          <ScalarProperty Name="DIVISION_ID" ColumnName="DIVISION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="VERSIONs">
+      <EntityTypeMapping TypeName="BLTRDSModel.VERSION">
+        <MappingFragment StoreEntitySet="VERSION">
+          <ScalarProperty Name="REVIEWED_TIME_STAMP" ColumnName="REVIEWED_TIME_STAMP" />
+          <ScalarProperty Name="REVIEWER_ID" ColumnName="REVIEWER_ID" />
+          <ScalarProperty Name="EXPIRED_TIME_STAMP" ColumnName="EXPIRED_TIME_STAMP" />
+          <ScalarProperty Name="EXPIRER_ID" ColumnName="EXPIRER_ID" />
+          <ScalarProperty Name="PUBLISHED_TIME_STAMP" ColumnName="PUBLISHED_TIME_STAMP" />
+          <ScalarProperty Name="PUBLISHER_ID" ColumnName="PUBLISHER_ID" />
+          <ScalarProperty Name="CREATED_TIME_STAMP" ColumnName="CREATED_TIME_STAMP" />
+          <ScalarProperty Name="CREATOR_ID" ColumnName="CREATOR_ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ORGANIZATION">
+      <EntityTypeMapping TypeName="BLTRDSModel.ORGANIZATION">
+        <MappingFragment StoreEntitySet="ORGANIZATION">
+          <ScalarProperty Name="NAME" ColumnName="NAME" />
+          <ScalarProperty Name="ORGANIZATION_ID" ColumnName="ORGANIZATION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AI_CLASS">
+      <EntityTypeMapping TypeName="BLTRDSModel.AI_CLASS">
+        <MappingFragment StoreEntitySet="AI_CLASS">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="AI_CLASS_NAME" ColumnName="AI_CLASS_NAME" />
+          <ScalarProperty Name="AI_CLASS_ID" ColumnName="AI_CLASS_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="USER_PROFILE_ADD" FunctionName="BLTRDSModel.Store.USER_PROFILE_ADD" />
+    <FunctionImportMapping FunctionImportName="USER_PROFILE_ADDROLE" FunctionName="BLTRDSModel.Store.USER_PROFILE_ADDROLE" />
+    <FunctionImportMapping FunctionImportName="USER_PROFILE_EDITPASSWORD" FunctionName="BLTRDSModel.Store.USER_PROFILE_EDITPASSWORD" />
+    <FunctionImportMapping FunctionImportName="USER_PROFILE_REMOVE" FunctionName="BLTRDSModel.Store.USER_PROFILE_REMOVE" />
+    <FunctionImportMapping FunctionImportName="USER_PROFILE_ALTER" FunctionName="BLTRDSModel.Store.USER_PROFILE_ALTER" />
+    <EntitySetMapping Name="ROLE">
+      <EntityTypeMapping TypeName="BLTRDSModel.ROLE">
+        <MappingFragment StoreEntitySet="ROLE">
+          <ScalarProperty Name="ROLE_DESCRIPTION" ColumnName="ROLE_DESCRIPTION" />
+          <ScalarProperty Name="ROLE_NAME" ColumnName="ROLE_NAME" />
+          <ScalarProperty Name="ROLE_ID" ColumnName="ROLE_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PRODUCT">
+      <EntityTypeMapping TypeName="BLTRDSModel.PRODUCT">
+        <MappingFragment StoreEntitySet="PRODUCT">
+          <ScalarProperty Name="PRODUCT_NAME_STATUS" ColumnName="PRODUCT_NAME_STATUS" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="PRODUCT_NAME" ColumnName="PRODUCT_NAME" />
+          <ScalarProperty Name="PRODUCT_REGISTRATION_NUMBER" ColumnName="PRODUCT_REGISTRATION_NUMBER" />
+          <ScalarProperty Name="PRODUCT_ID" ColumnName="PRODUCT_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ACTIVE_INGREDIENT_PULA">
+      <EntityTypeMapping TypeName="BLTRDSModel.ACTIVE_INGREDIENT_PULA">
+        <MappingFragment StoreEntitySet="ACTIVE_INGREDIENT_PULA">
+          <ScalarProperty Name="INTERIM_DECISION" ColumnName="INTERIM_DECISION" />
+          <ScalarProperty Name="SEC18" ColumnName="SEC18" />
+          <ScalarProperty Name="FINAL_DECISION" ColumnName="FINAL_DECISION" />
+          <ScalarProperty Name="SEC24" ColumnName="SEC24" />
+          <ScalarProperty Name="SEC3_NEWUSE" ColumnName="SEC3_NEWUSE" />
+          <ScalarProperty Name="SEC3_NEWCHEM" ColumnName="SEC3_NEWCHEM" />
+          <ScalarProperty Name="COMMENTS" ColumnName="COMMENTS" />
+          <ScalarProperty Name="EVENT_ID" ColumnName="EVENT_ID" />
+          <ScalarProperty Name="PROPOSED_DECISION" ColumnName="PROPOSED_DECISION" />
+          <ScalarProperty Name="BIOLOGICAL_OPINION_LIT" ColumnName="BIOLOGICAL_OPINION_LIT" />
+          <ScalarProperty Name="BIOLOGICAL_OPINION_REGREVIEW" ColumnName="BIOLOGICAL_OPINION_REGREVIEW" />
+          <ScalarProperty Name="OTHER_JUSTIFICATION" ColumnName="OTHER_JUSTIFICATION" />
+          <ScalarProperty Name="EFFECTIVE_DATE" ColumnName="EFFECTIVE_DATE" />
+          <ScalarProperty Name="IS_PUBLISHED" ColumnName="IS_PUBLISHED" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="FOCUS_MEETING" ColumnName="FOCUS_MEETING" />
+          <ScalarProperty Name="INTERIM_PROPOSED_DECISION" ColumnName="INTERIM_PROPOSED_DECISION" />
+          <ScalarProperty Name="ADDITIONAL_INFORMATION" ColumnName="ADDITIONAL_INFORMATION" />
+          <ScalarProperty Name="BASE_DATA_MODIFIERS" ColumnName="BASE_DATA_MODIFIERS" />
+          <ScalarProperty Name="BASE_DATA" ColumnName="BASE_DATA" />
+          <ScalarProperty Name="PULA_SHAPE_ID" ColumnName="PULA_SHAPE_ID" />
+          <ScalarProperty Name="PULA_ID" ColumnName="PULA_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SPECIES_ACTIVE_INGREDIENT_PULA">
+      <EntityTypeMapping TypeName="BLTRDSModel.SPECIES_ACTIVE_INGREDIENT_PULA">
+        <MappingFragment StoreEntitySet="SPECIES_ACTIVE_INGREDIENT_PULA">
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="PULA_ID" ColumnName="PULA_ID" />
+          <ScalarProperty Name="SPECIES_ID" ColumnName="SPECIES_ID" />
+          <ScalarProperty Name="SPECIES_ACTIVEINGREPULA_ID" ColumnName="SPECIES_ACTIVEINGREPULA_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="APPLICATION_METHOD">
+      <EntityTypeMapping TypeName="BLTRDSModel.APPLICATION_METHOD">
+        <MappingFragment StoreEntitySet="APPLICATION_METHOD">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="METHOD" ColumnName="METHOD" />
+          <ScalarProperty Name="APPLICATION_METHOD_ID" ColumnName="APPLICATION_METHOD_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FORMULATION">
+      <EntityTypeMapping TypeName="BLTRDSModel.FORMULATION">
+        <MappingFragment StoreEntitySet="FORMULATION">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="FORM" ColumnName="FORM" />
+          <ScalarProperty Name="FORMULATION_ID" ColumnName="FORMULATION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PULA_LIMITATIONS">
+      <EntityTypeMapping TypeName="BLTRDSModel.PULA_LIMITATIONS">
+        <MappingFragment StoreEntitySet="PULA_LIMITATIONS">
+          <ScalarProperty Name="PRODUCT_ID" ColumnName="PRODUCT_ID" />
+          <ScalarProperty Name="FORMULATION_ID" ColumnName="FORMULATION_ID" />
+          <ScalarProperty Name="PULA_ID" ColumnName="PULA_ID" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="APPLICATION_METHOD_ID" ColumnName="APPLICATION_METHOD_ID" />
+          <ScalarProperty Name="CROP_USE_ID" ColumnName="CROP_USE_ID" />
+          <ScalarProperty Name="LIMITATION_ID" ColumnName="LIMITATION_ID" />
+          <ScalarProperty Name="ACTIVE_INGREDIENT_ID" ColumnName="ACTIVE_INGREDIENT_ID" />
+          <ScalarProperty Name="PULA_LIMITATION_ID" ColumnName="PULA_LIMITATION_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="EVENT">
+      <EntityTypeMapping TypeName="BLTRDSModel.EVENT">
+        <MappingFragment StoreEntitySet="EVENT">
+          <ScalarProperty Name="NAME" ColumnName="NAME" />
+          <ScalarProperty Name="EVENT_ID" ColumnName="EVENT_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ACTIVE_INGREDIENT_AI_CLASS">
+      <EntityTypeMapping TypeName="BLTRDSModel.ACTIVE_INGREDIENT_AI_CLASS">
+        <MappingFragment StoreEntitySet="ACTIVE_INGREDIENT_AI_CLASS">
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="AI_CLASS_ID" ColumnName="AI_CLASS_ID" />
+          <ScalarProperty Name="ACTIVE_INGREDIENT_ID" ColumnName="ACTIVE_INGREDIENT_ID" />
+          <ScalarProperty Name="ACTIVE_INGREDIENT_AI_CLASS_ID" ColumnName="ACTIVE_INGREDIENT_AI_CLASS_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PULAVERSIONs">
+      <EntityTypeMapping TypeName="BLTRDSModel.PULAVERSION">
+        <MappingFragment StoreEntitySet="PULAVERSION">
+          <ScalarProperty Name="PULA_ID" ColumnName="PULA_ID" />
+          <ScalarProperty Name="EXPIRED_TIME_STAMP" ColumnName="EXPIRED_TIME_STAMP" />
+          <ScalarProperty Name="PUBLISHED_TIME_STAMP" ColumnName="PUBLISHED_TIME_STAMP" />
+          <ScalarProperty Name="CREATED_TIME_STAMP" ColumnName="CREATED_TIME_STAMP" />
+          <ScalarProperty Name="VERSION_ID" ColumnName="VERSION_ID" />
+          <ScalarProperty Name="EFFECTIVE_DATE" ColumnName="EFFECTIVE_DATE" />
+          <ScalarProperty Name="PULA_SHAPE_ID" ColumnName="PULA_SHAPE_ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CONTRIBUTORPULAVIEWs">
+      <EntityTypeMapping TypeName="BLTRDSModel.CONTRIBUTORPULAVIEW">
+        <MappingFragment StoreEntitySet="CONTRIBUTORPULAVIEW">
+          <ScalarProperty Name="COMMENTS" ColumnName="COMMENTS" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

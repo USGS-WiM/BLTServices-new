@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BLTModel.Store" Alias="Self" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityContainer Name="BLTModelStoreContainer">
+    <EntitySet Name="ACTIVEINGREDIENT" EntityType="BLTModel.Store.ACTIVEINGREDIENT" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="ACTIVEINGREDIENTPULA" EntityType="BLTModel.Store.ACTIVEINGREDIENTPULA" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="AI_LIMITATIONS" EntityType="BLTModel.Store.AI_LIMITATIONS" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="AICLASS" EntityType="BLTModel.Store.AICLASS" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="CROPUSE" EntityType="BLTModel.Store.CROPUSE" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="DIVISIONS" EntityType="BLTModel.Store.DIVISIONS" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="LIMITATIONS" EntityType="BLTModel.Store.LIMITATIONS" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="MODIFIER" EntityType="BLTModel.Store.MODIFIER" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="PRODUCT" EntityType="BLTModel.Store.PRODUCT" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="PRODUCT_ACTIVEINGREDIENT" EntityType="BLTModel.Store.PRODUCT_ACTIVEINGREDIENT" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="SPECIES" EntityType="BLTModel.Store.SPECIES" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="SPECIES_ACTIVEINGREDIENTPULA" EntityType="BLTModel.Store.SPECIES_ACTIVEINGREDIENTPULA" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="SPECIES_SPECIESIMAGES" EntityType="BLTModel.Store.SPECIES_SPECIESIMAGES" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="SPECIESFWSINFO" EntityType="BLTModel.Store.SPECIESFWSINFO" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="SPECIESIMAGES" EntityType="BLTModel.Store.SPECIESIMAGES" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="TAXONOMICCLASS" EntityType="BLTModel.Store.TAXONOMICCLASS" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="TAXONOMICTYPE" EntityType="BLTModel.Store.TAXONOMICTYPE" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="USER_" EntityType="BLTModel.Store.USER_" store:Type="Tables" Schema="BLTADMIN" />
+    <EntitySet Name="VERSION" EntityType="BLTModel.Store.VERSION" store:Type="Tables" Schema="BLTADMIN" />
+  </EntityContainer>
+  <EntityType Name="ACTIVEINGREDIENT">
+    <Key>
+      <PropertyRef Name="PCCODE" />
+    </Key>
+    <Property Name="INGREDIENTNAME" Type="nvarchar2" MaxLength="100" />
+    <Property Name="CAS" Type="nvarchar2" MaxLength="10" />
+    <Property Name="PCCODE" Type="nvarchar2" Nullable="false" MaxLength="10" />
+    <Property Name="AICLASSID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="ACTIVEINGREDIENTPULA">
+    <Key>
+      <PropertyRef Name="PULAID" />
+    </Key>
+    <Property Name="PULAID" Type="number" Nullable="false" />
+    <Property Name="BASIS" Type="nvarchar2" MaxLength="255" />
+    <Property Name="MODIFIERS" Type="nvarchar2" MaxLength="255" />
+    <Property Name="BASEMAP" Type="nvarchar2" MaxLength="255" />
+    <Property Name="BIOPDATE" Type="date" />
+    <Property Name="REGISTRATIONREVIEWDOCDATE" Type="date" />
+    <Property Name="OTHERCREATIONREASONS" Type="nvarchar2" MaxLength="255" />
+    <Property Name="PULASHAPEID" Type="number" />
+    <Property Name="APPID" Type="number" />
+    <Property Name="PRODUCTID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="AI_LIMITATIONS">
+    <Key>
+      <PropertyRef Name="APPID" />
+    </Key>
+    <Property Name="APPID" Type="number" Nullable="false" />
+    <Property Name="PCCODE" Type="nvarchar2" Nullable="false" MaxLength="10" />
+    <Property Name="LIMITATIONID" Type="number" />
+    <Property Name="CROPUSEID" Type="number" />
+    <Property Name="MODIFIERID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+    <Property Name="PULAID" Type="number" Nullable="false" />
+  </EntityType>
+  <EntityType Name="AICLASS">
+    <Key>
+      <PropertyRef Name="AICLASSID" />
+    </Key>
+    <Property Name="AICLASSID" Type="number" Nullable="false" />
+    <Property Name="AICLASSNAME" Type="nvarchar2" MaxLength="100" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="CROPUSE">
+    <Key>
+      <PropertyRef Name="CROPUSEID" />
+    </Key>
+    <Property Name="CROPUSEID" Type="number" Nullable="false" />
+    <Property Name="USE" Type="nvarchar2" MaxLength="100" />
+    <Property Name="FORMULATION" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="DIVISIONS">
+    <Key>
+      <PropertyRef Name="DIVISIONID" />
+    </Key>
+    <Property Name="DIVISIONID" Type="number" Nullable="false" />
+    <Property Name="DIVISIONNAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="LIMITATIONS">
+    <Key>
+      <PropertyRef Name="LIMITATIONID" />
+    </Key>
+    <Property Name="LIMITATIONID" Type="number" Nullable="false" />
+    <Property Name="CODE" Type="nvarchar2" MaxLength="5" />
+    <Property Name="LIMITATION" Type="nclob" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="MODIFIER">
+    <Key>
+      <PropertyRef Name="MODIFIERID" />
+    </Key>
+    <Property Name="MODIFIERID" Type="number" Nullable="false" />
+    <Property Name="MODIFIER" Type="nvarchar2" MaxLength="100" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="PRODUCT">
+    <Key>
+      <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+    </Key>
+    <Property Name="PRODUCTNAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="PRODUCTREGISTRATIONNUMBER" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="PRODUCT_ACTIVEINGREDIENT">
+    <Key>
+      <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+      <PropertyRef Name="PCCODE" />
+    </Key>
+    <Property Name="PRODUCTREGISTRATIONNUMBER" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="PCCODE" Type="nvarchar2" Nullable="false" MaxLength="10" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="SPECIES">
+    <Key>
+      <PropertyRef Name="ITIS_TSN" />
+    </Key>
+    <Property Name="ITIS_TSN" Type="number" Nullable="false" />
+    <Property Name="DESCRIPTIONTEXT" Type="nclob" />
+    <Property Name="FACTSHEETURL" Type="nvarchar2" MaxLength="255" />
+    <Property Name="FEDERALREGISTRATIONNUMBER" Type="nvarchar2" MaxLength="255" />
+    <Property Name="CLASSID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="SPECIES_ACTIVEINGREDIENTPULA">
+    <Key>
+      <PropertyRef Name="PULAID" />
+      <PropertyRef Name="ITIS_TSN" />
+    </Key>
+    <Property Name="PULAID" Type="number" Nullable="false" />
+    <Property Name="ITIS_TSN" Type="number" Nullable="false" />
+    <Property Name="CRITICALHABITATINPULA" Type="number" Precision="5" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="SPECIES_SPECIESIMAGES">
+    <Key>
+      <PropertyRef Name="ITIS_TSN" />
+      <PropertyRef Name="IMAGEID" />
+    </Key>
+    <Property Name="ITIS_TSN" Type="number" Nullable="false" />
+    <Property Name="IMAGEID" Type="number" Nullable="false" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="SPECIESFWSINFO">
+    <Key>
+      <PropertyRef Name="FWSINFOID" />
+    </Key>
+    <Property Name="FWSINFOID" Type="number" Nullable="false" />
+    <Property Name="ITIS_TSN" Type="number" />
+    <Property Name="SPECIES_CODE" Type="nvarchar2" MaxLength="255" />
+    <Property Name="COMMON_NAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="SCIENTIFIC_NAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="INVERTED_COMMON_NAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="CRITICAL_HABITAT" Type="nvarchar2" MaxLength="255" />
+    <Property Name="CURRENT_DISTRIBUTION" Type="nvarchar2" MaxLength="255" />
+    <Property Name="FAMILY" Type="nvarchar2" MaxLength="255" />
+    <Property Name="SPECIES_GROUP" Type="nvarchar2" MaxLength="255" />
+    <Property Name="LEAD_REGION" Type="nvarchar2" MaxLength="255" />
+    <Property Name="LISTING_STATUS" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERTEBRATE__INVERTEBRATE_PLANT" Type="nvarchar2" MaxLength="255" />
+    <Property Name="WHERE_LISTED" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="SPECIESIMAGES">
+    <Key>
+      <PropertyRef Name="IMAGEID" />
+    </Key>
+    <Property Name="IMAGEID" Type="number" Nullable="false" />
+    <Property Name="IMAGE" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="TAXONOMICCLASS">
+    <Key>
+      <PropertyRef Name="CLASSID" />
+    </Key>
+    <Property Name="CLASSID" Type="number" Nullable="false" />
+    <Property Name="CLASSNAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="PARENTID" Type="number" />
+    <Property Name="TYPEID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="TAXONOMICTYPE">
+    <Key>
+      <PropertyRef Name="TYPEID" />
+    </Key>
+    <Property Name="TYPEID" Type="number" Nullable="false" />
+    <Property Name="TYPE" Type="nvarchar2" MaxLength="255" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="USER_">
+    <Key>
+      <PropertyRef Name="USERID" />
+    </Key>
+    <Property Name="USERID" Type="number" Nullable="false" />
+    <Property Name="USERNAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="EMAIL" Type="nvarchar2" MaxLength="255" />
+    <Property Name="PHONE" Type="nvarchar2" MaxLength="20" />
+    <Property Name="ORGANIZATION" Type="nvarchar2" MaxLength="255" />
+    <Property Name="DIVISIONID" Type="number" />
+    <Property Name="VERSIONID" Type="number" />
+  </EntityType>
+  <EntityType Name="VERSION">
+    <Key>
+      <PropertyRef Name="VERSIONID" />
+    </Key>
+    <Property Name="VERSIONID" Type="number" Nullable="false" />
+    <Property Name="AUTHORID" Type="number" />
+    <Property Name="CREATED" Type="date" />
+    <Property Name="EXPIRES" Type="date" />
+    <Property Name="PUBLISHED" Type="number" Precision="5" />
+    <Property Name="USERID" Type="number" />
+  </EntityType>
+</Schema>

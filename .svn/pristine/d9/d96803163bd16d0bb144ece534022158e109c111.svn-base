@@ -1,0 +1,28 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page for parts 
+ */
+ *@
+ 
+@using BLTServices;
+
+
+@{
+    ViewBag.Title = "Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Which part do you want to edit?</h2>
+<div>@Html.ActionLink("Active Ingredients", "AI", "Parts")</div>
+<div>@Html.ActionLink("Codes", "Codes", "Parts")</div>
+<div>@Html.ActionLink("Family", "Family", "Parts")</div>
+<div>@Html.ActionLink("Species", "Species", "Parts")</div>
+<div>@Html.ActionLink("Use", "Use", "Parts")</div>
+<div>@Html.ActionLink("Groups", "Groups", "Parts")</div>

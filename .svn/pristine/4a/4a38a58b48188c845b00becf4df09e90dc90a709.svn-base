@@ -1,0 +1,87 @@
+﻿@*
+05.23.13 - TR - Hooked into services
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the AI Part Edit page 
+ */
+ *@
+ 
+@using BLTServices;
+
+@model BLTServices.ACTIVE_INGREDIENT
+           
+@{
+    ViewBag.Title = "Active Ingredient Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/loading1.gif")"  /></p></div></div>
+
+<div class="partsTitle">Manage Bulletins Components - Active Ingredient
+ <span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+ </div>
+
+@using (Html.BeginForm("AI_Edit", "Parts", FormMethod.Get, new { id = Model.ID }))
+{
+     <div class="siteColumn">
+
+     <input type="hidden" name="ID" value="@Model.ID" />
+
+     <input type="hidden" name="ACTIVE_INGREDIENT_ID" value="@Model.ACTIVE_INGREDIENT_ID" />
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a">AI Name:</div>
+	            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="INGREDIENT_NAME" data-mini="true" value="@Model.INGREDIENT_NAME"  /></div>
+            </div>
+        </div>
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+	            <div class="ui-block-a">AI Class:</div>
+	            <div class="ui-block-b">
+                    <select id="AIClassdropdown" class="bltSelectInput ui-shadow-inset" name="AI_CLASS_ID" data-native-menu="false" data-mini="true">
+                        <option value="0"></option>
+                        @foreach (AI_CLASS AIc in ViewData["AIClassList"] as List<AI_CLASS>)
+                        {
+                            <option @( (AIc.ID == Model.AI_CLASS_ID) ? "selected" : "") value='@AIc.ID'>@AIc.AI_CLASS_NAME</option> 
+                }
+                    </select>
+                </div>
+            </div>
+        </div>
+                    
+
+	@* should get pulled from a service
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">PC Code:</span>
+	    <input type="text" class="bltTextInput ui-shadow-inset margin" name="AI" data-mini="true" value="@ViewData["thisAI"]"  />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">CAS Number:</span>
+	    <input type="text" class="bltTextInput ui-shadow-inset margin" name="AI" data-mini="true" value="@ViewData["thisAI"]"  />
+	</div>
+    
+    <div data-role="fieldcontain">
+	    <span class="bold ui-label-a">Active Ingredient Class:</span>
+	    <select type="text" class="bltSelectInput ui-shadow-inset margin" name="AI" data-mini="true" value="@ViewData["thisAI"]"  />
+	</div>    *@
+    
+        
+    <div id="formSubmitDiv">
+        <div class="leftSideSubmit">
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" onclick="loading();" class="submit" value="Save" /></div></div>
+            <div class="submitDiv"><div class="darkButtonBorder"><input type="reset" id="resetButton" class="submit" value="Cancel" onclick="location.href='@Url.Action("AI", "Parts")' " /></div></div>
+        </div>
+    </div>
+
+</div>
+}

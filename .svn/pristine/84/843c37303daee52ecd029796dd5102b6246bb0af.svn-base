@@ -1,0 +1,173 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page (mapper) 
+ */
+ *@
+
+@using System.Configuration;
+@using BLTServices;
+@using BLT_Map;
+
+<style type="text/css">
+#main 
+{
+    padding: 12px 0 !important;
+}
+.page
+{
+    width: 98% !important;
+    /*width: 100%;
+    height: 100%*/
+}
+</style>    
+
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+
+@{
+    if (ViewData.ContainsKey("Published"))
+    {
+        <div>The comment period is over.</div>
+    }
+    else
+    {
+        <div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+        <div>
+            @* <img id="Map" onclick="ShapeClick();" style="float:left; width:40%" src="@Url.Content("~/Assets/Images/testMapper.JPG")"  /> 
+            *@
+            <iframe id="theIframe" width="40%" height="600" style="float:left" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
+                src='https://wimcloud.usgs.gov/BLT_Map/index.html'>
+            </iframe>
+    
+            @{
+                if (Session["EventId"] != null)
+                {
+                    <input type="hidden" id="eventID" value="@Session["EventId"]" />
+                }
+            }
+            @* ----- Partial Views go here ---------- *@
+            <div style="float:right; width:60%" id="content">
+                 <span style="padding-left:10px">Choose a PULA shape to get started.</span>
+               @* <input type="button" onclick="test();" value="refresh frame" />*@
+               <input type="button" onclick="testing('63');" value="testing" />
+            </div>
+
+        </div>
+
+
+    <br clear="all" />
+
+    }
+}
+
+
+<script type="text/javascript">
+    
+    function loading() {
+        $("#loading").fadeIn();
+    }
+    //Contributor_Details
+    function testing(SHAPEID) {
+        $("#loading").fadeIn();
+        $.ajax({
+            url: '@Url.Action("Contributor_Details", "PULA")',
+            type: 'GET',
+            data: { shapeId: SHAPEID },
+            success: function (response) {
+                $("#loading").fadeOut();
+                $("#content").html(response);
+            },
+            error: function (xhr) {
+                alert("Form didn't come back");
+            }
+        });
+    }
+    //mapper polygon clicked, go get form to show
+    function Shape_Click(PULASHPID) {
+        $("#loading").fadeIn();
+        var EventId = $("#eventID").val();
+        if (EventId != null) {
+            $.ajax({
+                url: '@Url.Action("PULA_Click", "PULA")',
+                type: 'GET',
+                data: { shapeId: PULASHPID, eventId: EventId },
+                success: function (response) {
+                    $("#loading").fadeOut();
+                    $("#content").html(response);
+                },
+                error: function (xhr) {
+                    alert("Form didn't come back");
+                }
+            });
+        }
+        else {
+            $.ajax({
+                url: '@Url.Action("PULA_Click", "PULA")',
+                type: 'GET',
+                data: { shapeId: PULASHPID },
+                success: function (response) {
+                    $("#loading").fadeOut();
+                    $("#content").html(response);
+                },
+                error: function (xhr) {
+                    alert("Form didn't come back");
+                }
+            });
+        }
+    }
+
+    //mapper is checking for eventID, pass it in if Contributor is logged in
+    function GetEventID() {
+        var eID = $("#eventID").val();
+        return eID;
+    }
+
+    //mapper wants filtered Event-based PULAs to show as shapes
+    //controller will return List<object> PULAlist ([0] - Created, [1] - Published, [2] - Effective)
+    function GetEventPULAs(eventID, callback) {
+        $.ajax({
+            url: '@Url.Action("GetEventPULAs", "PULA")',
+            type: 'GET',
+            dataType: 'json',
+            data: { eventId: eventID },
+            success: function (response) {
+                console.dir(response);
+                callback(response);
+            },
+            error: function (xhr) {
+                alert("Error");
+            }
+        }); GetEventPULAs
+    }
+
+    //mapper wants filtered PULAs to show as shapes (only effective pulas are returned)
+    function GetFilteredShapes(date, event_value, prod_value, AI_value, callback) {
+        var aDate = date != "" ? date : "0";
+        $.ajax({
+            url: '@Url.Action("GetFilteredSimplePULAs", "PULA")',
+            type: 'GET',
+            dataType: 'json',
+            data: { fDate: aDate, eventID: event_value, productID: prod_value, activeIngredientID: AI_value },
+            success: function (response) {
+                console.dir(response);
+                callback(response);
+            },
+            error: function (xhr) {
+                alert("Error");
+            }
+        });
+    }
+</script>

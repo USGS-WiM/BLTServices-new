@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="bltModel.Store" Provider="Npgsql" ProviderManifestToken="9.5.2" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityType Name="active_ingredient">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+    <Property Name="ingredient_name" Type="varchar" MaxLength="500" />
+    <Property Name="pc_code" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="cas_number" Type="varchar" MaxLength="20" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="active_ingredient_ai_class">
+    <Key>
+      <PropertyRef Name="active_ingredient_ai_class_id" />
+    </Key>
+    <Property Name="active_ingredient_ai_class_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+    <Property Name="ai_class_id" Type="int4" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+  </EntityType>
+  <EntityType Name="active_ingredient_pula">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="pula_id" Type="int4" Nullable="false" />
+    <Property Name="pula_shape_id" Type="int4" Nullable="false" />
+    <Property Name="other_justification" Type="varchar" MaxLength="1000" />
+    <Property Name="base_data" Type="varchar" MaxLength="1000" />
+    <Property Name="base_data_modifiers" Type="varchar" MaxLength="1000" />
+    <Property Name="interim_proposed_decision" Type="varchar" MaxLength="500" />
+    <Property Name="focus_meeting" Type="varchar" MaxLength="500" />
+    <Property Name="biological_opinion_regreview" Type="varchar" MaxLength="500" />
+    <Property Name="biological_opinion_lit" Type="varchar" MaxLength="500" />
+    <Property Name="proposed_decision" Type="varchar" MaxLength="500" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="is_published" Type="int4" Nullable="false" />
+    <Property Name="effective_date" Type="timestamp" />
+    <Property Name="event_id" Type="int4" />
+    <Property Name="comments" Type="varchar" MaxLength="500" />
+    <Property Name="sec3_newchem" Type="varchar" MaxLength="500" />
+    <Property Name="sec3_newuse" Type="varchar" MaxLength="500" />
+    <Property Name="sec24" Type="varchar" MaxLength="500" />
+    <Property Name="final_decision" Type="varchar" MaxLength="500" />
+    <Property Name="sec18" Type="varchar" MaxLength="500" />
+    <Property Name="interim_decision" Type="varchar" MaxLength="500" />
+    <Property Name="additional_information" Type="text" />
+  </EntityType>
+  <EntityType Name="ai_class">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="ai_class_id" Type="int4" Nullable="false" />
+    <Property Name="ai_class_name" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="application_method">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="application_method_id" Type="int4" Nullable="false" />
+    <Property Name="method" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="crop_use">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="crop_use_id" Type="int4" Nullable="false" />
+    <Property Name="use" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="divisions">
+    <Key>
+      <PropertyRef Name="division_id" />
+    </Key>
+    <Property Name="division_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="division_name" Type="varchar" MaxLength="255" Nullable="false" />
+  </EntityType>
+  <EntityType Name="event">
+    <Key>
+      <PropertyRef Name="event_id" />
+    </Key>
+    <Property Name="event_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="name" Type="varchar" MaxLength="200" Nullable="false" />
+  </EntityType>
+  <EntityType Name="formulation">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="formulation_id" Type="int4" Nullable="false" />
+    <Property Name="form" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="limitations">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="limitation_id" Type="int4" Nullable="false" />
+    <Property Name="code" Type="varchar" MaxLength="5" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="limitation" Type="varchar" MaxLength="4000" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+  </EntityType>
+  <EntityType Name="organization">
+    <Key>
+      <PropertyRef Name="organization_id" />
+    </Key>
+    <Property Name="organization_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
+  </EntityType>
+  <EntityType Name="product">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="product_id" Type="int4" Nullable="false" />
+    <Property Name="product_registration_number" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="product_name" Type="varchar" MaxLength="300" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="product_name_status" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="product_active_ingredient">
+    <Key>
+      <PropertyRef Name="product_active_ingredient_id" />
+    </Key>
+    <Property Name="product_active_ingredient_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="product_id" Type="int4" Nullable="false" />
+    <Property Name="active_ingredient_id" Type="int4" Nullable="false" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+  </EntityType>
+  <EntityType Name="pula_limitations">
+    <Key>
+      <PropertyRef Name="pula_limitation_id" />
+    </Key>
+    <Property Name="pula_limitation_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="active_ingredient_id" Type="int4" />
+    <Property Name="limitation_id" Type="int4" />
+    <Property Name="crop_use_id" Type="int4" />
+    <Property Name="application_method_id" Type="int4" />
+    <Property Name="version_id" Type="int4" Nullable="false" />
+    <Property Name="pula_id" Type="int4" Nullable="false" />
+    <Property Name="formulation_id" Type="int4" />
+    <Property Name="product_id" Type="int4" />
+  </EntityType>
+  <EntityType Name="role">
+    <Key>
+      <PropertyRef Name="role_id" />
+    </Key>
+    <Property Name="role_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="role_name" Type="varchar" MaxLength="25" Nullable="false" />
+    <Property Name="role_description" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="species_active_ingredient_pula">
+    <Key>
+      <PropertyRef Name="species_activeingrepula_id" />
+    </Key>
+    <Property Name="species_activeingrepula_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="species_id" Type="int4" Nullable="false" />
+    <Property Name="pula_id" Type="int4" Nullable="false" />
+    <Property Name="version_id" Type="float8" Nullable="false" />
+  </EntityType>
+  <EntityType Name="user_">
+    <Key>
+      <PropertyRef Name="user_id" />
+    </Key>
+    <Property Name="user_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="username" Type="varchar" MaxLength="255" />
+    <Property Name="email" Type="varchar" MaxLength="255" />
+    <Property Name="phone" Type="varchar" MaxLength="20" />
+    <Property Name="organization_id" Type="int4" />
+    <Property Name="division_id" Type="int4" />
+    <Property Name="role_id" Type="int4" Nullable="false" />
+    <Property Name="fname" Type="varchar" MaxLength="25" />
+    <Property Name="lname" Type="varchar" MaxLength="25" />
+  </EntityType>
+  <EntityType Name="version">
+    <Key>
+      <PropertyRef Name="version_id" />
+    </Key>
+    <Property Name="version_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="creator_id" Type="int4" />
+    <Property Name="created_time_stamp" Type="timestamp" />
+    <Property Name="publisher_id" Type="int4" />
+    <Property Name="published_time_stamp" Type="timestamp" />
+    <Property Name="expirer_id" Type="int4" />
+    <Property Name="expired_time_stamp" Type="timestamp" />
+    <Property Name="reviewer_id" Type="int4" />
+    <Property Name="reviewed_time_stamp" Type="timestamp" />
+  </EntityType>
+  <EntityContainer Name="bltModelStoreContainer">
+    <EntitySet Name="active_ingredient" EntityType="Self.active_ingredient" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="active_ingredient_ai_class" EntityType="Self.active_ingredient_ai_class" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="active_ingredient_pula" EntityType="Self.active_ingredient_pula" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="ai_class" EntityType="Self.ai_class" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="application_method" EntityType="Self.application_method" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="crop_use" EntityType="Self.crop_use" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="divisions" EntityType="Self.divisions" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="event" EntityType="Self.event" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="formulation" EntityType="Self.formulation" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="limitations" EntityType="Self.limitations" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="organization" EntityType="Self.organization" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="product" EntityType="Self.product" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="product_active_ingredient" EntityType="Self.product_active_ingredient" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="pula_limitations" EntityType="Self.pula_limitations" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="role" EntityType="Self.role" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="species_active_ingredient_pula" EntityType="Self.species_active_ingredient_pula" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="user_" EntityType="Self.user_" Schema="bltadmin" store:Type="Tables" />
+    <EntitySet Name="version" EntityType="Self.version" Schema="bltadmin" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

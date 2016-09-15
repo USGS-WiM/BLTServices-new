@@ -1,0 +1,470 @@
+﻿//------------------------------------------------------------------------------
+//----- AILimitationsHandler ---------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 11.09.12 - TR - Changed class name from SiteHandler to AILimitationsHandler and removed ForUriName "Sites" references
+// 10.19.12 - JB - Created from STN
+#endregion
+
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+
+namespace BLTServices.Handlers
+{
+    public class AILimitationsHandler: HandlerBase
+    {
+
+        #region Properties
+        public override string entityName
+        {
+            get { return "AI_LIMITATIONS"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        //---------------------Returns List of objects---------------------
+        // returns all AI_LIMITATIONS
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<AI_LIMITATIONS> aiLimit;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aiLimit = GetEntities<AI_LIMITATIONS>(aBLTE).ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<AI_LIMITATIONS>(aiLimit);
+
+                return new OperationResult.OK { ResponseResource = aiLimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns all active AI_LIMITATIONS
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(string date)
+        {
+            List<AI_LIMITATIONS> aiLimit = null;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now; 
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+              
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    aiLimit = GetActive(GetEntities<AI_LIMITATIONS>(aBLTE), thisDate.Value).ToList();
+                }//end using
+
+                activateLinks<AI_LIMITATIONS>(aiLimit);
+
+                return new OperationResult.OK { ResponseResource = aiLimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+
+        }//end HttpMethod.GET
+
+        // returns all AILimitations (active if date is supplied)
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 AILimitationsID, [Optional] string date)
+        {
+            try
+            {
+                List<AI_LIMITATIONS> aiList;
+                DateTime? thisDate = ValidDate(date);
+
+                if (AILimitationsID < 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        IQueryable<AI_LIMITATIONS> query;
+                        query = GetEntities<AI_LIMITATIONS>(aBLTE).Where(ai => ai.AI_LIMITATION_ID == AILimitationsID);
+
+                        if (thisDate.HasValue)
+                            query = GetActive(query, thisDate.Value);
+
+                        //process
+                        aiList = query.ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<AI_LIMITATIONS>(aiList);
+
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        // returns active Active AI_LIMITATIONS for the given pulaID
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetPULALimitations")]
+        public OperationResult GetPULAactiveLimitations(Int32 pulaId, [Optional]string date)
+        {
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                //set the date to current date if request is not authorized
+                if (DateTime.Compare(thisDate.Value, DateTime.Now) < 0 && !CanManage()) thisDate = DateTime.Now;
+
+                List<AI_LIMITATIONS> aiList;
+                using (BLTRDSEntities aBLTE = GetRDS())
+                {
+                    IQueryable<AI_LIMITATIONS> query1 = GetEntities<AI_LIMITATIONS>(aBLTE).Where(a => a.PULA_ID == pulaId);
+
+                    aiList = GetActive(query1, thisDate.Value).ToList();
+                    
+                    activateLinks<AI_LIMITATIONS>(aiList);
+
+                }//end using
+             
+                return new OperationResult.OK { ResponseResource = aiList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        //---------------------Returns individual objects---------------------
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]
+        public OperationResult GetEntity(Int32 entityID)
+        {
+            AI_LIMITATIONS anAILimit;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        anAILimit = GetEntities<AI_LIMITATIONS>(aBLTE).SingleOrDefault(ai => ai.AI_LIMITATION_ID == entityID);
+
+                    }//end using
+                }//end using
+
+                activateLinks<AI_LIMITATIONS>(anAILimit);
+
+                return new OperationResult.OK { ResponseResource = anAILimit };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        #endregion
+        #region POST Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult POST(AI_LIMITATIONS anEntity)
+        {
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        if (!Exists(aBLTE, ref anEntity))
+                        {
+                            //create version
+                            anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+
+                            aBLTE.AI_LIMITATIONS.AddObject(anEntity);
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region Activate Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "Activate")]
+        public OperationResult Activate(Int32 entityID, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            AI_LIMITATIONS anAILimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        anAILimit = aBLTE.AI_LIMITATIONS.FirstOrDefault(ai => ai.AI_LIMITATION_ID == entityID);
+
+                        if (anAILimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //assign version
+                        anAILimit.VERSION_ID = SetVersion(aBLTE, anAILimit.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+                       
+                        aBLTE.SaveChanges();
+
+                        activateLinks<AI_LIMITATIONS>(anAILimit);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anAILimit };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EDIT Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName="Edit")]
+        public OperationResult Edit(Int32 entityID, AI_LIMITATIONS anEntity, [Optional] string date)
+        {
+            //No editing of tables are allowed. An edit call will create and activate a new entity, and expire the old one
+            USER_ loggedInUser;
+            AI_LIMITATIONS anAILimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+                
+                if (entityID >= 0)
+                { return new OperationResult.BadRequest(); }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        //version user
+                        loggedInUser = LoggedInUser(aBLTE);
+
+                        anAILimit = aBLTE.AI_LIMITATIONS.FirstOrDefault(ai => ai.AI_LIMITATION_ID == entityID);
+                        if (anAILimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire 
+                        anAILimit.VERSION_ID = SetVersion(aBLTE, anAILimit.VERSION_ID, loggedInUser.USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        //assign version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Created, DateTime.Now).VERSION_ID;
+                        //activate version
+                        anEntity.VERSION_ID = SetVersion(aBLTE, anEntity.VERSION_ID, loggedInUser.USER_ID, StatusType.Activated, thisDate.Value).VERSION_ID;
+
+                        aBLTE.AI_LIMITATIONS.AddObject(anEntity);
+                        aBLTE.SaveChanges();
+
+                        activateLinks<AI_LIMITATIONS>(anEntity);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anEntity };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #region EXPIRE Methods
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.DELETE, ForUriName = "Expire")]
+        public OperationResult Expire(Int32 entityID, [Optional ]string date)
+        {
+            AI_LIMITATIONS anAILimit;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (entityID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                      
+                        anAILimit = aBLTE.AI_LIMITATIONS.FirstOrDefault(ai => ai.AI_LIMITATION_ID == entityID);
+                        if (anAILimit == null)
+                        { return new OperationResult.BadRequest(); }
+
+                        //expire current 
+                        anAILimit.VERSION_ID = SetVersion(aBLTE, anAILimit.VERSION_ID, LoggedInUser(aBLTE).USER_ID, StatusType.Expired, thisDate.Value).VERSION_ID;
+
+                        aBLTE.SaveChanges();
+
+                        activateLinks<AI_LIMITATIONS>(anAILimit);
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK { ResponseResource = anAILimit };
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole })]
+        [HttpOperation(HttpMethod.GET, ForUriName = "ExpirePULALimitations")]
+        public OperationResult ExpirePULALimitations(Int32 pulaID, [Optional] string date)
+        {
+            //No deleting of tables are allowed. An delete call will expire the entity
+            List<AI_LIMITATIONS> aiList;
+            try
+            {
+                DateTime? thisDate = ValidDate(date);
+                if (!thisDate.HasValue)
+                    thisDate = DateTime.Now;
+
+                if (pulaID <= 0)
+                { return new OperationResult.BadRequest { }; }
+
+
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aiList = GetEntities<AI_LIMITATIONS>(aBLTE).Where(l=>l.PULA_ID == pulaID &&
+                                                                              l.VERSION.PUBLISHED_TIME_STAMP >= thisDate.Value).ToList();
+                        USER_ loggedInUser =LoggedInUser(aBLTE);
+                        if (aiList != null)
+                        { 
+                            foreach (var p in aiList)
+                            {
+                                p.VERSION = SetVersion(aBLTE, p.VERSION_ID, loggedInUser.USER_ID, StatusType.Expired, thisDate.Value);
+                            }//next
+
+                            aBLTE.SaveChanges();
+                        }//end if
+
+                    }//end using
+                }//end using
+
+                return new OperationResult.OK();
+            }
+            catch (Exception)
+            { return new OperationResult.BadRequest(); }
+
+        }//end HttpMethod.GET
+
+        #endregion
+        #endregion
+        #region Helper Methods
+        private bool Exists(BLTRDSEntities aBLTE, ref AI_LIMITATIONS anEntity)
+        {
+            AI_LIMITATIONS existingEntity;
+            AI_LIMITATIONS thisEntity = anEntity;
+            //check if it exists
+            try
+            {
+                existingEntity = aBLTE.AI_LIMITATIONS.FirstOrDefault (mt => mt.PULA_ID == thisEntity.PULA_ID &&
+                                                                            (mt.ACTIVE_INGREDIENT_ID == thisEntity.ACTIVE_INGREDIENT_ID || thisEntity.ACTIVE_INGREDIENT_ID <= 0 || thisEntity.ACTIVE_INGREDIENT_ID == null) &&
+                                                                            (mt.LIMITATION_ID == thisEntity.LIMITATION_ID || thisEntity.LIMITATION_ID <= 0 || thisEntity.LIMITATION_ID == null) &&
+                                                                            (mt.CROP_USE_ID == thisEntity.CROP_USE_ID || thisEntity.CROP_USE_ID <= 0 || thisEntity.CROP_USE_ID == null) &&
+                                                                            (mt.MODIFIER_ID == thisEntity.MODIFIER_ID || thisEntity.MODIFIER_ID <= 0 || thisEntity.MODIFIER_ID == null)
+                                                                            );
+            
+                if (existingEntity == null)
+                    return false;
+
+                //if exists then update ref
+                anEntity = existingEntity;
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }//end Exists
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        
+    }//end class AILimitationsHandler
+
+}//end namespace

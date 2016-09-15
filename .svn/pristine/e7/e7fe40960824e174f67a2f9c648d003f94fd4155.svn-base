@@ -1,0 +1,302 @@
+﻿using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Data.Objects.DataClasses;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Xml.Serialization;
+using System.Linq;
+using System.Web;
+using System.Text;
+
+using BLTServices.Authentication;
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+namespace BLTServices.Handlers
+{
+   public abstract class HandlerBase
+   {
+       #region Constants
+       //role constants must match db table
+       protected const string AdminRole = "ADMIN";
+       protected const string PublisherRole = "PUBLISH";
+       protected const string CreaterRole = "CREATE";
+       protected const string EnforcerRole = "ENFORCE";
+       protected const string Public = "PUBLIC";
+       #endregion
+
+       #region "Base Properties"
+       protected String connectionString = @"metadata=res://*/BLTModel.csdl|res://*/BLTModel.ssdl|res://*/BLTModel.msl;provider=Oracle.DataAccess.Client;provider connection string=""DATA SOURCE=BLTRDS;USER ID={0};PASSWORD={1}""";
+
+       // will be automatically injected by DI in OpenRasta
+       public ICommunicationContext Context { get; set; }
+    
+       public string username
+       {
+           get { return Context.User.Identity.Name; }
+       }
+
+       public abstract string entityName { get; }
+        #endregion
+       #region Base Queries
+
+       protected ObjectQuery<T> GetEntities<T>(BLTRDSEntities aBLTE) where T : HypermediaEntity
+       {
+           ObjectQuery<T> entities = null;
+           //Get basic authentication password
+           
+                   // Get the metadata workspace from the connection.
+                   MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
+
+                   // Get a collection of the entity containers.
+                   ReadOnlyCollection<EntityContainer> containers =
+                            workspace.GetItems<EntityContainer>(
+                                               DataSpace.CSpace);
+
+                   EntitySet es;
+                   if (containers[0].TryGetEntitySetByName(entityName, true, out es))
+                   {
+                       string queryString =
+                           @"SELECT VALUE anEntity FROM BLTRDSEntities." + es.Name + " as anEntity";
+
+                       ObjectQuery<T> entityQuery =
+                           aBLTE.CreateQuery<T>(queryString,
+                               new ObjectParameter("ent", es.ElementType.Name));
+
+                       entities = entityQuery;
+
+                   }//end if
+  
+           return entities;
+           //return new OperationResult.OK { ResponseResource = entities };
+       }//end GetSecuredEntities
+
+       protected IQueryable<ACTIVE_INGREDIENT_PULA> GetActive(IQueryable<ACTIVE_INGREDIENT_PULA> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => p.IS_PUBLISHED > 1 &&
+                                 (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<ACTIVE_INGREDIENT> GetActive(IQueryable<ACTIVE_INGREDIENT> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<LIMITATION> GetActive(IQueryable<LIMITATION> Obj, DateTime thisDate)
+       {
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<AI_LIMITATIONS> GetActive(IQueryable<AI_LIMITATIONS> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<AI_CLASS> GetActive(IQueryable<AI_CLASS> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<CROP_USE> GetActive(IQueryable<CROP_USE> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<MODIFIER> GetActive(IQueryable<MODIFIER> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.VERSION.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.VERSION.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.VERSION.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.VERSION.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+       protected IQueryable<VERSION> GetActive(IQueryable<VERSION> Obj, DateTime thisDate)
+       {
+
+           return Obj.Where(p => (p.PUBLISHED_TIME_STAMP.HasValue && thisDate.Date >= p.PUBLISHED_TIME_STAMP) &&
+                                 ((!p.EXPIRED_TIME_STAMP.HasValue) || thisDate.Date < p.EXPIRED_TIME_STAMP));
+
+       }//end GetActive
+
+       #endregion
+       #region "Base Methods"
+       protected abstract void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt);
+       public bool CanManage()
+       {
+           try
+           {
+               if(IsAuthorized(EnforcerRole))
+                   return true;
+
+               if (IsAuthorized(PublisherRole))
+                   return true;
+
+               if (IsAuthorized(AdminRole))
+                   return true;
+
+               //else
+               return false;
+           }
+           catch (Exception)
+           {
+
+               return false;
+           }//end try
+
+       }//end CanManager
+       public bool IsAuthorized(string role)
+       {
+           try
+           {
+               return Context.User.IsInRole(role);
+           }
+           catch (Exception)
+           {
+
+               return false;
+           }//end try
+          
+       }//end IsAuthorized
+
+       protected VERSION SetVersion(decimal versionId, Decimal userId, StatusType stype, DateTime timeStamp )
+       {
+           VERSION newVersion;
+           using (EasySecureString securedPassword = GetSecuredPassword())
+           {
+               using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+               {
+
+                  newVersion= SetVersion(aBLTE,versionId, userId, stype, timeStamp);
+
+               }//end using
+           }//end using
+
+           return newVersion;
+       
+       }//end SetVersion
+       protected VERSION SetVersion(BLTRDSEntities aBLTE,Decimal versionId, Decimal userId, StatusType stype, DateTime timeStamp)
+       {
+           if (versionId == null) versionId = -1;
+
+           VERSION newVersion = aBLTE.VERSIONs.FirstOrDefault(v => v.VERSION_ID == versionId);
+                      
+           switch (stype)
+           {
+               case StatusType.Created:
+                   
+                   newVersion = new VERSION();
+                   newVersion.CREATOR_ID = userId;
+                   newVersion.CREATED_TIME_STAMP = timeStamp;
+                   
+                   aBLTE.VERSIONs.AddObject(newVersion);
+                   break;
+               case StatusType.Activated:
+                  
+                   if (newVersion == null)
+                       newVersion = SetVersion(aBLTE, -1, userId, StatusType.Created, DateTime.Now);
+                   //do not overwrite
+                   if (newVersion.PUBLISHED_TIME_STAMP.HasValue) break;
+                   //else
+                   newVersion.PUBLISHER_ID = userId;
+                   newVersion.PUBLISHED_TIME_STAMP = timeStamp;
+                   break;
+               case StatusType.Expired:
+                   //do not overwrite
+                   if (newVersion.EXPIRED_TIME_STAMP.HasValue) break;
+                   //else
+                   newVersion.EXPIRER_ID = userId;
+                   newVersion.EXPIRED_TIME_STAMP = timeStamp;
+                   break;
+               default:
+                   break;
+           }//end switch
+
+           //save
+           aBLTE.SaveChanges();
+
+           return newVersion;
+
+       }//end SetVersion
+
+       protected USER_ LoggedInUser(BLTRDSEntities rds)
+       {
+           return rds.USER_.FirstOrDefault(dm => dm.USERNAME.ToUpper().Equals(username.ToUpper()));
+       }//loggedInUser
+
+       protected BLTRDSEntities GetRDS(EasySecureString password)
+       {
+           //return new BLTRDSEntities(string.Format(connectionString, "lampadmin", "cafOR4_yR"));
+           return new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, password.decryptString()));
+       }
+
+       protected BLTRDSEntities GetRDS()
+       {
+           return new BLTRDSEntities(string.Format(connectionString, "BLTPUBLIC", "B1TPu673sS"));
+       }
+
+       protected EasySecureString GetSecuredPassword()
+       {
+           //return new EasySecureString("B1TMan673sS");
+           return new EasySecureString(BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password);
+       }
+
+       protected DateTime? ValidDate(string date)
+       {
+           DateTime tempDate;
+           try
+           {
+               if (date == null) return null;
+               if (!DateTime.TryParse(date, out tempDate))
+               {
+                   //try oadate
+                   tempDate = DateTime.FromOADate(Convert.ToDouble(date));
+               }
+
+
+               return tempDate;
+               // 
+           }
+           catch (Exception)
+           {
+
+               return null;
+           }
+
+       }//end ValidDate
+
+       protected void activateLinks<T>(T anEntity)where T:HypermediaEntity
+       {
+           if (anEntity != null)
+               anEntity.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+       }//end activateLinks
+       protected void activateLinks<T>(List<T> EntityList) where T: HypermediaEntity
+       {
+           if (EntityList != null)
+               EntityList.ForEach(x=>x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_group));
+       }//end activateLinks
+
+       #endregion
+
+       protected enum StatusType
+       {
+           Created = 1,
+           Activated= 2,
+           Expired = 3
+       }//end enum
+    }//end class HandlerBase
+
+}//end namespace

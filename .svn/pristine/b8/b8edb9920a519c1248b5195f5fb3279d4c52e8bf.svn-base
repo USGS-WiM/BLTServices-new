@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Web.Mvc;
+using System.Web.Security;
+
+using BLTServices;
+
+namespace BLTWeb.Models
+{
+
+    public class PublishedPULA
+    {
+        [DataType(DataType.Text)]
+        [Display(Name = "AI")]
+        public string AI { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Product")]
+        public string Product { get; set; }
+
+        //[DataType(DataType.Text)]
+        //[Display(Name = "CAS")]
+        //public string CAS { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Application Method")]
+        public string AppMethod { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Formulation")]
+        public string Formulation { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Crop Use")]
+        public string CropUse { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Code")]
+        public string Code { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Limitation")]
+        public string Limitation { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Species")]
+        public string Species { get; set; }
+
+        //[DataType(DataType.Text)]
+        //[Display(Name = "Creator")]
+        //public string Creator { get; set; }
+    }
+
+    public class SpeciesModel
+    {
+        [DataType(DataType.Text)]
+        [Display(Name = "SppID")]
+        public string SppID { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "CommonName")]
+        public string CommonName { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "ScienName")]
+        public string ScienName { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Family")]
+        public string Family { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Group")]
+        public string Group { get; set; }
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Taxa")]
+        public string Taxa { get; set; }
+    }
+
+    public class PULA_Model
+    {
+        public ACTIVE_INGREDIENT_PULA anAIPULA { get; set; }
+        public string EffMonths { get; set; }
+        public string EffYears { get; set; }
+        public string ExMonths { get; set; }
+        public string ExYears { get; set; }
+        public string SpeciesToAdd { get; set; }
+        public string Limitations { get; set; }
+
+        //public string aiIDsToAdd { get; set; }
+        //public string prodIDsToAdd { get; set; }
+        //public string useIDsToAdd { get; set; }
+        //public string appMethsIDsToAdd { get; set; }
+        //public string formsIDsToAdd { get; set; }
+        //public string codeIDsToAdd { get; set; }
+    }
+
+    public class AIModel
+    {
+        public ACTIVE_INGREDIENT AI { get; set; }
+        public string AIProdsToAdd { get; set; }
+        public string ProductIDsToRemove { get; set; }
+    }
+}

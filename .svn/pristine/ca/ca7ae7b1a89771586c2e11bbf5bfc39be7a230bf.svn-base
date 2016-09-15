@@ -1,0 +1,129 @@
+﻿//------------------------------------------------------------------------------
+//----- PartsController.cs-----------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Display a master Parts page and link to individual parts pages 
+//
+//discussion:   
+//
+//     
+
+#region Comments
+// 04.23.13 - TR - Created
+
+#endregion
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Objects.DataClasses;
+using System.Text;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Xml;
+
+using RestSharp;
+using BLTServices;
+using BLTServices.Authentication;
+using BLTWeb.Utilities;
+
+namespace BLTWeb.Controllers
+{
+    public class PartsController : Controller
+    {
+        //
+        // GET: /Parts/
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        #region AI
+        
+        //GET Active Ingredients page (lists all AI to choose what to do with)
+        public ActionResult AI()
+        {
+            //BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            //var request = new RestRequest();
+            //request.Resource = "/ActiveIngredients";
+            //request.RootElement = "ArrayOfActiveIngredient";
+            //ViewData["AIList"] = serviceCaller.Execute<List<ACTIVEINGREDIENT>>(request);
+            List<string> AIList = new List<string>();
+            AIList.Add("Acephate");
+            AIList.Add("Atrazine");
+            AIList.Add("Carbaryl");
+            ViewData["AIList"] = AIList;
+
+            return View("AI/AI");
+        }
+
+        //want to do something, depends on Create for AI
+        public ActionResult AI_DoSomething(FormCollection fc, string Create)
+        {
+            string AItoEdit = fc["AI"];
+
+            if (Create == "Edit")
+            {
+                ViewData["thisAI"] = AItoEdit;
+                return View("AI/AI_Edit");
+            }
+            else // Add New
+            {
+                return View("AI/AI_New");
+            }
+        }
+
+        //Post the edit to update the AI
+        [HttpPost]
+        public ActionResult AI_Edit(string AI)
+        {
+            //update the AI and go back to the AI index
+            return View("AI/AI");
+        }
+
+        //post the new AI
+        [HttpPost]
+        public ActionResult AI_NEW()
+        {
+            //post the new ai and redirect to the index for ai with new one added to dropdown
+            return View("AI/AI_NEW");
+        }
+
+        public Boolean Delete(string id)
+        {
+            return true;
+        }
+
+        #endregion AI
+        public ActionResult Codes()
+        {
+            return View("Codes/Codes");
+        }
+        public ActionResult Family()
+        {
+            return View("Family/Family");
+        }
+        public ActionResult Groups()
+        {
+            return View("Groups/Groups");
+        }
+        public ActionResult Species()
+        {
+            return View("Species/Species");
+        }
+        public ActionResult Use()
+        {
+            return View("Use/Use");
+        }
+    }
+}

@@ -1,0 +1,244 @@
+﻿//------------------------------------------------------------------------------
+//----- SiteHandler -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jon Baier USGS Wisconsin Internet Mapping
+//              Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 11.09.12 - TR - Changed class name from SiteHandler to AILimitationsHandler and removed ForUriName "Sites" references
+// 10.19.12 - JB - Created from STN
+#endregion
+
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+
+
+namespace BLTServices.Handlers
+{
+    public class AILimitationsHandler: HandlerBase
+    {
+       
+        #region Routed Methods
+
+        #region GetMethods
+
+        /// 
+        /// Force the user to provide authentication 
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<AI_LIMITATIONS> aiLimits = new List<AI_LIMITATIONS>();
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    aiLimits = aBLTE.AI_LIMITATIONS.OrderBy(aLimit => aLimit.APPID).ToList<AI_LIMITATIONS>();
+
+                    if(aiLimits != null)
+                        aiLimits.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_group));
+
+
+                }// end using
+            }//end useing
+
+            return new OperationResult.OK { ResponseResource = aiLimits };
+        }//end httpMethod.GET
+
+
+        /// 
+        /// Force the user to provide authentication 
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 appId)
+        {
+
+            AI_LIMITATIONS aiLimit;
+
+            //Return BadRequest if there is no ID
+            if (appId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(
+                                                            string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    aBLTE.ContextOptions.LazyLoadingEnabled = false;
+                    aiLimit = aBLTE.AI_LIMITATIONS.SingleOrDefault(
+                                        aLimit => aLimit.APPID == appId);
+                 
+                    if (aiLimit != null)
+                     aiLimit.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+
+                }
+            }
+            return new OperationResult.OK { ResponseResource = aiLimit };
+        }
+
+
+        #endregion
+
+        #region PostMethods
+
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.POST)]
+        public OperationResult Post(AI_LIMITATIONS aiLimit)
+        {
+            //Return BadRequest if missing required fields
+            if ((aiLimit.PULAID <= 0) || (String.IsNullOrEmpty(aiLimit.PCCODE)))
+            {
+                return new OperationResult.BadRequest();                
+            }
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    var lastKey = aBLTE.AI_LIMITATIONS.OrderByDescending(ail => ail.APPID).First();
+                    decimal nextKey = lastKey.APPID + 1;
+                    aiLimit.APPID = nextKey;
+                    aBLTE.AI_LIMITATIONS.AddObject(aiLimit);
+                    aBLTE.SaveChanges();
+
+                    if (aiLimit != null)
+                        aiLimit.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+                }//end using
+            }//end using
+
+            //Return OK instead of created, Flex incorrectly treats 201 as error
+            return new OperationResult.OK { ResponseResource = aiLimit };
+        }//end HttpMethod.POST
+        #endregion
+
+        #region PutMethods
+
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.PUT)]
+        public OperationResult Put(Int32 appId, AI_LIMITATIONS aiLimit)
+        {
+            AI_LIMITATIONS updatedAILimit;
+
+            //Return BadRequest if missing required fields
+            if ((appId <= 0) || (aiLimit.PULAID <= 0) || (String.IsNullOrEmpty(aiLimit.PCCODE)))
+            {
+                return new OperationResult.BadRequest();
+            }
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    updatedAILimit = aBLTE.AI_LIMITATIONS.SingleOrDefault(
+                                        ail => ail.APPID == appId);
+                    updatedAILimit.PCCODE = aiLimit.PCCODE;
+                    updatedAILimit.LIMITATIONID = aiLimit.LIMITATIONID;
+                    updatedAILimit.CROPUSEID = aiLimit.CROPUSEID;
+                    updatedAILimit.MODIFIERID = aiLimit.MODIFIERID;
+                    updatedAILimit.VERSIONID = updatedAILimit.VERSIONID;
+                    updatedAILimit.PULAID = aiLimit.PULAID;
+                    aBLTE.SaveChanges();
+
+                    if (aiLimit != null)
+                        aiLimit.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+
+                }//end using
+            }//end using
+
+            return new OperationResult.OK { ResponseResource = aiLimit };
+        }// end HttpMethod.PUT
+        #endregion
+
+        #region DeleteMethods
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(AdminRole)]
+        [HttpOperation(HttpMethod.DELETE, ForUriName = "DeleteSite")]
+        public OperationResult Delete(Int32 appId)
+        {
+            //Return BadRequest if missing required fields
+            if (appId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                  BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+            using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    //fetch the object to be updated (assuming that it exists)
+                    AI_LIMITATIONS ObjectToBeDeleted = aBLTE.AI_LIMITATIONS.SingleOrDefault(c => c.APPID == appId);
+                    //delete it
+                    aBLTE.AI_LIMITATIONS.DeleteObject(ObjectToBeDeleted);
+
+                    aBLTE.SaveChanges();
+
+                }// end using
+
+
+            } //end using
+
+            //Return object to verify persisitance
+            return new OperationResult.OK { };
+        }//end HttpMethod.DELETE
+
+        #endregion
+        
+        #endregion
+    }//end class SiteHandler
+
+}//end namespace

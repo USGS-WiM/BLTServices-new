@@ -1,0 +1,625 @@
+﻿@* Comments:
+05.28.13 - TR - Hooked into services
+05.03.12 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked (shapeId doesn't exist yet = Populate)
+ */
+ *@
+
+@using BLTServices;
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+
+<link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+
+
+@*<link rel="stylesheet" href="/resources/demos/style.css" />*@
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab1-Gen">General</a></li>
+            <li><a href="#tabs2-AIs">Active Ingredient</a></li>
+            <li><a href="#tabs3-Species">Species</a></li>
+            <li><a href="#tabs4-Product">Product</a></li>
+            <li><a href="#tabs5-Summary" onclick="Summary();">Summary</a></li>
+        </ul>
+
+        @*General Detail Tab*@
+        @{USER_ loggedIn = ViewData["User"] as USER_; }
+
+        @using (Html.BeginForm("CreatePULA", "PULA", null, FormMethod.Post, new { id = "createForm" }))
+        {
+            <div id="tab1-Gen"> 
+            
+            <input type="hidden" name="shapeId" value="@ViewData["shapeId"]" />
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Effective Date:</div>
+	                    <div class="ui-block-b">
+                           <div>Month:&nbsp;
+                                <select class="bltTextInput ui-shadow-inset" style="width:50%;margin-top:5px" id="effectiveMonth" name="AIpula.EFFECTIVE_MONTH" data-mini="true">
+                                    <option value="0"></option>
+                                    @foreach (string mo in ViewData["Months"] as List<string>)
+                                    { 
+                                        <option value="@mo">@mo</option>
+                                    }
+                                 </select>
+                            </div>
+                            <br />
+                            <div>Year:&nbsp;&nbsp;&nbsp
+                                <select class="bltTextInput ui-shadow-inset" style="width:50%" id="effectiveYear" name="AIpula.EFFECTIVE_YEAR" data-mini="true">
+                                    <option value="0"></option>
+                                    @foreach (string yr in ViewData["Years"] as List<string>)
+                                    {
+                                        <option value="@yr">@yr</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+	                </div>
+                </div>
+            
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Creation Date:</div>
+	                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="CreationDate" name="V.CREATED_TIME_STAMP" data-mini="true" value="@DateTime.Now.ToShortDateString()" /></div>
+	                </div>
+                </div>
+            
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Created By:</div>
+	                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="CreatedBy" name="Creator.CREATOR_NAME" data-mini="true" value="@loggedIn.FNAME @loggedIn.LNAME"/></div>
+	                </div>
+                </div>                
+                <input type="hidden" name="Creator.CREATOR_ID" value="@loggedIn.USER_ID" />
+            
+               <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Creator Organization:</div>
+	                    <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="COrg" name="Creator.ORGANIZATION_NAME" data-mini="true" value="@(ViewData.ContainsKey("Organization") ? ViewData["Organization"] : "")" /></div>
+                    </div>
+                </div>
+                <input type="hidden" name="Creator.ORGANIZATION_ID" value="@loggedIn.ORGANIZATION_ID" />
+
+                @if (ViewData.ContainsKey("Division"))
+                {
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+                            <div class="ui-block-a">Creator Division:</div>
+                            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="CDiv" name="Creator.DIVISION_NAME" data-mini="true" value="@ViewData["Division"]" /></div>
+                        </div>
+	                </div>
+                    
+                }
+                else
+                { 
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Creator Division:</div>
+                            <div class="ui-block-b">
+                                <select id="Divdropdown" class="bltSelectInput ui-shadow-inset" name="Creator.DIVISION_ID" data-native-menu="false" data-mini="true">
+                                    <option value="0">Choose Division</option>
+		                            @foreach (DIVISION div in ViewData["DivisionList"] as List<DIVISION>)
+                              {
+                                        <option value='@div.DIVISION_ID'>@div.DIVISION_NAME</option> 
+                              }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @*
+                @if (loggedIn.ROLE_ID <= 2) @* and some other requirement like createDate already exists 
+                {            
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Published Date:</div>
+	                        <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="V.PUBLISHIED_TIME_STAMP" data-mini="true"  value="@DateTime.Now.ToShortDateString()" /></div>
+	                    </div>
+                    </div>    
+
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Published By:</div>
+	                        <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="Publisher.PUBLISHER_NAME" data-mini="true"  value="@loggedIn.FNAME @loggedIn.LNAME"/></div>
+	                    </div>
+                    </div>    
+                    <input type="hidden" name="Publisher.PUBLISHER_ID" value="@loggedIn.USER_ID" />
+                        
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Publisher Organization:</div>
+	                        <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="Publisher.ORGANIZATION_NAME" data-mini="true" value="@(ViewData.ContainsKey("Organization") ? ViewData["Organization"] : "")" /></div>
+	                    </div>
+                    </div>
+                    <input type="hidden" name="Publisher.ORGANIZATION_ID" value="@loggedIn.ORGANIZATION_ID" />
+                    
+                    if (ViewData.ContainsKey("Division"))
+                    {
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+                            <div class="ui-block-a">Published Division:</div>
+                            <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" id="CDiv" name="Publisher.DIVISION_NAME" data-mini="true" value="@ViewData["Division"]" /></div>
+                        </div>
+	                </div>
+                    
+                    }
+                    else
+                    { 
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Published Division:</div>
+                            <div class="ui-block-b">
+                                <select id="Divdropdown" class="bltSelectInput ui-shadow-inset" name="Publisher.DIVISION_ID" data-native-menu="false" data-mini="true">
+                                    <option value="0">Choose Division</option>
+		                            @foreach (DIVISION div in ViewData["DivisionList"] as List<DIVISION>)
+                                    {
+                                        <option value='@div.DIVISION_ID'>@div.DIVISION_NAME</option> 
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                }
+  *@
+                <div class="ui-grid-a">
+                     <div data-role="fieldcontain">
+	                     <div class="ui-block-a">Expired By:</div>
+	                     <div class="ui-block-b"><input type="text" class="bltTextInput ui-shadow-inset" name="Expirer.EXPIRER_NAME" data-mini="true"  value="@loggedIn.FNAME @loggedIn.LNAME"/></div>
+	                 </div>
+                </div>    
+                <input type="hidden" name="Expirer.EXPIRER_ID" value="@loggedIn.USER_ID" />
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Expiration Date:</div>
+	                    <div class="ui-block-b">
+                           <div>Month:&nbsp;<select class="bltTextInput ui-shadow-inset" style="width:50%;margin-top:5px" id="expirationMonth" name="V.EXPIRATION_MONTH" data-mini="true"><option value="0"></option><option value="January">January</option><option value="February">February</option><option value="March">March</option><option value="April">April</option><option value="May">May</option><option value="June">June</option><option value="July">July</option><option value="August">August</option><option value="September">September</option><option value="October">October</option><option value="November">November</option><option value="December">December</option></select></div>
+                            <br />
+                            <div>Year:&nbsp;&nbsp;&nbsp;<select class="bltTextInput ui-shadow-inset" style="width:50%" id="expirationYear" name="V.EXPIRATION_YEAR" data-mini="true"><option value="0"></option><option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option><option value="2015">2015</option></select></div>
+                        </div>
+                     </div>
+                </div>    
+            
+                <br clear="all" />
+        
+            </div> @* end id="tab1-Gen" div *@
+
+            @*AIs Tab*@
+            <div id="tabs2-AIs">
+
+                 <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">Additional Information:</div>
+	                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" id="addInfo" name="AI_PULA.ADDITIONAL_INFORMATION"></textarea></div>
+	                </div>
+                </div>   
+
+                <div class="ui-grid-a">
+                    <div data-role="fieldcontain">
+	                    <div class="ui-block-a">PULA Justification:</div>
+	                    <div class="ui-block-b"><textarea class="bltTextInput ui-shadow-inset" id="Justification" name="AI_PULA.JUSTIFICATION"></textarea></div>
+	                </div>
+                </div>   
+                
+                @{ List<PublishedPULA> pubPULAModel = ViewData["PulaModel"] as List<PublishedPULA>; }
+
+                <table id="" style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <b>Active<br />Ingredient</b><br />
+                            <select id="AIdropdown" class="bltSelectInput ui-shadow-inset" name="SPECIES" data-native-menu="false" data-mini="true">
+		                        @foreach (ACTIVE_INGREDIENT ai in ViewData["AIList"] as List<ACTIVE_INGREDIENT>)
+                                {
+                                    <option value="@ai.ACTIVE_INGREDIENT_ID">@ai.INGREDIENT_NAME</option> 
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <b><br />Use</b><br />
+                            <select id="Usedropdown" class="bltSelectInput ui-shadow-inset" name="CROP_USE" data-native-menu="false" data-mini="true">
+		                        @foreach (CROP_USE cu in ViewData["CUList"] as List<CROP_USE>)
+                                {
+                                    <option value="@cu.CROP_USE_ID">@cu.FORMULATION</option> 
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <b><br />Modifier</b><br />
+                            <select id="Moddropdown" class="bltSelectInput ui-shadow-inset" name="MODIFIER" data-native-menu="false" data-mini="true">
+		                        @foreach (MODIFIER mo in ViewData["ModList"] as List<MODIFIER>)
+                          {
+                                    <option value="@mo.MODIFIER_ID">@mo.MODIFIER1</option> 
+                          }
+                            </select>
+                        </td>                      
+                        <td>
+                            <b><br />Code</b><br />
+                            <select id="Codedropdown" class="bltSelectInput ui-shadow-inset" name="LIMITATION" data-native-menu="false" data-mini="true">
+		                        @foreach (LIMITATION code in ViewData["CodeList"] as List<LIMITATION>)
+                          {
+                                    <option value="@code.LIMITATION_ID">@code.CODE</option> 
+                          }
+                            </select>
+                        </td>   
+                    </tr>
+                    <tr>
+                        <td></td> 
+                        <td></td>
+                        <td></td>
+                        <td></td>            
+                    </tr>
+                    <tr>
+                        <td colspan="4" align="center"><input type="button" value="Add" onclick="AddLimitation();" name="Copy_Codes" />
+                    </td>
+                    </tr>
+                </table>
+                <br /><br />
+
+                <table id="LimitTable" style="width:100%; margin-left:15px; margin-right:15px">
+                    <thead>
+                        <tr>
+                            <td><b>Active Ingredient</b></td>
+                            <td><b>Use</b></td>
+                            <td><b>Modifier</b></td>
+                            <td><b>Code</b></td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                
+                    </tbody>
+                </table>
+
+                @* hidden inputs to store id of chosen values above *@
+                <input type="hidden" id="aiIDs" name="aiIDsToAdd" />
+                <input type="hidden" id="useIDs" name="useIDsToAdd" />
+                <input type="hidden" id="modIDs" name="modIDsToAdd" />
+                <input type="hidden" id="codeIDs" name="codeIDsToAdd" />
+
+
+            </div> @* end id="tabs2-AIs" div *@
+  
+            @*Species Tab*@
+            <div id="tabs3-Species">            
+                 <div>Choose a Group to get a narrowed down Species list.</div>
+
+                 <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Group:</div>
+                            <div class="ui-block-b">
+                                <select id="Grpdropdown" class="bltSelectInput ui-shadow-inset" name="GROUP" data-native-menu="false" data-mini="true">
+		                            <option value="0">Choose a group</option>
+                                    @foreach (SPECIES_GROUP sppGrp in ViewData["SppGrpList"] as List<SPECIES_GROUP>)
+                                    {
+                                        <option value="@sppGrp.SPECIES_GROUP_ID">@sppGrp.SP_GROUP</option> 
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Species:</div>
+                            <div class="ui-block-b">
+                                <select id="Sppdropdown" class="bltSelectInput ui-shadow-inset" data-native-menu="false" data-mini="true">
+		       
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a"><input type="button" value="Add" onclick="AddSpecies();" name="Copy_Spp" /></div>
+                        </div>
+                    </div>
+                
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Species to add:
+                                <div id="addedSpp" class="">
+                                    <ul>
+                                    </ul>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="spIDs" name="SpeciesToAdd" /> @* species IDs are stored here when spp is added to list above *@
+
+                </div> @* end id="tabs3-Species" div *@
+                <br clear="all" />
+            @*Product Tab*@
+            <div id="tabs4-Product">
+                 <div></div>
+                 <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Product:</div>
+                            <div class="ui-block-b">
+                                <select id="Proddropdown" class="bltSelectInput ui-shadow-inset" name="PRODUCT" data-native-menu="false" data-mini="true">
+		                            <option value="0">Choose a product</option>
+                                    @foreach (PRODUCT prod in ViewData["ProductList"] as List<PRODUCT>)
+                                    {
+                                        <option value="@prod.PRODUCT_ID">@prod.PRODUCT_NAME</option> 
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>  
+
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a"><input type="button" value="Add" onclick="AddProduct();" name="Copy_Prod" /></div>
+                        </div>
+                    </div>
+                
+                    <div class="ui-grid-a">
+                        <div data-role="fieldcontain">
+	                        <div class="ui-block-a">Product to add:
+                                <div id="addedProd" class="">
+                                    <ul>
+                                    </ul>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="prodIDs" name="ProdsToAdd" /> @* species IDs are stored here when spp is added to list above *@
+
+                    <br clear="all" />
+            </div> @* end id="tabs4-Product" div*@
+        
+
+            <div id="tabs5-Summary">            
+                <div>
+                    <span class="bold popup-label-a">Effective Date:</span>
+                    <label id="leffectDate" class="inline"></label>
+                </div>
+            
+                 <div>
+                    <span class="bold popup-label-a">Creation Date:</span>
+                    <label id="lcreateDate" class="inline"></label>
+                 </div>
+                
+                <div>
+                    <span class="bold popup-label-a">Created By:</span>
+	                <label id="createBy" class="inline"></label>
+                </div>
+            
+                <div>
+                    <span class="bold popup-label-a">Creator Organization:</span>
+	                <label id="createOrg" class="inline"></label>
+                </div>
+            
+                <div>
+                    <span class="bold popup-label-a">Creator Division:</span>
+	                <label id="createDiv" class="inline"></label>
+                </div>
+
+                <div>
+                     <span class="bold popup-label-a">Expiration Date:</span>
+                     <label id="ExpireDate" class="inline"></label>
+                </div>
+
+                <br clear="all" />
+        
+            @*AIs*@
+                 <div>
+                    <span class="bold popup-label-a">Additional Information:</span>
+                    <label id="additionalInfo" class="inline"></label>
+                </div>
+            
+                 <div>
+                    <span class="bold popup-label-a">PULA Justification:</span>
+                    <textarea readonly="readonly" id="justification" class="textAreaDetails"></textarea>
+                 </div>
+                
+            
+                <h3>Active Ingredient Limitations</h3>
+                
+                <table class="peak-table-a" id="AILimitSum">
+                    <thead>
+                        <tr>
+                            <td>ActiveIngredient</td>
+                            <td>Use</td>
+                            <td>Modifier</td>
+                            <td>Code</td>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>                
+                                  
+                    </tbody>
+                </table>
+                 
+  
+            @*Species*@
+            
+                 <h3>Species</h3>
+                 <ul id="species">
+                
+                 </ul>
+        
+
+            @*Product*@
+                     
+                    <h3>Products</h3>
+                 <ul id="products">
+                
+                 </ul>      
+
+                 <div id="formSubmitDiv">
+                    <div class="leftSideSubmit">
+                        <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Create" name="Create" /></div></div>
+                        @if (loggedIn.ROLE_ID <= 2)
+                        {<div class="submitDiv"><div class="darkButtonBorder"><input type="submit" class="submit" value="Publish" name="Create" onclick="PublishThis();" /></div></div>}
+                    </div>
+                </div>
+             
+            </div> 
+        }    
+        </div>   
+       
+</body>
+</html>
+
+<script type="text/javascript">
+    //Active Ingredient Tab: selections made from dropdown, clicked Add, add to the table below (can have multiple adds)
+    function AddLimitation() {
+        var aiID = $("#AIdropdown").val();
+        var ai = $("#AIdropdown option:selected").text();
+        var useID = $("#Usedropdown").val();
+        var use = $("#Usedropdown option:selected").text();
+        var modID = $("#Moddropdown").val();
+        var mod = $("#Moddropdown option:selected").text();
+        var codeID = $("#Codedropdown").val();
+        var code = $("#Codedropdown option:selected").text();
+        $("#LimitTable > tbody:last").append('<tr><td>' + ai + '</td><td>' + use + '</td><td>' + mod + '</td><td>' + code + '</td></tr>');
+        //store id's to pass to controller
+        if ($("#aiIDs").val() == "") {
+            $("#aiIDs").val(aiID);
+            $("#useIDs").val(useID);
+            $("#modIDs").val(modID);
+            $("#codeIDs").val(codeID);
+        }
+        else {
+            $("#aiIDs").val($("#aiIDs").val() + "," + aiID);
+            $("#useIDs").val($("#useIDs").val() + "," + useID);
+            $("#modIDs").val($("#modIDs").val() + "," + modID);
+            $("#codeIDs").val($("#codeIDs").val() + "," + codeID);
+        }
+    }
+
+    //species tab: chose a group, go get the species for that group to populate dropdown
+    $("#Grpdropdown").change(function () {
+        var thisGroup = $("#Grpdropdown").val();
+        var url = "/BLTWeb/PULA/GetSpeciesByGroup/";
+        $.post(url, { id: thisGroup }, function (data) {
+            populatesppDD($("#Sppdropdown"), data);
+        });
+    });
+
+    //populate dropdown with returned spp
+    function populatesppDD(select, data) {
+        select.empty();
+        $.each(data, function(id, option) {
+            select.append($('<option>', {
+                value: option.SPECIES_ID,
+                text: option.COMMON_NAME
+            }));
+        });
+    }
+
+    //Species tab: add was clicked to add the spp to the table
+    function AddSpecies() {
+        var species = $("#Sppdropdown option:selected").text();
+        var spID = $("#Sppdropdown").val();
+        //store id's to pass to controller
+        $("#addedSpp ul").append('<li>' + species + '</li>');
+        if ($("#spIDs").val() == "") {
+            $("#spIDs").val(spID);
+        }
+        else {
+            $("#spIDs").val($("#spIDs").val() + "," + spID);
+        }
+    }
+
+    //Product tab: add was clicked to add the product to the table below
+    function AddProduct() {
+        var product = $("#Proddropdown option:selected").text();
+        var prodID = $("#Proddropdown").val();
+        $("#addedProd ul").append('<li>' + product + '</li>'); prodIDs
+        //store ids to send to controller
+        if ($("#prodIDs").val() == "") {
+            $("#prodIDs").val(prodID);
+        }
+        else {
+            $("#prodIDs").val($("#prodIDs").val() + "," + prodID);
+        }
+    }
+
+   function Summary() {
+        //get all the values
+        var effectiveDate = $("#effectiveDate").val();
+        var createDate = $("#CreationDate").val();
+        var CreatedBy = $("#CreatedBy").val();
+        var COrg = $("#COrg").val();
+        var CDiv = $("#CDiv").val();
+        var div = $("#Divdropdown option:selected").text();
+        var ExpirationDate = $("#ExpirationDate").val();
+        var addInfo = $("#addInfo").val();
+        var Justification = $("#Justification").val();
+        var LimitTable = $("#LimitTable tbody").html();
+        var addedSpp = $("#addedSpp ul").text();
+        var addedProd = $("#addedProd ul").text();
+
+        $("#leffectDate").text(effectiveDate);
+        $("#lcreateDate").text(createDate);
+        $("#createBy").text(CreatedBy);
+        $("#createOrg").text(COrg);
+        if (CDiv != null)
+        {  $("#createDiv").text(CDiv); }
+        else
+        { $("#createDiv").text(div);}
+        $("#ExpireDate").text(ExpirationDate);
+        $("#additionalInfo").text(addInfo);
+        $("#justification").text(Justification);
+        $("#AILimitSum tbody").append(LimitTable);
+        $("#species").text(addedSpp);
+        $("#products").text(addedProd);
+    }
+
+    $(function () {
+        $("#createForm").submit(function () {
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result) {
+                        window.close();
+                        top.opener.reload(true); //not sure if this works because testing is another window, not popup within iframe
+                    }
+                }
+            });
+            // it is important to return false in order to cancel the default submission of the form and perform the AJAX call
+            return false;
+        });
+    });
+</script>

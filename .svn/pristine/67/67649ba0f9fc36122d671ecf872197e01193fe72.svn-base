@@ -1,0 +1,264 @@
+﻿@*
+04.23.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the home/index page for parts 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Models;
+@using BLTWeb.Assets.Resources;
+
+@{
+    ViewBag.Title = "Parts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="dataTitle">
+    <div class="title">Parts</div>    
+</div>
+<br clear="all" />
+
+<hr class="headerUnderline" />
+
+<div class="dashboardColumn" style="width:50%">
+
+    <div class="subSection">@*Left 1*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexCropUse)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("CropUse", "Parts", FormMethod.Post, null))
+            {                
+                <select id="CropUsedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Crop Use to Edit or Copy</option>
+                    @foreach (CROP_USE cu in ViewData["CropUseList"] as List<CROP_USE>)
+                    {
+                        <option value='@cu.ID'>@cu.USE</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />
+            }
+        </div>
+    </div> 
+
+    <br />	<br />
+
+    <div class="subSection">@*Left 2*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexProduct)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Product", "Parts", FormMethod.Post, null))
+            {                
+                <select id="ProductUsedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">List of Products from Service</option>
+                    @*@foreach (PRODUCT prod in ViewData["ProductList"] as List<PRODUCT>)
+                    {
+                        <option value='@prod.ID'>@prod.PRODUCT_NAME</option> 
+                    }*@
+                </select>
+                <br />	<br />
+                @*if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div> 
+    
+    <br />	<br />
+
+    <div class="subSection">@*Left 3*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexAI)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("AI", "Parts", FormMethod.Post, null))
+            {                
+                <select id="AIUsedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">List of Active Ingredients from Service</option>
+                    @*@foreach (ACTIVE_INGREDIENT ai in ViewData["AIList"] as List<ACTIVE_INGREDIENT>)
+                    {
+                        <option value='@ai.ID'>@ai.INGREDIENT_NAME</option> 
+                    }*@
+                </select>
+                <br />	<br />
+                @*if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div>
+    
+    <br />	<br />
+
+    <div class="subSection">@*Left 4*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexSpp)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Species", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Sppdropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">List of Species from service</option>
+                    @*@foreach (SpeciesModel sp in ViewData["SpeciesList"] as List<SpeciesModel>)
+                    {
+                        <option value='@Convert.ToInt32(sp.SppID)'>@sp.CommonName | @sp.ScienName | @sp.Family | @sp.Group | @sp.Taxa</option> 
+                    }*@
+                </select>
+                <br />	<br />
+                @*if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div>
+
+    <br />	<br />
+    
+    <div class="subSection">@*Left 5*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexOrganization)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Organizations", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Orgdropdown" class="bltSelectInput ui-shadow-inset" name="ORGANIZATION_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an Organization to Edit or Copy</option>
+                    @foreach (ORGANIZATION org in ViewData["OrganizationList"] as List<ORGANIZATION>)
+                    {
+                        <option value='@org.ORGANIZATION_ID'>@org.NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div>    
+</div> @* end Dashboard *@
+
+<div class="dashboardColumn" style="width:50%">
+
+    <div class="subSection">@*Right 1*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexLimitCode)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Codes", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Codedropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Code to Edit or Copy</option>
+                    @foreach (LIMITATION code in ViewData["LimitationList"] as List<LIMITATION>)
+                    {
+                        <option value='@code.ID'>@code.CODE | @code.LIMITATION1</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />
+            }
+        </div>
+    </div>
+     
+       <br />	<br />
+
+    <div class="subSection">@*Right 2*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexModifier)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Modifiers", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Moddropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Modifier to Edit or Copy</option>
+                    @foreach (MODIFIER mod in ViewData["ModList"] as List<MODIFIER>)
+                    {
+                        <option value='@mod.ID'>@mod.MODIFIER1</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+               @* <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+
+    </div> 
+    
+       <br />	<br />
+
+    <div class="subSection">@*Right 3*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexAIClass)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("AI_Class", "Parts", FormMethod.Post, null))
+            {                
+                <select id="AIClassdropdown" class="bltSelectInput ui-shadow-inset" name="ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose an AI Class to Edit or Copy</option>
+                    @foreach (AI_CLASS aiCl in ViewData["AIClassList"] as List<AI_CLASS>)
+                    {
+                        <option value='@aiCl.ID'>@aiCl.AI_CLASS_NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+                @*<input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Copy to New" />*@
+            }
+        </div>
+    </div> 
+
+     <br />	<br />
+
+    <div class="subSection">@*Right 4*@
+        <div class="subSectionHeader"><label class="bold">@Html.Label(ResStrings.IndexDivision)</label></div>          
+        <div class="subSectionContent">
+            @using (Html.BeginForm("Divisions", "Parts", FormMethod.Post, null))
+            {                
+                <select id="Divdropdown" class="bltSelectInput ui-shadow-inset" name="DIVISION_ID" data-native-menu="false" data-mini="true">
+                    <option value="0">Choose a Division to Edit or Copy</option>
+                    @foreach (DIVISION div in ViewData["DivisionList"] as List<DIVISION>)
+                    {
+                        <option value='@div.DIVISION_ID'>@div.DIVISION_NAME</option> 
+                    }
+                </select>
+                <br />	<br />
+                if (ViewData["Role"] == "Admin" || ViewData["Role"] == "Publish")
+                {
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Edit" />
+                }
+                <input type="submit" name="Create" onclick="loading();" class="BLTButton blue" value="Add New" />
+            }
+        </div>
+    </div>    
+</div> @* end Dashboard *@
+
+<br clear="all" />
+
+
+
+
+
+
+
+

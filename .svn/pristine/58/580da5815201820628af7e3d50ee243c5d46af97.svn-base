@@ -1,0 +1,137 @@
+﻿@*
+05.23.13 - TR - Hooked into services
+04.24.13 - TR - Created *@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display the Codes Part Add New page 
+ */
+ *@
+ 
+@using BLTServices;
+@using BLTWeb.Assets.Resources;
+
+@{
+    ViewBag.Title = "New Limitation Code";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+
+<div class="partsTitle">
+    Manage Bulletins Components - Limitation Code
+    <span id="errorSection" class="failureNotification"><asp:Literal ID="ErrorMessage" runat="server"></asp:Literal></span>
+</div>
+
+@using (Html.BeginForm("Codes_New", "Parts", FormMethod.Post, new { @id = "form0" }))
+{    
+    <div class="siteColumn" style="width:80%">
+
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+    	        <div class="ui-block-a" style="width:20%">@Html.Label(ResStrings.LimitationCode_Label)</div>
+	            <div class="ui-block-b" style="width:20%"><input type="text" class="bltTextInput ui-shadow-inset" name="CODE" data-mini="true" /></div>
+	        </div>
+        </div>
+        
+        <div class="ui-grid-a">
+            <div data-role="fieldcontain">
+                <div class="ui-block-a" style="width:20%"><span class="required">@Html.Label(ResStrings.Limitation_Label)</span></div>
+                <div class="ui-block-b" style="width:70%"><textarea cols="30" rows="6" class="required bltTextInput ui-shadow-inset" name="LIMITATION1" data-mini="true"></textarea></div>
+            </div>
+        </div>
+        
+        <br clear="all" />
+    
+        <div id="formSubmitDiv" class="formSection">
+            <div class="leftSideSubmit">
+                <div class="submitDiv"><div class="darkButtonBorder"><input type="submit" name="Create" class="submit" value="Save" /></div></div>
+                <div class="cancelDiv"><div class="lightButtonBorder"><input type="reset" id="resetButton" class="cancel" value="Cancel" onclick="cancelClick();" /></div></div>
+            </div>
+        </div>
+
+    </div>
+}
+
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    }
+</script>
+<script type="text/javascript">
+    function cancelClick() {
+        $("#loading").fadeIn();
+        window.location.href = '@Url.Action("Index", "Parts")'
+    };
+</script>
+
+<script type="text/javascript">
+    $("#form0").submit(function () {        
+        var MISSING = "ui-req";
+        var SelMISSING = "ui-Sel-req";
+
+        var requiredInput = $('input[class*="required"]');
+        var requiredSelect = $('select[class*="required"]');
+        var requiredTextArea = $('textarea[class*="required"]');
+
+        var Ierr = false;
+        var Serr = false;
+        var Terr = false;
+        var missingMsg = "The highlighted fields are required.";
+
+        // Reset the previously highlighted input fields  
+        requiredInput.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted select fields  
+        requiredSelect.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Reset the previously highlighted textarea fields  
+        requiredTextArea.each(function (index) {
+            $(this).removeClass(MISSING);
+            $(this).addClass("ui-shadow-inset");
+        });
+        // Perform form validation (input field)
+        requiredInput.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Ierr = true;
+            }
+        });
+        // Perform form validation (select field) 
+        requiredSelect.each(function (index) {
+            var ind = $(this).context.selectedIndex;
+            if (ind == 0) {
+                $(this).addClass(SelMISSING);
+                Serr = true;
+            }
+        });
+        // Perform form validation (textarea field)
+        requiredTextArea.each(function (index) {
+            if ($(this).val() == null || $(this).val() == "") {
+                $(this).addClass(MISSING);
+                $(this).removeClass("ui-shadow-inset");
+                Terr = true;
+            }
+        });
+        // Check if validation fails
+        if (Ierr == true || Serr == true || Terr == true) {
+            $("#errorSection").append(missingMsg);
+            return false;
+        }
+        else {
+            loading();
+            return true;
+        }
+    });
+
+</script>

@@ -1,0 +1,509 @@
+﻿/* DEFAULTS
+----------------------------------------------------------*/
+html, body 
+{
+    height:100%;
+}
+
+@font-face 
+{
+    font-family: 'BryantRegular';
+    src: url('/fonts/Bryant2Combo/Bryant2Web_EOT/BryantWebRegular.eot');
+    src: url('/fonts/Bryant2Combo/Bryant2Web_EOT/BryantWebRegular.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/Bryant2Combo/Bryant2Web_WOFF/BryantWebRegular.woff?#iefix') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body   
+{
+    /*background-image: url("../Images/bg-texture1.jpg");*/
+    background-color:#F3F3F3;
+    font-size: .80em;
+    /*font-family: "Helvetica Neue", "Lucida Grande", "Segoe UI", Arial, Helvetica, Verdana, sans-serif, "Bryant";*/
+    font-family: 'BryantRegular';
+    margin: 0px;
+    padding: 0px;
+    color: #464646;
+}
+
+a  
+{
+	text-decoration: none;
+	
+}
+
+a:link, a:visited
+{
+    color: #F37A49;
+}
+
+a:hover
+{
+    cursor:pointer;
+}
+
+a:active
+{
+    color: #59595C;
+}
+
+a img {
+	border: none;
+	vertical-align: middle;
+}
+
+p
+{
+    margin-bottom: 10px;
+    line-height: 1.6em;
+}
+
+
+/* HEADINGS   
+----------------------------------------------------------*/
+
+h1, h2, h3, h4, h5, h6
+{
+    font-size: 1.5em;
+    color: #E7E4CE;
+    font-variant: small-caps;
+    text-transform: none;
+    font-weight: 200;
+    margin-bottom: 10px;
+}
+
+h1
+{
+    font-size: 1.6em;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+h2
+{
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+h3
+{
+    font-size: 1.2em;
+}
+
+h4
+{
+    font-size: 1.1em;
+}
+
+h5, h6
+{
+    font-size: 1em;
+}
+
+/* this rule styles <h1> and <h2> tags that are the 
+first child of the left and right table columns */
+.rightColumn > h1, .rightColumn > h2, .leftColumn > h1, .leftColumn > h2
+{
+    margin-top: 0px;
+}
+
+
+/* PRIMARY LAYOUT ELEMENTS   
+----------------------------------------------------------*/
+
+.page
+{
+    width: 1024px;
+    margin: 20px auto 0px auto;
+    border: 1px solid #59595C;
+}
+
+#header
+{
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    background: #59595C;
+    width: 100%;
+}
+
+#header h1
+{
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px 0px 0px 20px;
+    color: #f9f9f9;
+    border: none;
+    line-height: 2em;
+    font-size: 2em;
+}
+
+#main
+{
+    padding: 12px;
+    min-height: 420px;
+    
+    /*background-image: linear-gradient(bottom, rgb(255,255,255) 99.2%, rgb(30,41,51) 100%);
+    background-image: -o-linear-gradient(bottom, rgb(255,255,255) 99.2%, rgb(30,41,51) 100%);
+    background-image: -moz-linear-gradient(bottom, rgb(255,255,255) 99.2%, rgb(30,41,51) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgb(255,255,255) 99.2%, rgb(30,41,51) 100%);
+    background-image: -ms-linear-gradient(bottom, rgb(255,255,255) 99.2%, rgb(30,41,51) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#ffffff', endColorstr='#000000');/*For IE8-9
+    background-image: -webkit-gradient(
+	    linear,
+	    left bottom,
+	    left top,
+	    color-stop(0.996, rgb(255,255,255)),
+	    color-stop(1, rgb(30,41,51))
+    );*/
+}
+
+.leftCol
+{
+    padding: 6px 0px;
+    margin: 12px 8px 8px 8px;
+    width: 200px;
+    min-height: 200px;
+}
+
+#footer
+{
+    color: #4e5766;
+    padding: 8px 0px 0px 0px;
+    margin: 0px auto;
+    text-align: center;
+    line-height: normal;
+}
+
+#footer, #main
+{
+    background-color: #fff;
+}
+ 
+
+/* TAB MENU   
+----------------------------------------------------------*/
+
+div.hideSkiplink
+{
+    background-color:#7E7E84;
+    width:100%;
+}
+
+#NavigationMenu 
+{    
+    float:left;
+}
+
+/*div.menu
+{
+    padding: 4px 0px 4px 8px;
+}*/
+
+div.menu ul
+{
+    position: relative; 
+    width: auto; 
+    float: left;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    width: auto;
+}
+
+div.menu ul li
+{
+    position: relative; 
+    float: left;
+}
+
+div.menu ul li a, div.menu ul li a:visited
+{
+    background-color: #464646;
+    background-repeat: no-repeat;
+    background-position: 8px;
+    border: 1px #2f2f2f solid;
+    color: #F37A49;
+    padding: 6px 20px 4px 36px;
+    padding-left: 36px;
+    height: 26px;
+    display:table-cell;
+    vertical-align: middle;
+    line-height: 1.35em;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+div.menu ul li a img 
+{
+    padding-right:5px;    
+}
+
+div.menu ul li a:hover
+{
+    background-color: #cccccc;
+    color: #59595C;
+    text-decoration: none;
+}
+
+div.menu ul li a:active
+{
+    background-color: #465c71;
+    color: #cfdbe6;
+    text-decoration: none;
+}
+
+div.menu ul li a.homeButton
+{   
+    background-image: url(../Images/home1.png);
+}
+
+div.menu ul li a.homeButton:hover
+{   
+    background-image: url(../Images/home_blue.png);
+}
+
+
+div.menu ul li a.partsButton
+{   
+    background-image: url(../Images/approval1.png);
+}
+
+div.menu ul li a.partsButton:hover
+{   
+    background-image: url(../Images/approval_blue.png);
+}
+
+div.menu ul li a.settingsButton
+{   
+    background-image: url(../Images/settings1.png);
+}
+
+div.menu ul li a.settingsButton:hover
+{   
+    background-image: url(../Images/settings_blue.png);
+}
+
+div.menu ul li a.mapButton
+{   
+    background-image: url(../Images/globe.png);
+}
+
+div.menu ul li a.mapButton:hover
+{   
+    background-image: url(../Images/globe_blue.png);
+}
+
+/* FORM ELEMENTS   
+----------------------------------------------------------*/
+
+fieldset
+{
+    margin: 1em 0px;
+    padding: 1em;
+    border: 1px solid #ccc;
+}
+
+fieldset p 
+{
+    margin: 2px 12px 10px 10px;
+}
+
+fieldset.login label, fieldset.register label, fieldset.changePassword label
+{
+    display: block;
+}
+
+fieldset .rememberMe-label label
+{
+    display: inline;
+}
+
+legend 
+{
+    font-size: 1.1em;
+    font-weight: 600;
+    padding: 2px 4px 8px 4px;
+}
+
+.username-field input
+{
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+.password-field input
+{
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+div.accountInfo
+{
+    width: 42%;
+}
+
+/* Member Table
+----------------------------------------------------------*/
+
+#MemberListTable-a
+{
+    /*font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;*/
+    font-family: 'BryantRegular';
+	font-size: 12px;
+	background: #fff;
+	margin:10px 45px;
+	width: 480px;
+	border-collapse: collapse;
+	text-align: left;
+}
+
+#MemberListTable-a th
+{
+	font-size: 14px;
+	font-weight: normal;
+	color: #59595C;
+	padding: 10px 8px;
+	border-bottom: 2px solid #7E7E84;
+}
+
+#MemberListTable-a td
+{
+	color: #59595C;
+	padding: 9px 8px 0px 8px;
+}
+
+#MemberListTable-a tbody tr:hover td
+{
+	color: #464646;
+}
+
+#peak-table-a
+{
+	/*font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;*/
+	font-family: 'BryantRegular';
+	font-size: 10px;
+	margin: 10px;
+	text-align: center;
+	border-collapse: collapse;
+	border-top: 7px solid #4B6C9E;
+	border-bottom: 7px solid #4B6C9E;
+}
+#peak-table-a th
+{
+	font-size: 11px;
+	font-weight: normal;
+	padding: 8px;
+	background: #F9F9F9;
+	border-right: 1px solid #4B6C9E;
+	border-left: 1px solid #4B6C9E;
+	border-bottom: 1px solid #4B6C9E;
+	color: #039;
+}
+#peak-table-a td
+{
+	padding: 8px;
+	background: #F9F9F9; 
+	border-right: 1px solid #4B6C9E;
+	border-left: 1px solid #4B6C9E;
+	color: #669;
+	min-width: 40px;
+	max-width: 80px;
+	text-align: left;
+}
+
+
+/* MISC  
+----------------------------------------------------------*/
+
+.clear
+{
+    clear: both;
+}
+
+#title /*Short-Term Network Application - */
+{
+    display: block;
+    float: left;
+    text-align: left;
+    width: auto;
+}
+
+#logindisplay
+{
+    font-size: 1.1em;
+    display: block;
+    text-align: right;
+    padding: 10px;
+    color: #E7E4CE;
+}
+
+#logindisplay a:link
+{
+    color: #F37A49;
+}
+
+#logindisplay a:visited
+{
+    color: white;
+}
+
+#logindisplay a:hover
+{
+    color: white;
+}
+
+.failureNotification
+{
+    color: Red;
+}
+
+.bold
+{
+    font-weight: bold;
+}
+
+.bigAndBold
+{
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.noUnderline
+{
+	text-decoration: none;
+}
+
+.submitButton
+{
+    text-align: right;
+    padding-right: 10px;
+}
+
+.padRight
+{
+    padding-right: 10px;
+}
+
+/* Jquery Mobile Style Fixes */
+
+.ui-body-c .header, .ui-overlay-c .header
+{
+	text-shadow: none;
+}
+
+#header a.ui-link 
+{
+	color: white !important;
+}
+
+.ui-body-c, .ui-overlay-c 
+{
+	color: #696969;
+	text-shadow: none;
+}
+
+.ui-body-c .ui-link {
+    font-weight: normal;
+}

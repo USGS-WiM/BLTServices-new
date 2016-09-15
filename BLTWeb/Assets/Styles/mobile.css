@@ -1,0 +1,51 @@
+﻿body 
+{
+	background: #fff !important;
+	font-size: x-large;
+}
+
+.page 
+{
+	margin-top:0 !important;
+	width: auto !important;
+	border: 0px !important;
+}
+
+.header 
+{
+  display: none !important;	
+}
+
+#commandBar a, #dataTitle .title 
+{	
+	font-size: 2em  !important;
+	margin-bottom: 0.2em;
+}
+
+.subSection
+{
+	min-width: 340px;
+	width: 30%;
+}
+
+
+
+.formSection
+{
+	height: 80px;
+	left:0;
+}
+
+
+.leftSideSubmit 
+{
+	width:50%;
+	padding-top: 0.4em;
+	padding-left: 63.5%;
+}
+
+
+.ui-body-c, .ui-overlay-c 
+{
+	background: #fff !important;
+}

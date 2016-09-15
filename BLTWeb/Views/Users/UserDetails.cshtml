@@ -1,0 +1,69 @@
+﻿ 
+@* Comments:
+06.13.13 - TR - Created master page for details and edit partialviews 
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2013 USGS - WiM
+ * Purpose:
+ *      Display details of a member 
+ */
+ *@
+ 
+@using BLTServices;
+
+@model BLTServices.USER_
+
+@{
+    ViewBag.Title = "User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+
+<div class="partsTitle" style="padding-bottom:0">
+    <div style="float:left">
+     @Html.ActionLink("All Users", "Index", "Users", null, new { onclick = "loading();" })
+        | User: @(Model.FNAME + " " + Model.LNAME)&nbsp;&nbsp;</div>
+    @if (ViewData["Role"] == "Admin")
+    {
+        <div>
+            @Html.ActionLink("Delete", "UserDelete", new { id = Model.USER_ID }, new { onclick = "return confirm('Are you sure you want to delete member " + Model.FNAME + " " + Model.LNAME + "?');", @class = "BLTButton blue" })
+        </div>
+    }
+</div>
+<br clear="all" />
+
+<hr class="headerUnderline" />
+
+<div id="content">
+@if (Model.USERNAME == User.Identity.Name || ViewData["Role"] == "Admin")
+{
+    using (Ajax.BeginForm("UserEditPV", "Users", new { id = Model.USER_ID }, new AjaxOptions() { UpdateTargetId = "content", HttpMethod = "GET" }))
+    {     
+        <div><a id="editButton" onclick="loading();" class="BLTButton icon blue"><span class="editIcon">Edit User</span></a></div>
+        <br clear="all" />            
+    }
+}   
+                  
+@* --------------------- Partial views will go here ------------------*@
+    
+        @{ Html.RenderAction("UserDetailsPV", "Users", Model.USER_ID);} 
+    </div>
+@*----------------------End Partial views ----------------------------*@
+
+<script language="javascript">
+    $("#editButton").click(function () {
+        $("#form0").submit();
+    });       
+</script>
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    };
+</script>

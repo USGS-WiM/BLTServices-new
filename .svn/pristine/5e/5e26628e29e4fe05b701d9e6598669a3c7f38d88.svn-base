@@ -1,0 +1,16 @@
+﻿@* Comments:
+09.06.13 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Error page 
+ */
+ *@
+
+<div>There was a problem.</div>

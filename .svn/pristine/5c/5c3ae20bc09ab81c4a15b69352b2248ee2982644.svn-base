@@ -1,0 +1,120 @@
+﻿//------------------------------------------------------------------------------
+//----- PartsController.cs-----------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Display a master PULA page and link to individual parts pages (all in popup)
+//
+//discussion:   
+//
+//     
+
+#region Comments
+// 05.03.13 - TR - Created
+
+#endregion
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Objects.DataClasses;
+using System.Text;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Xml;
+
+using RestSharp;
+using BLTServices;
+using BLTServices.Authentication;
+using BLTWeb.Utilities;
+
+
+namespace BLTWeb.Controllers
+{
+    public class PULAController : Controller
+    {
+        //pula was clicked in mapper, show info in popup
+        // GET: /PULA_Details/11
+        public ActionResult PULA_Details(int id, DateTime date)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            /*1: /PULAs/POI/{shapeId}?ActiveDate={date}
+             *   if date == null -- default to current date
+             *   the shapeID queries the table to find all of the pulas
+             *   (there will be more than one)  and then the date queries to 
+             *   identify the active date and expired date. which should return one entity */
+            request.Resource = "/PULAs/POI/{shapeId}?ActiveDate={date}";
+            request.RootElement = "ArrayOfACTIVE_INGREDIENT_PULA";
+            request.AddParameter("shapeId", id, ParameterType.UrlSegment);
+            ACTIVE_INGREDIENT_PULA thisAIPULA = serviceCaller.Execute<ACTIVE_INGREDIENT_PULA>(request);
+
+            /* 2:  Associative table is AI Limitations table 
+             *     PULAs/{pulaID}/AILimitations?ActiveDate={date}*/
+            request = new RestRequest();
+            request.Resource = "PULAs/{pulaID}/AILimitations?ActiveDate={date}";
+            request.RootElement = "ArrayOfAI_LIMITATIONS";
+            request.AddParameter("pulaID", thisAIPULA.PULA_ID, ParameterType.UrlSegment);
+            AI_LIMITATIONS thisAILimitation = serviceCaller.Execute<AI_LIMITATIONS>(request);
+
+            /* 4:  these fkeys are references to secondary keys in their associated tables. 
+             *     so to requst the crop use, the date needs to be passed as well 
+             *     /CropUses?CropUseID={cropUseID}&ActiveDate={date}    */
+            request = new RestRequest();
+            request.Resource = "
+            
+            //GENERAL TAB
+                //effective date, creation date, publish date, created by, published by, expiration date
+
+            //AI TAB
+                //Active Ingredients, Use, Modifiers, Code
+
+            //SPECIES TAB
+                //Species
+
+            //PRODUCT TAB
+                //Product Name
+
+            return View();
+        }
+
+        //edit button clicked in pula_details
+        //GET: /PULA_Edit/11
+        public ActionResult PULA_Edit(int id)
+        {
+            //return a form populated with all the same info as details, but editable
+            //this new pula will have a new versionID
+            return View();
+        }
+
+        //post the new pula
+        //POST: /PULA_Edit/11
+        [HttpPost]
+        public ActionResult PULA_Edit(ACTIVE_INGREDIENT_PULA newPULA, int id)
+        {
+            //save the new pula, not yet publish it
+            //old one this one is based off of - set expires date 1 month prior to this active date
+            return RedirectToAction("ThankYou");
+        }
+
+        //pula has been saved, thank you page
+        //GET: /ThankYou
+        public ActionResult ThankYou()
+        {
+            //pula was successfully saved, here's the thank you page with a close button. when user clicks pula again, will
+            //have publish option available.
+            return View();
+        }
+        
+
+    }
+}

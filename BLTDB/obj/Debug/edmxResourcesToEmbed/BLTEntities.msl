@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="bltModelStoreContainer" CdmEntityContainer="bltEntities">
+    <EntitySetMapping Name="active_ingredient">
+      <EntityTypeMapping TypeName="bltModel.active_ingredient">
+        <MappingFragment StoreEntitySet="active_ingredient">
+          <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+          <ScalarProperty Name="ingredient_name" ColumnName="ingredient_name" />
+          <ScalarProperty Name="pc_code" ColumnName="pc_code" />
+          <ScalarProperty Name="cas_number" ColumnName="cas_number" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="active_ingredient_ai_class">
+      <EntityTypeMapping TypeName="bltModel.active_ingredient_ai_class">
+        <MappingFragment StoreEntitySet="active_ingredient_ai_class">
+          <ScalarProperty Name="active_ingredient_ai_class_id" ColumnName="active_ingredient_ai_class_id" />
+          <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+          <ScalarProperty Name="ai_class_id" ColumnName="ai_class_id" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="active_ingredient_pula">
+      <EntityTypeMapping TypeName="bltModel.active_ingredient_pula">
+        <MappingFragment StoreEntitySet="active_ingredient_pula">
+          <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+          <ScalarProperty Name="pula_shape_id" ColumnName="pula_shape_id" />
+          <ScalarProperty Name="other_justification" ColumnName="other_justification" />
+          <ScalarProperty Name="base_data" ColumnName="base_data" />
+          <ScalarProperty Name="base_data_modifiers" ColumnName="base_data_modifiers" />
+          <ScalarProperty Name="interim_proposed_decision" ColumnName="interim_proposed_decision" />
+          <ScalarProperty Name="focus_meeting" ColumnName="focus_meeting" />
+          <ScalarProperty Name="biological_opinion_regreview" ColumnName="biological_opinion_regreview" />
+          <ScalarProperty Name="biological_opinion_lit" ColumnName="biological_opinion_lit" />
+          <ScalarProperty Name="proposed_decision" ColumnName="proposed_decision" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="is_published" ColumnName="is_published" />
+          <ScalarProperty Name="effective_date" ColumnName="effective_date" />
+          <ScalarProperty Name="event_id" ColumnName="event_id" />
+          <ScalarProperty Name="comments" ColumnName="comments" />
+          <ScalarProperty Name="sec3_newchem" ColumnName="sec3_newchem" />
+          <ScalarProperty Name="sec3_newuse" ColumnName="sec3_newuse" />
+          <ScalarProperty Name="sec24" ColumnName="sec24" />
+          <ScalarProperty Name="final_decision" ColumnName="final_decision" />
+          <ScalarProperty Name="sec18" ColumnName="sec18" />
+          <ScalarProperty Name="interim_decision" ColumnName="interim_decision" />
+          <ScalarProperty Name="additional_information" ColumnName="additional_information" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ai_class">
+      <EntityTypeMapping TypeName="bltModel.ai_class">
+        <MappingFragment StoreEntitySet="ai_class">
+          <ScalarProperty Name="ai_class_id" ColumnName="ai_class_id" />
+          <ScalarProperty Name="ai_class_name" ColumnName="ai_class_name" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="application_method">
+      <EntityTypeMapping TypeName="bltModel.application_method">
+        <MappingFragment StoreEntitySet="application_method">
+          <ScalarProperty Name="application_method_id" ColumnName="application_method_id" />
+          <ScalarProperty Name="method" ColumnName="method" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="crop_use">
+      <EntityTypeMapping TypeName="bltModel.crop_use">
+        <MappingFragment StoreEntitySet="crop_use">
+          <ScalarProperty Name="crop_use_id" ColumnName="crop_use_id" />
+          <ScalarProperty Name="use" ColumnName="use" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="divisions">
+      <EntityTypeMapping TypeName="bltModel.division">
+        <MappingFragment StoreEntitySet="divisions">
+          <ScalarProperty Name="division_id" ColumnName="division_id" />
+          <ScalarProperty Name="division_name" ColumnName="division_name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="events">
+      <EntityTypeMapping TypeName="bltModel.event">
+        <MappingFragment StoreEntitySet="event">
+          <ScalarProperty Name="event_id" ColumnName="event_id" />
+          <ScalarProperty Name="name" ColumnName="name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="formulations">
+      <EntityTypeMapping TypeName="bltModel.formulation">
+        <MappingFragment StoreEntitySet="formulation">
+          <ScalarProperty Name="formulation_id" ColumnName="formulation_id" />
+          <ScalarProperty Name="form" ColumnName="form" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="limitations">
+      <EntityTypeMapping TypeName="bltModel.limitation">
+        <MappingFragment StoreEntitySet="limitations">
+          <ScalarProperty Name="limitation_id" ColumnName="limitation_id" />
+          <ScalarProperty Name="code" ColumnName="code" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="limitation1" ColumnName="limitation" />
+          <ScalarProperty Name="id" ColumnName="id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="organizations">
+      <EntityTypeMapping TypeName="bltModel.organization">
+        <MappingFragment StoreEntitySet="organization">
+          <ScalarProperty Name="organization_id" ColumnName="organization_id" />
+          <ScalarProperty Name="name" ColumnName="name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="products">
+      <EntityTypeMapping TypeName="bltModel.product">
+        <MappingFragment StoreEntitySet="product">
+          <ScalarProperty Name="product_id" ColumnName="product_id" />
+          <ScalarProperty Name="product_registration_number" ColumnName="product_registration_number" />
+          <ScalarProperty Name="product_name" ColumnName="product_name" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="product_name_status" ColumnName="product_name_status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="product_active_ingredient">
+      <EntityTypeMapping TypeName="bltModel.product_active_ingredient">
+        <MappingFragment StoreEntitySet="product_active_ingredient">
+          <ScalarProperty Name="product_active_ingredient_id" ColumnName="product_active_ingredient_id" />
+          <ScalarProperty Name="product_id" ColumnName="product_id" />
+          <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="pula_limitations">
+      <EntityTypeMapping TypeName="bltModel.pula_limitations">
+        <MappingFragment StoreEntitySet="pula_limitations">
+          <ScalarProperty Name="pula_limitation_id" ColumnName="pula_limitation_id" />
+          <ScalarProperty Name="active_ingredient_id" ColumnName="active_ingredient_id" />
+          <ScalarProperty Name="limitation_id" ColumnName="limitation_id" />
+          <ScalarProperty Name="crop_use_id" ColumnName="crop_use_id" />
+          <ScalarProperty Name="application_method_id" ColumnName="application_method_id" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+          <ScalarProperty Name="formulation_id" ColumnName="formulation_id" />
+          <ScalarProperty Name="product_id" ColumnName="product_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="roles">
+      <EntityTypeMapping TypeName="bltModel.role">
+        <MappingFragment StoreEntitySet="role">
+          <ScalarProperty Name="role_id" ColumnName="role_id" />
+          <ScalarProperty Name="role_name" ColumnName="role_name" />
+          <ScalarProperty Name="role_description" ColumnName="role_description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="species_active_ingredient_pula">
+      <EntityTypeMapping TypeName="bltModel.species_active_ingredient_pula">
+        <MappingFragment StoreEntitySet="species_active_ingredient_pula">
+          <ScalarProperty Name="species_activeingrepula_id" ColumnName="species_activeingrepula_id" />
+          <ScalarProperty Name="species_id" ColumnName="species_id" />
+          <ScalarProperty Name="pula_id" ColumnName="pula_id" />
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="user_">
+      <EntityTypeMapping TypeName="bltModel.user_">
+        <MappingFragment StoreEntitySet="user_">
+          <ScalarProperty Name="user_id" ColumnName="user_id" />
+          <ScalarProperty Name="username" ColumnName="username" />
+          <ScalarProperty Name="email" ColumnName="email" />
+          <ScalarProperty Name="phone" ColumnName="phone" />
+          <ScalarProperty Name="organization_id" ColumnName="organization_id" />
+          <ScalarProperty Name="division_id" ColumnName="division_id" />
+          <ScalarProperty Name="role_id" ColumnName="role_id" />
+          <ScalarProperty Name="fname" ColumnName="fname" />
+          <ScalarProperty Name="lname" ColumnName="lname" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="versions">
+      <EntityTypeMapping TypeName="bltModel.version">
+        <MappingFragment StoreEntitySet="version">
+          <ScalarProperty Name="version_id" ColumnName="version_id" />
+          <ScalarProperty Name="creator_id" ColumnName="creator_id" />
+          <ScalarProperty Name="created_time_stamp" ColumnName="created_time_stamp" />
+          <ScalarProperty Name="publisher_id" ColumnName="publisher_id" />
+          <ScalarProperty Name="published_time_stamp" ColumnName="published_time_stamp" />
+          <ScalarProperty Name="expirer_id" ColumnName="expirer_id" />
+          <ScalarProperty Name="expired_time_stamp" ColumnName="expired_time_stamp" />
+          <ScalarProperty Name="reviewer_id" ColumnName="reviewer_id" />
+          <ScalarProperty Name="reviewed_time_stamp" ColumnName="reviewed_time_stamp" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

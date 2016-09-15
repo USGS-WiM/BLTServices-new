@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="pgtestModelStoreContainer" CdmEntityContainer="BLTEntities">
+    <EntitySetMapping Name="data_manager">
+      <EntityTypeMapping TypeName="pgtestModel.data_manager">
+        <MappingFragment StoreEntitySet="data_manager">
+          <ScalarProperty Name="data_manager_id" ColumnName="data_manager_id" />
+          <ScalarProperty Name="username" ColumnName="username" />
+          <ScalarProperty Name="fname" ColumnName="fname" />
+          <ScalarProperty Name="lname" ColumnName="lname" />
+          <ScalarProperty Name="organization_system_id" ColumnName="organization_system_id" />
+          <ScalarProperty Name="phone" ColumnName="phone" />
+          <ScalarProperty Name="email" ColumnName="email" />
+          <ScalarProperty Name="role_id" ColumnName="role_id" />
+          <ScalarProperty Name="password" ColumnName="password" />
+          <ScalarProperty Name="salt" ColumnName="salt" />
+          <ScalarProperty Name="reset_flag" ColumnName="reset_flag" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="divisions">
+      <EntityTypeMapping TypeName="pgtestModel.division">
+        <MappingFragment StoreEntitySet="division">
+          <ScalarProperty Name="division_id" ColumnName="division_id" />
+          <ScalarProperty Name="division_name" ColumnName="division_name" />
+          <ScalarProperty Name="org_id" ColumnName="org_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="organizations">
+      <EntityTypeMapping TypeName="pgtestModel.organization">
+        <MappingFragment StoreEntitySet="organization">
+          <ScalarProperty Name="organization_id" ColumnName="organization_id" />
+          <ScalarProperty Name="organization_name" ColumnName="organization_name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="organization_system">
+      <EntityTypeMapping TypeName="pgtestModel.organization_system">
+        <MappingFragment StoreEntitySet="organization_system">
+          <ScalarProperty Name="organization_system_id" ColumnName="organization_system_id" />
+          <ScalarProperty Name="org_id" ColumnName="org_id" />
+          <ScalarProperty Name="div_id" ColumnName="div_id" />
+          <ScalarProperty Name="sec_id" ColumnName="sec_id" />
+          <ScalarProperty Name="science_base_id" ColumnName="science_base_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="sections">
+      <EntityTypeMapping TypeName="pgtestModel.section">
+        <MappingFragment StoreEntitySet="section">
+          <ScalarProperty Name="section_id" ColumnName="section_id" />
+          <ScalarProperty Name="section_name" ColumnName="section_name" />
+          <ScalarProperty Name="div_id" ColumnName="div_id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

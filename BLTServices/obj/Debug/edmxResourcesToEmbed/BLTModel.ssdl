@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BLTRDSModel.Store" Alias="Self" Provider="Oracle.DataAccess.Client" ProviderManifestToken="11.2" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="BLTRDSModelStoreContainer">
+    <EntitySet Name="ACTIVE_INGREDIENT" EntityType="BLTRDSModel.Store.ACTIVE_INGREDIENT" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="ACTIVE_INGREDIENT_AI_CLASS" EntityType="BLTRDSModel.Store.ACTIVE_INGREDIENT_AI_CLASS" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="ACTIVE_INGREDIENT_PULA" EntityType="BLTRDSModel.Store.ACTIVE_INGREDIENT_PULA" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="AI_CLASS" EntityType="BLTRDSModel.Store.AI_CLASS" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="APPLICATION_METHOD" EntityType="BLTRDSModel.Store.APPLICATION_METHOD" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="CROP_USE" EntityType="BLTRDSModel.Store.CROP_USE" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="DIVISIONS" EntityType="BLTRDSModel.Store.DIVISIONS" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="EVENT" EntityType="BLTRDSModel.Store.EVENT" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="FORMULATION" EntityType="BLTRDSModel.Store.FORMULATION" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="LIMITATIONS" EntityType="BLTRDSModel.Store.LIMITATIONS" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="ORGANIZATION" EntityType="BLTRDSModel.Store.ORGANIZATION" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="PRODUCT" EntityType="BLTRDSModel.Store.PRODUCT" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="PRODUCT_ACTIVE_INGREDIENT" EntityType="BLTRDSModel.Store.PRODUCT_ACTIVE_INGREDIENT" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="PULA_LIMITATIONS" EntityType="BLTRDSModel.Store.PULA_LIMITATIONS" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="ROLE" EntityType="BLTRDSModel.Store.ROLE" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="SPECIES_ACTIVE_INGREDIENT_PULA" EntityType="BLTRDSModel.Store.SPECIES_ACTIVE_INGREDIENT_PULA" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="USER_" EntityType="BLTRDSModel.Store.USER_" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="VERSION" EntityType="BLTRDSModel.Store.VERSION" store:Type="Tables" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="CONTRIBUTORPULAVIEW" EntityType="BLTRDSModel.Store.CONTRIBUTORPULAVIEW" store:Type="Views" Schema="BLTADMIN" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+    <EntitySet Name="PULAVERSION" EntityType="BLTRDSModel.Store.PULAVERSION" store:Type="Views" store:Schema="BLTADMIN" store:Name="PULAVERSION" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator">
+      <DefiningQuery>SELECT 
+      "PULAVERSION"."PULA_ID" AS "PULA_ID", 
+      "PULAVERSION"."PULA_SHAPE_ID" AS "PULA_SHAPE_ID", 
+      "PULAVERSION"."EFFECTIVE_DATE" AS "EFFECTIVE_DATE", 
+      "PULAVERSION"."VERSION_ID" AS "VERSION_ID", 
+      "PULAVERSION"."CREATED_TIME_STAMP" AS "CREATED_TIME_STAMP", 
+      "PULAVERSION"."PUBLISHED_TIME_STAMP" AS "PUBLISHED_TIME_STAMP", 
+      "PULAVERSION"."EXPIRED_TIME_STAMP" AS "EXPIRED_TIME_STAMP"
+      FROM "BLTADMIN"."PULAVERSION" "PULAVERSION"</DefiningQuery>
+    </EntitySet>
+  </EntityContainer>
+  <EntityType Name="ACTIVE_INGREDIENT">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ACTIVE_INGREDIENT_ID" Type="number" Nullable="false" />
+    <Property Name="INGREDIENT_NAME" Type="nvarchar2" MaxLength="500" />
+    <Property Name="PC_CODE" Type="nvarchar2" Nullable="false" MaxLength="20" />
+    <Property Name="CAS_NUMBER" Type="nvarchar2" MaxLength="20" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="ACTIVE_INGREDIENT_AI_CLASS">
+    <Key>
+      <PropertyRef Name="ACTIVE_INGREDIENT_AI_CLASS_ID" />
+    </Key>
+    <Property Name="ACTIVE_INGREDIENT_AI_CLASS_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="ACTIVE_INGREDIENT_ID" Type="number" Nullable="false" />
+    <Property Name="AI_CLASS_ID" Type="number" Nullable="false" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ACTIVE_INGREDIENT_PULA">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="PULA_ID" Type="number" Nullable="false" />
+    <Property Name="PULA_SHAPE_ID" Type="number" Nullable="false" />
+    <Property Name="OTHER_JUSTIFICATION" Type="nvarchar2" MaxLength="1000" />
+    <Property Name="BASE_DATA" Type="nvarchar2" MaxLength="1000" />
+    <Property Name="BASE_DATA_MODIFIERS" Type="nvarchar2" MaxLength="1000" />
+    <Property Name="ADDITIONAL_INFORMATION" Type="nvarchar2" />
+    <Property Name="INTERIM_PROPOSED_DECISION" Type="nvarchar2" MaxLength="500" />
+    <Property Name="FOCUS_MEETING" Type="nvarchar2" MaxLength="500" />
+    <Property Name="BIOLOGICAL_OPINION_REGREVIEW" Type="nvarchar2" MaxLength="500" />
+    <Property Name="BIOLOGICAL_OPINION_LIT" Type="nvarchar2" MaxLength="500" />
+    <Property Name="PROPOSED_DECISION" Type="nvarchar2" MaxLength="500" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="IS_PUBLISHED" Type="number" Nullable="false" />
+    <Property Name="EFFECTIVE_DATE" Type="date" />
+    <Property Name="EVENT_ID" Type="number" />
+    <Property Name="COMMENTS" Type="nvarchar2" MaxLength="500" />
+    <Property Name="SEC3_NEWCHEM" Type="nvarchar2" MaxLength="500" />
+    <Property Name="SEC3_NEWUSE" Type="nvarchar2" MaxLength="500" />
+    <Property Name="SEC24" Type="nvarchar2" MaxLength="500" />
+    <Property Name="FINAL_DECISION" Type="nvarchar2" MaxLength="500" />
+    <Property Name="SEC18" Type="nvarchar2" MaxLength="500" />
+    <Property Name="INTERIM_DECISION" Type="varchar2" MaxLength="500" />
+  </EntityType>
+  <EntityType Name="AI_CLASS">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="AI_CLASS_ID" Type="number" Nullable="false" />
+    <Property Name="AI_CLASS_NAME" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="APPLICATION_METHOD">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="APPLICATION_METHOD_ID" Type="number" Nullable="false" />
+    <Property Name="METHOD" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="CROP_USE">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="CROP_USE_ID" Type="number" Nullable="false" />
+    <Property Name="USE" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="DIVISIONS">
+    <Key>
+      <PropertyRef Name="DIVISION_ID" />
+    </Key>
+    <Property Name="DIVISION_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="DIVISION_NAME" Type="nvarchar2" Nullable="false" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="EVENT">
+    <Key>
+      <PropertyRef Name="EVENT_ID" />
+    </Key>
+    <Property Name="EVENT_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="NAME" Type="varchar2" Nullable="false" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="FORMULATION">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="FORMULATION_ID" Type="number" Nullable="false" />
+    <Property Name="FORM" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="LIMITATIONS">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="LIMITATION_ID" Type="number" Nullable="false" />
+    <Property Name="CODE" Type="nvarchar2" MaxLength="5" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="LIMITATION" Type="varchar2" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+  </EntityType>
+  <EntityType Name="ORGANIZATION">
+    <Key>
+      <PropertyRef Name="ORGANIZATION_ID" />
+    </Key>
+    <Property Name="ORGANIZATION_ID" Type="number" Nullable="false" />
+    <Property Name="NAME" Type="nvarchar2" Nullable="false" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="PRODUCT">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="PRODUCT_ID" Type="number" Nullable="false" />
+    <Property Name="PRODUCT_REGISTRATION_NUMBER" Type="nvarchar2" Nullable="false" MaxLength="100" />
+    <Property Name="PRODUCT_NAME" Type="nvarchar2" MaxLength="300" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="PRODUCT_NAME_STATUS" Type="varchar2" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="PRODUCT_ACTIVE_INGREDIENT">
+    <Key>
+      <PropertyRef Name="PRODUCT_ACTIVE_INGREDIENT_ID" />
+    </Key>
+    <Property Name="PRODUCT_ACTIVE_INGREDIENT_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="PRODUCT_ID" Type="number" Nullable="false" />
+    <Property Name="ACTIVE_INGREDIENT_ID" Type="number" Nullable="false" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PULA_LIMITATIONS">
+    <Key>
+      <PropertyRef Name="PULA_LIMITATION_ID" />
+    </Key>
+    <Property Name="PULA_LIMITATION_ID" Type="number" Nullable="false" />
+    <Property Name="ACTIVE_INGREDIENT_ID" Type="number" />
+    <Property Name="LIMITATION_ID" Type="number" />
+    <Property Name="CROP_USE_ID" Type="number" />
+    <Property Name="APPLICATION_METHOD_ID" Type="number" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="PULA_ID" Type="number" Nullable="false" />
+    <Property Name="FORMULATION_ID" Type="number" />
+    <Property Name="PRODUCT_ID" Type="number" />
+  </EntityType>
+  <EntityType Name="ROLE">
+    <Key>
+      <PropertyRef Name="ROLE_ID" />
+    </Key>
+    <Property Name="ROLE_ID" Type="number" Nullable="false" />
+    <Property Name="ROLE_NAME" Type="nvarchar2" Nullable="false" MaxLength="25" />
+    <Property Name="ROLE_DESCRIPTION" Type="nvarchar2" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="SPECIES_ACTIVE_INGREDIENT_PULA">
+    <Key>
+      <PropertyRef Name="SPECIES_ACTIVEINGREPULA_ID" />
+    </Key>
+    <Property Name="SPECIES_ACTIVEINGREPULA_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="SPECIES_ID" Type="number" Nullable="false" />
+    <Property Name="PULA_ID" Type="number" Nullable="false" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+  </EntityType>
+  <EntityType Name="USER_">
+    <Key>
+      <PropertyRef Name="USER_ID" />
+    </Key>
+    <Property Name="USER_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="USERNAME" Type="nvarchar2" MaxLength="255" />
+    <Property Name="EMAIL" Type="nvarchar2" MaxLength="255" />
+    <Property Name="PHONE" Type="nvarchar2" MaxLength="20" />
+    <Property Name="ORGANIZATION_ID" Type="number" />
+    <Property Name="DIVISION_ID" Type="number" />
+    <Property Name="ROLE_ID" Type="number" Nullable="false" />
+    <Property Name="FNAME" Type="nvarchar2" MaxLength="25" />
+    <Property Name="LNAME" Type="nvarchar2" MaxLength="25" />
+  </EntityType>
+  <EntityType Name="VERSION">
+    <Key>
+      <PropertyRef Name="VERSION_ID" />
+    </Key>
+    <Property Name="VERSION_ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="CREATOR_ID" Type="number" />
+    <Property Name="CREATED_TIME_STAMP" Type="date" />
+    <Property Name="PUBLISHER_ID" Type="number" />
+    <Property Name="PUBLISHED_TIME_STAMP" Type="date" />
+    <Property Name="EXPIRER_ID" Type="number" />
+    <Property Name="EXPIRED_TIME_STAMP" Type="date" />
+    <Property Name="REVIEWER_ID" Type="number" />
+    <Property Name="REVIEWED_TIME_STAMP" Type="date" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'BLTADMIN.CONTRIBUTORPULAVIEW' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="CONTRIBUTORPULAVIEW">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="number" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="COMMENTS" Type="nvarchar2" MaxLength="500" />
+  </EntityType>
+  <!--Errors Found During Generation:
+      warning 6002: The table/view 'BLTADMIN.PULAVERSION' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.
+      -->
+  <EntityType Name="PULAVERSION">
+    <Key>
+      <PropertyRef Name="PULA_ID" />
+      <PropertyRef Name="PULA_SHAPE_ID" />
+      <PropertyRef Name="VERSION_ID" />
+    </Key>
+    <Property Name="PULA_ID" Type="number" Nullable="false" />
+    <Property Name="PULA_SHAPE_ID" Type="number" Nullable="false" />
+    <Property Name="EFFECTIVE_DATE" Type="date" />
+    <Property Name="VERSION_ID" Type="number" Nullable="false" />
+    <Property Name="CREATED_TIME_STAMP" Type="date" />
+    <Property Name="PUBLISHED_TIME_STAMP" Type="date" />
+    <Property Name="EXPIRED_TIME_STAMP" Type="date" />
+  </EntityType>
+  <Function Name="USER_PROFILE_ADD" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" StoreFunctionName="USER_PROFILE.ADD" Schema="BLTADMIN">
+    <Parameter Name="USERNAME" Type="varchar2" Mode="In" />
+    <Parameter Name="PASSWORD" Type="varchar2" Mode="In" />
+  </Function>
+  <Function Name="USER_PROFILE_ADDROLE" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" StoreFunctionName="USER_PROFILE.ADDROLE" Schema="BLTADMIN">
+    <Parameter Name="USERNAME" Type="varchar2" Mode="In" />
+    <Parameter Name="ROLEID" Type="number" Mode="In" />
+  </Function>
+  <Function Name="USER_PROFILE_ALTER" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" StoreFunctionName="USER_PROFILE.ALTER" Schema="BLTADMIN">
+    <Parameter Name="USERNAME" Type="varchar2" Mode="In" />
+    <Parameter Name="ALTERSTATEMENT" Type="varchar2" Mode="In" />
+  </Function>
+  <Function Name="USER_PROFILE_EDITPASSWORD" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" StoreFunctionName="USER_PROFILE.EDITPASSWORD" Schema="BLTADMIN">
+    <Parameter Name="USERNAME" Type="varchar2" Mode="In" />
+    <Parameter Name="NEWPASSWORD" Type="varchar2" Mode="In" />
+  </Function>
+  <Function Name="USER_PROFILE_REMOVE" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" StoreFunctionName="USER_PROFILE.REMOVE" Schema="BLTADMIN">
+    <Parameter Name="USERNAME" Type="varchar2" Mode="In" />
+  </Function>
+</Schema>

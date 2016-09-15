@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+
+   <link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Assets/Styles/tableSorter.css")" rel="stylesheet" type="text/css" />
+    
+    <script src="@Url.Content("~/Assets/Scripts/jquery-1.7.2.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Assets/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Assets/Scripts/jquery.dateFormat-1.0.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Assets/Scripts/jquery.base64.min.js")" type="text/javascript"></script>
+     
+    <script src="@Url.Content("~/Assets/Scripts/BLTWebApplication.js")" type="text/javascript"></script> 
+    <script src="@Url.Content("~/Assets/Scripts/jquery.tablesorter.js")" type="text/javascript"></script>   
+    
+
+</head>
+<body>
+<div id="loading"><div id="loadingcontent"><p id="loadingspinner" style=""><img src="@Url.Content("~/Assets/Images/LoadingOrange110.gif")" /></p></div></div>
+    <div class="page">
+        <header>
+        <div id="header">            
+            <div id="logindisplay">
+                    @Html.Partial("_LogOnPartial")
+            </div>
+            
+        </div>
+    </header>
+            
+
+            <div id="MainNavigationBar" class="clear hideSkiplink">
+                <div id="NavigationMenu" class="menu" >    
+                    <nav>                    
+                        <ul id="menu" class="menu">
+                          @{
+                             if (User.Identity.Name != "guest")
+                             {
+                                 <li>@Html.ActionLink("HOME", "Index", "Home", null, new { @class = "homeButton", onclick = "loading();" })</li>
+                                 <li>@Html.ActionLink("PARTS", "Index", "Parts", null, new { @class = "partsButton", onclick = "loading();" })</li>
+                                 <li>@Html.ActionLink("USERS", "Index", "Users", null, new { @class = "settingsButton", onclick = "loading();" })</li>
+                              }
+                              }
+                        </ul>
+                    </nav>
+                </div>
+                <div id="title" style="float:right;padding-right:10px">
+                    <a href="@Url.Content("~/Home/Index")" ID="HomeLink" runat="server">
+                        <h1 style="font-weight:bold;color:#E7E4CE;font-variant:normal">Bulletins Live - 
+                            <span>@ViewBag.Title</span>
+                        </h1>
+                    </a>
+                </div>
+                <div style="clear:inherit"></div>
+            </div>
+        
+    <section>
+        <div id="main">
+            @RenderBody()
+        </div>
+    </section>
+    <footer id="footer">        
+    </footer>
+   </div>
+
+</body>
+</html>
+
+<script type="text/javascript">
+    function loading() {
+        $("#loading").fadeIn();
+    };
+</script>

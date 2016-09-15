@@ -1,0 +1,297 @@
+﻿@* Comments:
+05.28.13 - TR - Hooked into services
+05.03.12 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked (published already = details)
+ */
+ *@
+
+@using BLTServices;
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+<link href="@Url.Content("~/Assets/Styles/Site.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/BLT.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Assets/Styles/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Assets/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-1.8.3.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Assets/Scripts/jquery-ui.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab1-Gen">Details</a></li>
+          
+@*           @using (Html.BeginForm("PULA_New", "PULA", *@
+@*            <input style="background-color:#4B6C9E;color:white" type="button" onclick="PULA_NEW();" value="Copy To New" class="popup-button" />
+            @Html.ActionLink("Copy To New", "PULA_New", "PULA", new {@class="BLTButton blue"})*@
+        </ul>
+
+        @*General Detail Tab*@
+        @{VERSION thisVersion = ViewData["Version"] as VERSION; 
+          USER_ loggedIn = ViewData["loggedIn"] as USER_;
+          }
+          <input type="hidden" value="@Model.PULA_ID" id="PulaID" />
+          <div id="tab1-Gen"> 
+        <h3 style="color:#59595C; font-weight:bold">General Information</h3>
+            <div>
+                <span class="popup-label-a">Effective Date:</span>
+                <label class="inline">@( Model.EFFECTIVE_DATE != null ? ((DateTime)Model.EFFECTIVE_DATE).ToShortDateString() : "")</label>
+            </div>
+            
+            <div>
+               <span class="popup-label-a">Creation Date:</span>
+               <label class="inline">@( thisVersion.CREATED_TIME_STAMP != null ? ((DateTime)thisVersion.CREATED_TIME_STAMP).ToShortDateString() : "" )</label>
+            </div>
+                
+            <div>
+                <span class="popup-label-a">Created By:</span>
+	            <label class="inline">@ViewData["CreatorName"]</label>
+            </div>
+            
+            <div>
+                <span class="popup-label-a">Creator Organization:</span>
+	            <label class="inline">@ViewData["creatorOrg"]</label>
+            </div>
+            
+            <div>
+                <span class="popup-label-a">Creator Division:</span>
+	            <label class="inline">@ViewData["creatorDiv"]</label>
+            </div>
+
+            <div>
+	            <span class="popup-label-a">Published Date:</span>
+	            <label class="inline">@(thisVersion.PUBLISHED_TIME_STAMP != null ? ((DateTime)thisVersion.PUBLISHED_TIME_STAMP).ToShortDateString():"")</label>
+	        </div>
+            
+            <div>
+                <span class="popup-label-a">Published By:</span>
+	            <label class="inline">@ViewData["publisherName"]</label>
+	        </div>
+
+            <div>
+                <span class="popup-label-a">Publisher Organization:</span>
+	            <label class="inline">@ViewData["publisherOrg"]</label>
+            </div>
+            
+            <div>
+                <span class="popup-label-a">Publisher Division:</span>
+	            <label class="inline">@ViewData["publisherDiv"]</label>
+            </div>
+
+            <div>
+                <span class="popup-label-a">Expiration Date:</span>
+                <div id="expiredInfo">
+                    @if (thisVersion.EXPIRED_TIME_STAMP != null)
+                    {
+                       <label class="inline">@(((DateTime)thisVersion.EXPIRED_TIME_STAMP).ToShortDateString())</label>
+                    }
+                    else
+                    {
+                        <div style="width:50%" class="ui-block-b">                        
+                            @Html.DropDownList("Months", null, "--Month--", new {@class="bltTextInput ui-shadow-inset", @style="width:50%"})
+                            <br /><br />
+                            @Html.DropDownList("Years", null, "--Year--", new { @class = "bltTextInput ui-shadow-inset", @style = "width:50%; margin-bottom:5px" })
+                            <input type="button" value="Add Expiration Date" onclick="AddExpiration()" />        
+                        </div>
+                    }
+                </div>
+            </div>            
+            
+            @if (thisVersion.EXPIRER_ID != null & thisVersion.EXPIRER_ID != 0)
+            {
+                <div>
+                    <span class="popup-label-a">Expired By:</span>
+	                <label class="inline">@ViewData["expirerName"]</label>
+	            </div>
+
+                <div>
+                    <span class="popup-label-a">Expirer Organization:</span>
+	                <label class="inline">@ViewData["expirerOrg"]</label>
+                </div>
+            
+                <div>
+                    <span class="popup-label-a">Expirer Division:</span>
+	                <label class="inline">@ViewData["expirerDiv"]</label>
+                </div>
+                }
+            <br clear="all" />
+               
+
+        @*Justification Tab*@
+              <h3 style="color:#59595C; font-weight:bold">PULA Justification</h3>
+
+            @if (!String.IsNullOrEmpty(Model.OTHER_JUSTIFICATION))
+            {
+                <div>
+                    <span class="popup-label-a">Other:</span>
+	                <label class="inline">@Model.OTHER_JUSTIFICATION</label>
+                </div>
+            }
+            
+            @if (!String.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_LIT))
+            {
+                <div>
+                    <span class="popup-label-a">Litigation, Biological Opinion:</span>
+	                <label class="inline">@Model.BIOLOGICAL_OPINION_LIT</label>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.INTERIM_PROPOSED_DECISION))
+            {
+                <div>
+                    <span class="popup-label-a">Registration Review, Proposed Interim Decision:</span>
+	                <label class="inline">@Model.INTERIM_PROPOSED_DECISION</label>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.FOCUS_MEETING))
+            {
+                <div>
+                    <span class="popup-label-a">Registration Review, Focus Meeting:</span>
+	                <label class="inline">@Model.FOCUS_MEETING</label>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.PROPOSED_DECISION))
+            {
+                <div>
+                    <span class="popup-label-a">Registration Review, Proposed Decision:</span>
+	                <label class="inline">@Model.PROPOSED_DECISION</label>
+                </div>
+            }
+            
+            @if (!String.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_REGREVIEW))
+            {
+                <div>
+                    <span class="popup-label-a">Registration Review, Biological Opinion:</span>
+	                <label class="inline">@Model.BIOLOGICAL_OPINION_REGREVIEW</label>
+                </div>
+            }
+            
+            <div>
+                <span class="popup-label-a">Base Data:</span>
+                <label class="inline">@Model.BASE_DATA</label>
+            </div>
+            
+             <div>
+                <span class="popup-label-a">Base Data Modifiers:</span>
+                <textarea readonly="readonly" class="textAreaDetails">@Model.BASE_DATA_MODIFIERS</textarea>
+             </div>
+                
+             <div>
+                <span class="popup-label-a">Additional Information:</span>
+                <textarea readonly="readonly" class="textAreaDetails">@Model.ADDITIONAL_INFORMATION</textarea>
+             </div>
+
+
+             
+             
+
+            @* AI Limitation Tab *@
+            @{ List<PublishedPULA> pubPULAModel = ViewData["PULAlimitationList"] as List<PublishedPULA>; }
+            <h3 style="color:#59595C; font-weight:bold">Limitations</h3> 
+            <table class="peak-table-a">
+                <thead>
+                    <tr>
+                        <th scope="col">Active Ingredient/Product</th>
+                        <th scope="col">Application Method</th>
+                        <th scope="col">Formulation</th>
+                        <th scope="col">Crop Use</th>
+                        <th scope="col">Code</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (PublishedPULA ppm in pubPULAModel)
+                 {
+                    <tr>
+                        @if (ppm.Product != null)
+                        { <td>@ppm.Product</td> }
+                        else { <td>@ppm.AI</td> }
+                        <td>@ppm.AppMethod</td>
+                        <td>@ppm.Formulation</td>
+                        <td>@ppm.CropUse</td>
+                        <td title="@ppm.Limitation">@ppm.Code</td>                     
+                    </tr>
+                  }
+                </tbody>
+            </table>
+
+     
+            @* Species Tab *@
+             <h3 style="color:#59595C; font-weight:bold">Species</h3>   
+             
+             @{List<SPECIES> PULAsppList = ViewData["PULAspp"] as List<SPECIES>; }
+               <ul>
+               @foreach (SPECIES sp in PULAsppList)
+                   {
+                        <li>@sp.COMMON_NAME: @sp.SCIENTIFIC_NAME</li>
+                   }
+               </ul>
+        
+              
+        </div> @* end id="tabs" div*@
+
+    </div>
+    
+        
+</body>
+</html>
+
+<script type="text/javascript">
+    function PULA_NEW() {
+       // $.ajax({
+       //     type: 'GET',
+       //     url: '@Url.Action("PULA_New", "Members")',
+       //     data: { userName: $("#userName").val() },
+       //     success: function (response) {
+       //         if (response.dir == "") {
+       //            alert("User name does not exist");
+       //         }
+       //         else {
+       //             alert("Member: " + response);
+       //         }
+       //     }
+       // });
+    }
+
+    function AddExpiration() {
+        var VersionID = '@thisVersion.VERSION_ID';
+        var Month = $("#Months").val();
+        var Year = $("#Years").val();
+        var pulaID = $("#PulaID").val();
+        if (Month != 0 && Year != 0) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("AddExpiration", "PULA")',
+                data: { month: Month, year: Year, PulaID: pulaID, loggedInID: '@loggedIn.USER_ID' },
+                success: function (response) {
+                    $("#expiredInfo").html(response);
+                }
+            });
+        }
+        else {
+            alert("Pick a Month and Year before clicking on Add Expiration Date Button");
+        }        
+    }
+</script>

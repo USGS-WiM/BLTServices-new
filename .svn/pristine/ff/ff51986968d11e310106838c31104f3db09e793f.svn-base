@@ -1,0 +1,411 @@
+﻿//------------------------------------------------------------------------------
+//----- Configuration -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jonathan Baier
+//              Jeremy Newson          
+//  
+//   purpose:   Configuration implements the IConfiurationSource interface. OpenRasta
+//              will call the Configure method and use it to configure the application 
+//              through a fluent interface using the Resource space as root objects. 
+//
+//discussion:   The ResourceSpace is where you can define the resources in the application and what
+//              handles them and how thy are represented. 
+//              https://github.com/openrasta/openrasta/wiki/Configuration
+//
+//     
+#region Comments
+// 05.15.13 - JKN- Implement remaining resources
+// 11.09.12 - TR - Added PULA and AILimitations Resources
+// 10.10.12 - JB - Created
+#endregion                          
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Data.Objects.DataClasses;
+using System.ServiceModel.Syndication;
+
+using OpenRasta.Authentication;
+using OpenRasta.Authentication.Basic;
+using OpenRasta.Codecs;
+using OpenRasta.Codecs.WebForms;
+using OpenRasta.Configuration;
+using OpenRasta.DI;
+using OpenRasta.IO;
+using OpenRasta.Pipeline.Contributors;
+using OpenRasta.Web.UriDecorators;
+
+using BLTServices.Authentication;
+using BLTServices.Resources;
+using BLTServices.Handlers;
+using BLTServices.Codecs;
+
+
+namespace BLTServices
+{
+    public class Configuration:IConfigurationSource
+    {
+        public void Configure()
+        {
+            using (OpenRastaConfiguration.Manual)
+            {
+
+                // specify the authentication scheme you want to use, you can register multiple ones
+                ResourceSpace.Uses.CustomDependency<IAuthenticationScheme, BasicAuthenticationScheme>(DependencyLifetime.Singleton);
+
+                // register your basic authenticator in the DI resolver
+                ResourceSpace.Uses.CustomDependency<IBasicAuthenticator, BLTBasicAuthentication>(DependencyLifetime.Transient);
+
+                
+                AddACTIVE_INGREDIENT_Resources();
+                AddACTIVE_INGREDIENT_PULA_Resources();
+                AddAI_CLASS_Resources();
+                AddAI_LIMITATIONS_Resources();
+                AddCROP_USE_Resources();
+                AddPRODUCT_Resources();
+                AddDIVISION_Resources();
+                AddSPECIES_Resources();
+                AddSPECIES_FAMILY_Resources();
+                AddSPECIES_GROUP_Resources();
+                AddSPECIES_TAXA_Resources();
+                AddLIMITATION_Resources();
+                AddMODIFIER_Resources();
+                AddORGANIZATION_Resources();
+                AddROLE_Resources();
+                AddUSER_Resources();
+                AddVERSION_Resources();
+                AddAUTHENTICATION_Resources();
+
+            }//End using OpenRastaConfiguration.Manual
+
+        }//End Configure()
+
+        #region Helper methods
+
+        private void AddAUTHENTICATION_Resources()
+        {
+            //Authentication
+            ResourceSpace.Has.ResourcesOfType<Boolean>()
+            .AtUri("/login")
+            .HandledBy<LoginHandler>()
+            .TranscodedBy<WiMXmlSerializerCodec>();
+
+        }//end AddAUTHENTICATION_Resources
+
+        private void AddACTIVE_INGREDIENT_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<ACTIVE_INGREDIENT>>()
+                .AtUri("/ActiveIngredients")
+                .And.AtUri("/ActiveIngredients?ActiveDate={date}")
+                .And.AtUri("/ActiveIngredients?aiID={activeIngredientID}&ActiveDate={date}").Named("GetAI")
+                .And.AtUri("/PULAS/{pulaID}/ActiveIngredients?ActiveDate={date}").Named("GetPULAactiveIngredients")
+                .HandledBy<ActiveIngredientHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<ACTIVE_INGREDIENT>()
+                .AtUri("/ActiveIngredients/{entityID}").Named("GetEntity")
+                .And.AtUri("/ActiveIngredients/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/ActiveIngredients/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/ActiveIngredients/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/ActiveIngredients/Expire?aiID={activeIngredientID}&ExpireDate={date}").Named("ExpireActiveIngredient")
+                .HandledBy<ActiveIngredientHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddACTIVE_INGREDIENT_Resources
+
+        private void AddACTIVE_INGREDIENT_PULA_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<ACTIVE_INGREDIENT_PULA>>()
+                .AtUri("/PULAs")
+                .And.AtUri("/PULAs?ActiveDate={date}")
+                .And.AtUri("/PULAs/POI/{shapeId}?ActiveDate={date}").Named("GetShapePULAS")
+                .And.AtUri("/PULAs?pulaId={pulaId}&ActiveDate={date}").Named("GetAIPULAS")
+                .HandledBy<ActiveIngredientPULAHander>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<ACTIVE_INGREDIENT_PULA>()
+                .AtUri("/PULAs/{entityID}").Named("GetEntity")
+                .And.AtUri("/PULAs/{entityID}/Publish").Named("PublishAIPULA")
+                .And.AtUri("/PULAs/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/PULAs/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/PULAs/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/PULAs/Expire?pulaID={pulaID}&ExpireDate={date}").Named("ExpirePULA")
+                .HandledBy<ActiveIngredientPULAHander>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<PULAList>()
+               .AtUri("PULAs/simplePULAs?ActiveDate={date}").Named("GetSimplePULAS")
+               .HandledBy<ActiveIngredientPULAHander>()
+               .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        } //end AddACTIVE_INGREDIENT_PULA_Resources
+       
+        private void AddAI_CLASS_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<AI_CLASS>>()
+                .AtUri("/AIClasses")
+                .And.AtUri("/AIClasses?ActiveDate={date}")
+                .And.AtUri("/AIClasses?aiClassID={aiClassID}&ActiveDate={date}")
+                .And.AtUri("/ActiveIngredients/{activeIngredientID}/AIClass?ActiveDate={date}").Named("GetActiveIngredientClasses")
+                .HandledBy<AIClassHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<AI_CLASS>()
+                .AtUri("/AIClasses/{entityID}").Named("GetEntity")
+                .And.AtUri("/AIClasses/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/AIClasses/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/AIClasses/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/AIClasses/Expire?aiClassID={aiClassID}&ExpireDate={date}").Named("ExpireActiveIngredient")
+                .And.AtUri("/ActiveIngredients/{entityID}/AIClass").Named("GetActiveIngredientsClass")
+                .HandledBy<AIClassHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddAI_CLASS_Resources
+
+        private void AddAI_LIMITATIONS_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<AI_LIMITATIONS>>()
+                .AtUri("/AILimitations")
+                .And.AtUri("/AILimitations?ActiveDate={date}")
+                .And.AtUri("/AILimitations?aiLimitationsID={aiClassID}&ActiveDate={date}")
+                .And.AtUri("/PULAs/{pulaID}/AILimitations?ActiveDate={date}").Named("GetPULALimitations")
+                .HandledBy<AILimitationsHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<AI_LIMITATIONS>()
+                .AtUri("/AILimitation/{entityID}").Named("GetEntity")
+                .And.AtUri("/AILimitations/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/AILimitations/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/AILimitations/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/AILimitations/Expire?pulaID={pulaID}&ExpireDate={date}").Named("ExpirePULALimitations")
+                .HandledBy<AILimitationsHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddAI_LIMITATIONS_Resources
+
+        private void AddCROP_USE_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<CROP_USE>>()
+                .AtUri("/CropUses")
+                .And.AtUri("/CropUses?ActiveDate={date}")
+                .And.AtUri("/CropUses?CropUseID={cropUseID}&ActiveDate={date}")
+                .And.AtUri("/AILimitations/{aiLimitationsID}/CropUse?ActiveDate={date}").Named("GetAILimitationsCropUse")
+                .HandledBy<CropUseHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<CROP_USE>()
+                .AtUri("/CropUses/{entityID}").Named("GetEntity")
+                .And.AtUri("/CropUses/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/CropUses/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/CropUses/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/CropUses/Expire?CropUseID={cropUseID}&ExpireDate={date}").Named("ExpireCropUse")
+                .HandledBy<CropUseHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+                        
+        }//end AddCROP_USE_Resources
+
+        private void AddPRODUCT_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<PRODUCT>>()
+                .AtUri("/Products")
+                .And.AtUri("/Products?ActiveDate={date}")
+                .And.AtUri("/Products?ProductID={productID}&ActiveDate={date}")
+                .And.AtUri("/ActiveIngredients/{activeIngredientID}/Product?ActiveDate={date}").Named("GetAIProduct")
+                .HandledBy<ProductHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<PRODUCT>()
+                .AtUri("/Products/{entityID}").Named("GetEntity")
+                .And.AtUri("/Products/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/Products/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/Products/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/Products/Expire?ProductID={productID}&ExpireDate={date}").Named("ExpireProduct")
+                .HandledBy<ProductHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+        }//end AddPRODUCT_Resources
+
+        private void AddDIVISION_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<DIVISION>>()
+                .AtUri("/Divisions")
+                .HandledBy<DivisionHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<DIVISION>()
+                .AtUri("/Divisions/{divisionID}")
+                .HandledBy<DivisionHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+                        
+        }//end AddDIVISION_Resources
+
+        private void AddSPECIES_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<SPECIES>>()
+                .AtUri("/Species")
+                .And.AtUri("/ActiveIngredientPULA/{activeIngredientPULAID}/Species").Named("GetPULASpecies")
+                .HandledBy<SpeciesHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<SPECIES>()
+                .AtUri("/Species/{speciesID}")
+                .HandledBy<SpeciesHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddSPECIES_Resources
+
+        private void AddSPECIES_GROUP_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<SPECIES_GROUP>>()
+                .AtUri("/SpeciesGroups")
+                .HandledBy<SpeciesGroupHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<SPECIES_GROUP>()
+                .AtUri("/SpeciesGroups/{speciesGroupID}")
+                .HandledBy<SpeciesGroupHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddSPECIES_GROUP_Resources
+        
+        private void AddSPECIES_FAMILY_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<SPECIES_FAMILY>>()
+                .AtUri("/SpeciesFamilies")
+                .HandledBy<SpeciesFamilyHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<SPECIES_FAMILY>()
+                .AtUri("/SpeciesFamilies/{speciesFamilyID}")
+                .HandledBy<SpeciesFamilyHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddSPECIES_FAMILY_Resources
+
+        private void AddSPECIES_TAXA_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<SPECIES_TAXA>>()
+                .AtUri("/SpeciesTaxas")
+                .HandledBy<SpeciesTaxaHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<SPECIES_TAXA>()
+                .AtUri("/SpeciesTaxas/{speciesTaxaID}")
+                .HandledBy<SpeciesTaxaHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddSPECIES_TAXA_Resources
+
+        private void AddLIMITATION_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<LIMITATION>>()
+                .AtUri("/Limitations")
+                .And.AtUri("/Limitations?ActiveDate={date}")
+                .And.AtUri("/Limitations?LimitationID={limitationID}&ActiveDate={date}")
+                .And.AtUri("/AILimitations/{aiLimitationsID}/Limitation?ActiveDate={date}").Named("GetAILimitationsLimitation")
+                .HandledBy<LimitationHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<LIMITATION>()
+                .AtUri("/Limitations/{entityID}").Named("GetEntity")
+                 .And.AtUri("/Limitations/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/Limitations/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/Limitations/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/Limitations/Expire?LimitationID={limitationID}&ExpireDate={date}").Named("ExpireLimitation")
+                .HandledBy<LimitationHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddLIMITATION_Resources
+
+        private void AddMODIFIER_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<MODIFIER>>()
+                .AtUri("/Modifiers")
+                .And.AtUri("/Modifiers?ActiveDate={date}")
+                .And.AtUri("/Modifiers?ModifierID={modifierID}&ActiveDate={date}")
+                .And.AtUri("/AILimitations/{aiLimitationsID}/Modifier?ActiveDate={date}").Named("GetAILimitationsModifier")
+                .HandledBy<ModifierHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<MODIFIER>()
+                .AtUri("/Modifiers/{entityID}").Named("GetEntity")
+                .And.AtUri("/Modifiers/{entityID}/Activate?ActiveDate={date}").Named("Activate")
+                .And.AtUri("/Modifiers/{entityID}/Edit?ActiveDate={date}").Named("Edit")
+                .And.AtUri("/Modifiers/{entityID}/Expire?ExpireDate={date}").Named("Expire")
+                .And.AtUri("/Modifiers/Expire?ModifierID={modifierID}&ExpireDate={date}").Named("ExpireModifier")
+                .HandledBy<ModifierHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+                        
+        }//end AddMODIFIER_Resources
+
+        private void AddORGANIZATION_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<ORGANIZATION>>()
+                .AtUri("/Organizations")
+                .HandledBy<OrganizationHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<ORGANIZATION>()
+                .AtUri("/Organizations/{organizationID}")
+                .HandledBy<OrganizationHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddORGANIZATION_Resources
+
+        private void AddROLE_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<ROLE>>()
+                .AtUri("/Roles")
+                .HandledBy<RoleHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<ROLE>()
+                .AtUri("/Roles/{roleID}")
+                .HandledBy<RoleHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddROLE_Resources
+
+        private void AddUSER_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<USER_>>()
+                .AtUri("/Users")
+                .And.AtUri("Versions/{versionID}/Users").Named("GetVersionUsers")
+                .HandledBy<UserHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<USER_>()
+                .AtUri("/Users/{userID}")
+                .And.AtUri("Users?username={userName}").Named("GetUserByUserName")
+                .And.AtUri("/Users?username={userName}&old={oldPassword}&new={newPassword}").Named("ChangeUserPassword")
+                .HandledBy<UserHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }//end AddUSER_Resources
+
+        private void AddVERSION_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<Version>>()
+               .AtUri("/Versions")
+               .And.AtUri("/Versions?ActiveDate={date}")
+               .HandledBy<VersionHandler>()
+               .TranscodedBy<SimpleUTF8XmlSerializerCodec>(); 
+            
+            ResourceSpace.Has.ResourcesOfType<VERSION>()
+                .AtUri("/Versions/{AILimitID}")
+                .And.AtUri("/Version/{entityID}").Named("GetVersion")
+                .And.AtUri("/ActiveIngredients/{entityID}/Version").Named("GetActiveIngredientVersion")
+                .HandledBy<VersionHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }
+        #endregion
+
+    }//End class Configuration
+}//End namespace

@@ -1,0 +1,700 @@
+//Copyright 2013 USGS Wisconsin Internet Mapping(WiM)
+//Author: Tonia Roddick
+//Created: December 1st, 2013	
+
+dojo.require("esri.map");
+dojo.require("esri.dijit.Popup");
+dojo.require("esri.dijit.Legend");
+dojo.require("esri.dijit.BasemapGallery");
+dojo.require("esri.arcgis.utils");
+dojo.require("esri.virtualearth.VETiledLayer");
+dojo.require("esri.tasks.locator");
+dojo.require("esri.graphic");
+dojo.require("esri.tasks.query");
+dojo.require("esri.utils");
+
+dojo.require("dijit.TitlePane");
+dojo.require("dijit.Tooltip");
+dojo.require("dijit.Toolbar");
+dojo.require("dijit.Menu");
+dojo.require("dijit.TooltipDialog");
+
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+
+dojo.require("dijit.form.CheckBox");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ComboBox");
+dojo.require("dijit.form.DropDownButton");
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dijit.Dialog");
+dojo.require("dojox.data.XmlStore");
+
+dojo.require("wim.ExtentNav");
+dojo.require("wim.LatLngScale");
+dojo.require("wim.CollapsingContainer");
+dojo.require("wim.Disclaimer");
+dojo.require("modules.SiteFilter");
+dojo.require("wim.RefreshScreen");
+dojo.require("wim.LoadingScreen");
+
+
+//global variables     
+var map, legendLayers = [];
+var identifyTask, identifyParams;
+var navToolbar;
+var locator;
+var pulaLayer;
+Date.prototype.today = function () {
+    return (this.getMonth() + 1) + "/" + this.getDate() + "/" + this.getFullYear()
+};
+var newDate = new Date();
+var datetime = newDate.today();
+var EventListResponse = false;
+var AIListResponse = false;
+var PULA_queryTask;
+var ExtentQuery;
+var eventID;
+var eventIDExists = false;
+var layerDefinitions = [];
+
+function init() {
+
+    //point to proxy
+    esri.config.defaults.io.proxyUrl = "/BLTProxy/proxy.ashx";
+    esri.config.defaults.io.alwaysUseProxy = true;
+
+	//sets up the onClick listener for the USGS logo
+	//dojo.connect(dojo.byId("usgsLogo"), "onclick", showUSGSLinks);
+	// a popup is constructed below from the dijit.Popup class, which extends some addtional capability to the InfoWindowBase class.
+	//var popup = new esri.dijit.Popup({},dojo.create("div"));
+	 
+	map = new esri.Map("map", {
+    	basemap: "topo",
+		wrapAround180: true,
+		extent: new esri.geometry.Extent({xmin:-14580516.019450117,ymin:2072972.2070934423,xmax:-5618427.327072154,ymax:7527518.54552217,spatialReference:{wkid:102100}}), 
+		slider: true,
+		sliderStyle: "small",
+		logo:false
+		//infoWindow: popup
+	});
+	
+	//navToolbar constructor declared, which serves the extent navigator tool.
+    navToolbar = new esri.toolbars.Navigation(map);
+	
+	//dojo.connect method (a common Dojo framework construction) used to call mapReady function. Fires when the first or base layer has been successfully added to the map.
+    dojo.connect(map, "onLoad", mapReady);
+	
+	//basemapGallery constructor which serves the basemap selector tool. List of available basemaps can be customized. Here,default ArcGIS online basemaps are set to be available.
+	var basemapGallery = new esri.dijit.BasemapGallery({
+		showArcGISBasemaps: true,
+		map: map
+	}, "basemapGallery");
+	basemapGallery.startup();
+	
+	//basemapGallery error catcher
+	dojo.connect(basemapGallery, "onError", function() {console.log("Basemap gallery failed")});
+	
+	//calls the executeSiteIdentifyTask function from a click on the map. 
+	dojo.connect(map, "onClick", executePULATask);
+    
+	//need to call to parent to see if an eventID is there, if so: only show those PULAs, else: show all
+	eventID = top.window.GetEventID();
+	if (eventID >= 1) {
+	    eventIDExists = true;
+	}
+	//declaration of layers. 
+    PendingPULALayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/", { "visible": false, "opacity": 0.5 });
+    CreatedPULALayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/", { "visible": false, "opacity": 0.5 });
+    PublishedPULALayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/", { "visible": false, "opacity": 0.5 });
+    EffectivePULALayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/", { "visible": false, "opacity": 0.5 });
+
+    //layers added to the map
+    map.addLayers([PendingPULALayer, CreatedPULALayer, PublishedPULALayer, EffectivePULALayer]);
+
+    if (!eventIDExists) {
+        //this is not a contributor logged in, proceed as usual..
+        legendLayers.push({ layer: EffectivePULALayer, title: 'Effective' });
+	    legendLayers.push({ layer: PublishedPULALayer, title: 'Published' });
+	    legendLayers.push({ layer: CreatedPULALayer, title: 'Created' });
+	    legendLayers.push({ layer: PendingPULALayer, title: 'Pending' });
+	    
+        PendingPULALayer.setVisibleLayers([0]);
+	    CreatedPULALayer.setVisibleLayers([1]);
+	    PublishedPULALayer.setVisibleLayers([2]);
+	    EffectivePULALayer.setVisibleLayers([3]);
+        
+        var d = new Date();
+	    var formatDate = dojo.date.locale.format(d, { datePattern: "yyyy-MM-dd", selector: "date" });
+	    var monthYear = dojo.date.locale.format(d, { datePattern: "yyyy-MM", selector: "date" });
+	    
+        //pending
+	    layerDefinitions[0] = "BLTADMIN.%PULAVERSION_1.PULA_SHAPE_ID IS NULL";
+	    //created ( Create Date is before today AND published Date is null )
+        layerDefinitions[1] = "BLTADMIN.%PULAVERSION_1.CREATED_TIME_STAMP <= DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP IS NULL";
+        //published ( Published Date is before today AND (Effective Date is after today OR Effective Date is null) AND (Expired Date is after today OR Expired Date is null) )
+        layerDefinitions[2] = "BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP <= DATE '" + formatDate + "' AND ((BLTADMIN.%PULAVERSION_1.EFFECTIVE_DATE > DATE '" + formatDate + "') OR (BLTADMIN.%PULAVERSION_1.EFFECTIVE_DATE IS NULL))";
+        //effective ( Effective Date is before today AND Published Date is before today AND (Expired Date is after today OR Expired Date is null) )
+        layerDefinitions[3] = "BLTADMIN.%PULAVERSION_1.EFFECTIVE_DATE <= DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP <= DATE '" + formatDate + "' AND ((BLTADMIN.%PULAVERSION_1.EXPIRED_TIME_STAMP >= DATE '" + monthYear + "') OR (BLTADMIN.%PULAVERSION_1.EXPIRED_TIME_STAMP IS NULL))";
+
+        PendingPULALayer.setLayerDefinitions(layerDefinitions);
+	    PendingPULALayer.setVisibility(true);
+        	    
+	    CreatedPULALayer.setLayerDefinitions(layerDefinitions);
+	    CreatedPULALayer.setVisibility(true);
+
+	    PublishedPULALayer.setLayerDefinitions(layerDefinitions);
+	    PublishedPULALayer.setVisibility(true);
+
+	    EffectivePULALayer.setLayerDefinitions(layerDefinitions);
+	    EffectivePULALayer.setVisibility(true);
+	}
+
+	//this function creates the legend element based on the legendLayers array which contains the relevant data for each layer. 
+	dojo.connect(map,'onLayersAddResult',function(results){
+		var legend = new esri.dijit.Legend({
+			map:map,
+			layerInfos:legendLayers
+		},"legendDiv");
+		legend.startup();
+		
+		//this forEach loop generates the checkbox toggles for each layer by looping through the legendLayers array (same way the legend element is generated). 
+		dojo.forEach (legendLayers, function(layer){
+			var layerName = layer.title;
+			var checkBox = new dijit.form.CheckBox({
+				name:"checkBox" + layer.layer.id,
+				value:layer.layer.id,
+				checked:layer.layer.visible,
+				onChange:function(evt){
+					var checkLayer = map.getLayer(this.value);
+					checkLayer.setVisibility(!checkLayer.visible);
+					this.checked = checkLayer.visible;						
+				}
+			});
+			if (layer.zoomScale) {
+				//create the holder for the checkbox and zoom icon
+				var toggleDiv = dojo.doc.createElement("div");
+				dojo.place(toggleDiv,dojo.byId("toggle"),"after");
+				dojo.place(checkBox.domNode,toggleDiv,"first");
+				var checkLabel = dojo.create('label',{'for':checkBox.name,innerHTML:layerName},checkBox.domNode,"after");
+				var scale = layer.zoomScale;
+				var zoomImage = dojo.doc.createElement("div");
+				zoomImage.id = 'zoom' + layer.layer.id;
+				zoomImage.innerHTML = '<img id="zoomImage" style="height: 18px;width: 18px" src="images/zoom.gif" />';
+				dojo.connect(zoomImage, "click", function() {
+					if (map.getScale() > scale) {
+						map.setScale(scale);;
+					}
+				});
+				dojo.place(zoomImage,toggleDiv,"last");
+				dojo.setStyle(checkBox.domNode, "float", "left");
+				dojo.setStyle(checkLabel, "float", "left");
+				dojo.setStyle(toggleDiv, "paddingTop", "5px");
+				dojo.setStyle(dojo.byId("zoomImage"), "paddingLeft", "10px");
+				dojo.setStyle(toggleDiv, "height", "25px");
+				//dojo.byId("toggle").appendChild(zoomImage);
+				//dojo.appendChild(zoomImage.domNode,dojo.byId("toggle"),"after");
+				
+				dojo.place("<br/>",zoomImage,"after");
+			} else {
+				dojo.place(checkBox.domNode,dojo.byId("toggle"),"after");
+				var checkLabel = dojo.create('label',{'for':checkBox.name,innerHTML:layerName},checkBox.domNode,"after");
+				dojo.place("<br/>",checkLabel,"after");
+			}
+		}); //end dojo.foreach
+    }); //end dojo.connect
+
+    //if there is an eventID, means cooperator is logged in, only show those event based PULAs
+    if (eventIDExists) {
+        GetEventPULAs();
+    }
+    else {
+        document.getElementById("userTools").style.visibility="visible";
+    }
+	/////////////// Request and Dropdown Populating for EVENT ////////////////////////////////
+	var EventRequest = esri.request({
+	    url: "http://107.20.182.222/BLTServices/Events",
+	    handleAs: "xml"
+	});
+	EventRequest.then(EventRequestSucceeded, EventRequestFailed);
+
+	//successful: populate the dropdown
+	function EventRequestSucceeded(data) {
+	    var select = document.getElementById("eventSelectInput");
+
+	    //first option will default to all
+	    var so = document.createElement("option");
+	    so.textContent = "All";
+	    so.value = "0";
+	    select.appendChild(so);
+	    //now get the rest of the EVENTS
+	    var HTMLstuff = data.documentElement.children;
+	    var collection = Array.prototype.slice.call(HTMLstuff); //convert nodeList to array to be able to use array methods
+	    for (var i = 0; i < collection.length; i++) {
+	        var opt = collection[i];
+	        var el = document.createElement("option");
+	        el.textContent = opt.children[2].textContent;
+	        el.value = opt.children[1].textContent;
+	        select.appendChild(el);
+	    }
+	    //set global variable to true and test to see if all others are done yet
+	    EventListResponse = true;
+	    if (AIListResponse == true && EventListResponse == true) {
+	        AllDone();
+	    }
+	}
+
+	function EventRequestFailed(error) {
+	    console.log("Error: ", error.message);
+	}
+	/////////// end Event Request and Dropdown populating //////////////////////    
+
+	/////////////// Request and Dropdown Populating for ACTIVE INGREDIENT ////////////////////////////////
+    var AIRequest = esri.request({
+	    url: "http://107.20.182.222/BLTServices/ActiveIngredients?publishedDate=" + datetime,
+	    handleAs: "xml"
+	});
+	AIRequest.then(AIRequestSucceeded, AIRequestFailed);
+
+	//function for request to get AI
+	function AIRequestSucceeded(data) {
+	    var AIselect = document.getElementById("AISelectInput");
+	    
+        //first option will default to all
+        var so = document.createElement("option");
+	    so.textContent = "";
+	    so.value = "0";
+	    AIselect.appendChild(so);
+	    //now get the rest of the ACTIVE INGREDIENTS
+	    var HTMLstuff = data.documentElement.children;
+	    var collection = Array.prototype.slice.call(HTMLstuff);
+	    for (var i = 0; i < collection.length; i++) {
+	        var opt = collection[i];
+	        var el = document.createElement("option");
+	        el.textContent = (opt.children[2].textContent).substring(0, 40);
+	        el.title = opt.children[2].textContent;
+	        el.value = opt.children[1].textContent;
+	        AIselect.appendChild(el);
+	    }
+	    //set global variable to true and test to see if all others are done yet
+	    AIListResponse = true;
+	    if (AIListResponse == true && EventListResponse == true) {
+	        AllDone();
+	    }
+	}
+
+	function AIRequestFailed(error) {
+	    console.log("Error: ", error.message);
+	}
+	/////////// end AI Request and Dropdown populating //////////////////////
+
+	//OPTIONAL: the below remaining lines within the init function are for performing an identify task on a layer in the mapper. 
+	// the following 7 lines establish an IdentifyParameters object(which is an argument for an identifyTask.execute method)and specifies the criteria used to identify features. 
+	// the constructor of the identifyTask is especially important. the service URL there should match that of the layer from which you'd like to identify.
+	identifyParams = new esri.tasks.IdentifyParameters();
+    identifyParams.tolerance = 4;
+    identifyParams.returnGeometry = true;
+    identifyParams.layerOption = esri.tasks.IdentifyParameters.LAYER_OPTION_TOP;
+    identifyParams.width  = map.width;
+    identifyParams.height = map.height;
+    identifyTask = new esri.tasks.IdentifyTask("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer");
+
+    
+	//OPTIONAL: the following function carries out an identify task query on a layer and returns attributes for the feature in an info window according to the 
+	//InfoTemplate defined below. It is also possible to set a default info window on the layer declaration which will automatically display all the attributes 
+	//for the layer in the order they come from the table schema. This code below creates custom labels for each field and substitutes in the value using the notation ${[FIELD NAME]}. 
+    function executePULATask(evt) {
+        identifyParams.geometry = evt.mapPoint;
+        identifyParams.mapExtent = map.extent;
+        map.graphics.clear();
+	    // the deferred variable is set to the parameters defined above and will be used later to build the contents of the infoWindow.
+        var deferredResult = identifyTask.execute(identifyParams);
+        var ShapeID = 0;
+
+        deferredResult.addCallback(function (response) {
+            var numberOfShapes = response.length;
+            // response is an array of identify result objects    
+            // dojo.map is used to set the variable feature to each result in the response array and apply the same template to each of those features, 
+            if (response.length > 1) {
+                alert("Please zoom in and click to ensure only 1 PULA is selected");
+            }
+            else {
+                return dojo.map(response, function (result) {
+                    var feature = result.feature;
+                    feature.attributes.layerName = result.layerName;
+                    var ShapeID = feature.attributes.PULASHPID;
+
+                    //highlight selected
+                    var highlightSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 0]), 2);
+                    var highlightGraphic = feature;
+                    highlightGraphic.setSymbol(highlightSymbol);
+                    map.graphics.add(highlightGraphic);
+                    //call parent to get correct form                               
+                    parent.Shape_Click(ShapeID);
+
+                });
+            }
+        });
+    }
+	//end executeSiteIdentifyTask method    
+
+	//Geocoder reference to geocoding services
+    locator = new esri.tasks.Locator("http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer");
+	//calls the function that does the goeocoding logic (found in geocoder.js, an associated JS module)*
+    dojo.connect(locator, "onAddressToLocationsComplete", showResults);
+}//end of init function	
+
+function mapReady(map){ 	
+	//Sets the globe button on the extent nav tool to reset extent to the initial extent.
+	dijit.byId("extentSelector").set("initExtent", map.extent);
+
+	//Create scale bar programmatically because there are some event listeners that can't be set until the map is created.
+	//Just uses a simple div with id "latLngScaleBar" to contain it
+	var latLngBar = new wim.LatLngScale({ map: map }, 'latLngScaleBar');
+       
+	dojo.style('loadingScreen', 'opacity', '0.75');
+	var loadingUpdate = dojo.connect(map, "onUpdateStart", function () {
+	    dojo.style('loadingScreen', 'visibility', 'visible');
+	});
+
+	dojo.connect(map, "onUpdateEnd", function () {
+	    dojo.disconnect(loadingUpdate);
+
+	    dojo.connect(map, "onUpdateStart", function () {
+	        dojo.style('refreshScreen', 'visibility', 'visible');
+	    });
+
+	    dojo.connect(map, "onUpdateEnd", function () {
+	        dojo.style('refreshScreen', 'visibility', 'hidden');
+	    });
+	});
+}
+
+
+//call from parent to refresh the shapes ( a PULA has been created, published or expired - need symbology updated)
+function ReloadShapes() {
+    PendingPULALayer.refresh(); CreatedPULALayer.refresh(); PublishedPULALayer.refresh(); EffectivePULALayer.refresh(); 
+}
+
+//function to hide the loading div
+function AllDone() {
+    dojo.style('loadingScreen', 'visibility', 'hidden');
+}
+
+//Get contributor polygons based off the EventId
+function GetEventPULAs() {
+
+    layerDefinitions[0] = "1=0"; //pending
+    layerDefinitions[1] = "";    //created
+    layerDefinitions[2] = "1=0"; //published
+    layerDefinitions[3] = "1=0"; //effective
+
+    var returningEventPULAs;
+    window.top.GetEventPULAs(eventID, function (result) {
+        returningEventPULAs = result;
+    });
+
+    var ShapeIDarray = [];
+
+    setTimeout(function () {
+        if (returningEventPULAs != undefined) {
+            //put the shapeIDs into an array
+            //returningPULAs[0] = Created, [1] = Published, [2] = Effective ((ONLY WANT CREATED))
+            for (var i = 0; i < returningEventPULAs[0].length; i++) {
+                ShapeIDarray[i] = returningEventPULAs[0][i].ShapeID;
+            }
+
+            //loop through to set definitions
+            var i = 0;
+            while (i < ShapeIDarray.length) {
+                if (i == ShapeIDarray.length - 1) {
+                    layerDefinitions[1] += "PULASHPID = " + ShapeIDarray[i];
+                }
+                else {
+                    layerDefinitions[1] += "PULASHPID = " + ShapeIDarray[i] + " or ";
+                }
+                i++;
+            }
+            PendingPULALayer.setLayerDefinitions(layerDefinitions);
+            CreatedPULALayer.setLayerDefinitions(layerDefinitions);
+            PublishedPULALayer.setLayerDefinitions(layerDefinitions);
+            EffectivePULALayer.setLayerDefinitions(layerDefinitions);
+
+            CreatedPULALayer.setVisibility(true);
+            dojo.style('refreshScreen', 'visibility', 'hidden');
+
+            //do a query to get geometry of results (returningPULAs) and set that as extent
+            ZoomToExtent(layerDefinitions[1]);
+
+        }
+    }, 3000);
+}
+
+//function that sends filtered choices to the services to get corresponding Published PULAs
+//On Submit Click
+function executeUpdatePULAs() {
+    //loading...
+    dojo.style('refreshScreen', 'visibility', 'visible');
+
+    //1. get chosen values
+    var date = document.getElementById("startDate").value;
+
+    var e = document.getElementById("eventSelectInput");
+    var event_value = e.options[e.selectedIndex].value;
+   
+    var prod_value = document.getElementById("hiddenProdID").value;
+    if (prod_value == "") {
+        prod_value = "0"
+    }
+
+    var AI = document.getElementById("AISelectInput");
+    var AI_value = AI.options[AI.selectedIndex].value;
+    
+    //2. 'turn off' pending, created and Published pulas. Clear effective PULAs definition
+    
+    layerDefinitions[0] = "1=0"; //pending
+    layerDefinitions[1] = "1=0";;    //created
+    layerDefinitions[2] = "1=0"; //published
+    layerDefinitions[3] = "" //effective
+
+    //3. get published PULAs that match filters
+    var returningPULAs;
+    window.top.GetFilteredShapes(date, event_value, prod_value, AI_value, function (result) {
+        returningPULAs = result;
+    });
+
+    //4. update layer definition for published PULAs
+    setTimeout(function () {
+        if (returningPULAs != undefined && returningPULAs.length != 0) {
+            //put the shapeIDs into an array
+            var ShapeIDarray = [];
+            for (var i = 0; i < returningPULAs.length; i++) {
+                ShapeIDarray[i] = returningPULAs[i].ShapeID;
+            }
+
+            //loop through and set the layerDefinition for effective PULAs
+            var i = 0;
+            while (i < returningPULAs.length) {
+                //if (layerDefinition.length > 0) {
+                if (i == returningPULAs.length - 1) {
+                    layerDefinitions[3] += "PULASHPID = " + ShapeIDarray[i];
+                }
+                else {
+                    layerDefinitions[3] += "PULASHPID = " + ShapeIDarray[i] + " or ";
+                }
+                //}
+                //                else {
+                //layerDefinitions[3] = "PULASHPID  = " + ShapeIDarray[i] + " or ";
+                //                }
+                i++;
+            }
+            PendingPULALayer.setLayerDefinitions(layerDefinitions);
+            CreatedPULALayer.setLayerDefinitions(layerDefinitions);
+            PublishedPULALayer.setLayerDefinitions(layerDefinitions);
+            EffectivePULALayer.setLayerDefinitions(layerDefinitions);
+
+            dojo.style('refreshScreen', 'visibility', 'hidden');
+            //5. zoom to those
+            //do a query to get geometry of results (returningPULAs) and set that as extent
+            ZoomToExtent(layerDefinitions[3]);
+        }
+        else {
+            alert("No PULAs matching this filter were returned");
+            dojo.style('refreshScreen', 'visibility', 'hidden');
+            $("#startDate").val("");
+            $("#eventSelectInput").val("");
+            $("#AISelectInput").val("");
+            $("#hiddenProdID").val("");
+            $("#prods").val("");
+        }
+    }, 3000);    
+}
+
+//filter by event only
+function executeEventPULAs() {
+    //loading...
+    dojo.style('refreshScreen', 'visibility', 'visible');
+
+    //1. get chosen values
+    var e = document.getElementById("eventSelectInput");
+    var event_value = e.options[e.selectedIndex].value;
+    
+    //2. clear PULAs definition
+    layerDefinitions[0] = "1=0"; //pending
+    layerDefinitions[1] = ""; //created
+    layerDefinitions[2] = ""; //published
+    layerDefinitions[3] = ""; //effective
+
+    //3. get PULAs that match filters
+    var returningPULAs;
+    window.top.GetEventPULAs(event_value, function (result) {
+        returningPULAs = result;
+    });
+
+	var CreatedSHPID = [];
+    var PublishedSHPID = [];
+    var EffectiveSHPID = [];
+
+    
+//    var returnedCreateLength = returningPULAs[0].length; //created
+//    var returnedPubLength = returningPULAs[1].length;    //published
+//    var returnedEffLength = returningPULAs[2].length;    //effective
+
+    //4. update layer definition for published PULAs
+    setTimeout(function () {
+        if (returningPULAs != undefined && (returningPULAs[0].length > 0 || returningPULAs[1].length > 0 || returningPULAs[2].length > 0)) {
+            //put the shapeIDs into an array
+            //returningPULAs[0] = Created, [1] = Published, [2] = Effective
+            for (var a = 0; a < returningPULAs[0].length; a++) {
+                CreatedSHPID[a] = returningPULAs[0][a].ShapeID;
+            }
+            for (var b = 0; b < returningPULAs[1].length; b++) {
+                PublishedSHPID[b] = returningPULAs[1][b].ShapeID;
+            }
+            for (var c = 0; c < returningPULAs[2].length; c++) {
+                EffectiveSHPID[c] = returningPULAs[2][c].ShapeID;
+            }
+
+            //loop through and set the layerDefinitions
+            var i = 0;
+            if (CreatedSHPID.length > 0) {
+                while (i < CreatedSHPID.length) {
+                    if (i == CreatedSHPID.length - 1) {
+                        layerDefinitions[1] += "PULASHPID = " + CreatedSHPID[i];
+                    }
+                    else {
+                        layerDefinitions[1] += "PULASHPID = " + CreatedSHPID[i] + " or ";
+                    }
+                    i++;
+                }
+            }
+            else {
+                layerDefinitions[1] = "1=0";
+            }
+
+            i = 0;
+            if (PublishedSHPID.length > 0) {
+                while (i < PublishedSHPID.length) {
+                    if (i == PublishedSHPID.length - 1) {
+                        layerDefinitions[2] += "PULASHPID = " + PublishedSHPID[i];
+                    }
+                    else {
+                        layerDefinitions[2] += "PULASHPID = " + PublishedSHPID[i] + " or ";
+                    }
+                    i++;
+                }
+            }
+            else {
+                layerDefinitions[2] = "1=0";
+            }
+
+            i = 0;
+            if (EffectiveSHPID.length > 0) {
+                while (i < EffectiveSHPID.length) {
+                    if (i == EffectiveSHPID.length - 1) {
+                        layerDefinitions[3] += "PULASHPID = " + EffectiveSHPID[i];
+                    }
+                    else {
+                        layerDefinitions[3] += "PULASHPID = " + EffectiveSHPID[i] + " or ";
+                    }
+                    i++;
+                }
+            }
+            else {
+                layerDefinitions[3] = "1=0";
+            }
+
+            PendingPULALayer.setLayerDefinitions(layerDefinitions);
+            CreatedPULALayer.setLayerDefinitions(layerDefinitions);
+            PublishedPULALayer.setLayerDefinitions(layerDefinitions);
+            EffectivePULALayer.setLayerDefinitions(layerDefinitions);
+
+            dojo.style('refreshScreen', 'visibility', 'hidden');
+            //5. zoom to those
+            //do a query to get geometry of results (returningPULAs) and set that as extent
+            //ZoomToExtent(layerDefinitions);
+        }
+        else {
+            alert("No PULAs matching this filter were returned");
+            dojo.style('refreshScreen', 'visibility', 'hidden');
+            $("#eventSelectInput").val("");
+        }
+    }, 3000);    
+
+}
+//clear the filter choices and see all the PULAs
+function executeClearFilter() {
+    //clear date
+    $("#startDate").val("");
+
+    //set event to all
+    $("#eventSelectInput").val("");
+ 
+    //set AI to all
+    $("#AISelectInput").val("");
+
+    //set Product to all
+    $("#hiddenProdID").val(""); 
+
+    //set layerDefinition to onLoad (today's date)
+    var d = new Date();
+    var formatDate = dojo.date.locale.format(d, { datePattern: "yyyy-MM-dd", selector: "date" });
+    var monthYear = dojo.date.locale.format(d, { datePattern: "yyyy-MM", selector: "date" });
+    //pending
+	layerDefinitions[0] = "BLTADMIN.%PULAVERSION_1.PULA_SHAPE_ID IS NULL";
+	//created
+    layerDefinitions[1] = "BLTADMIN.%PULAVERSION_1.CREATED_TIME_STAMP <= DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP IS NULL";
+    //published
+    layerDefinitions[2] = "BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP <= DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.EFFECTIVE_DATE > DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.EXPIRED_TIME_STAMP IS NULL";
+    //effective
+    layerDefinitions[3] = "BLTADMIN.%PULAVERSION_1.EFFECTIVE_DATE <= DATE '" + formatDate + "' AND BLTADMIN.%PULAVERSION_1.PUBLISHED_TIME_STAMP <= DATE '" + formatDate + "' AND ((BLTADMIN.%PULAVERSION_1.EXPIRED_TIME_STAMP >= DATE '" + monthYear + "') OR (BLTADMIN.%PULAVERSION_1.EXPIRED_TIME_STAMP IS NULL))";
+    
+    PendingPULALayer.setLayerDefinitions(layerDefinitions);
+	CreatedPULALayer.setLayerDefinitions(layerDefinitions);
+	PublishedPULALayer.setLayerDefinitions(layerDefinitions);
+	EffectivePULALayer.setLayerDefinitions(layerDefinitions);
+	
+}
+
+//query related table to show/hide polygons for each layer (pending through expired)
+//function QueryRelatedTable() {
+//    var RelatedTbl_queryTask = new esri.tasks.QueryTask("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/4");
+//    var createdQuery = new esri.tasks.Query();
+//    createdQuery.returnGeometry = true;
+//    createdQuery.outFields = ["PULA_SHAPE_ID"];
+//    createdQuery.where = "CREATED_TIME_STAMP IS NOT NULL AND PUBLISHED_TIME_STAMP IS NULL";
+
+//    RelatedTbl_queryTask.execute(createdQuery, gatherIDs);
+//}
+
+//function gatherIDs(results) {
+//    var something = "what's the problem";
+//}
+
+//called from GetEventPULAs and executeUpdatePULAs(submit click from filter)
+function ZoomToExtent(layerDefinitions) {
+    PULA_queryTask = new esri.tasks.QueryTask("http://wim.usgs.gov/arcgis/rest/services/BLT/BLT_PULAs/MapServer/0");
+    ExtentQuery = new esri.tasks.Query();
+    ExtentQuery.returnGeometry = true;
+   // ExtentQuery.outFields = ["PULASHPID"];
+    ExtentQuery.where = layerDefinitions;
+
+    PULA_queryTask.execute(ExtentQuery, showResults);
+}
+
+//called from ZoomToExtent, execute queryTask
+function showResults(results) {
+    var identifyGraphics = [];
+    var graphicExtent = results.features[0].geometry.getExtent();
+    for (var i = 1, il = results.features.length; i < il; i++) {
+        var anExtent = results.features[i].geometry.getExtent();
+        graphicExtent = graphicExtent.union(anExtent);
+    }
+    map.setExtent(graphicExtent, true);
+}
+
+//remove (destroy) the usgs Links div (called on mouseleave event)
+function removeLinks(){
+	dojo.destroy('usgsLinks');
+}
+dojo.ready(init);

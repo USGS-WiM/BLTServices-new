@@ -1,0 +1,276 @@
+﻿//------------------------------------------------------------------------------
+//----- SiteHandler -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jon Baier USGS Wisconsin Internet Mapping
+//              Jeremy K. Newson USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 10.19.12 - JB - Created from STN
+#endregion
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+
+
+namespace BLTServices.Handlers
+{
+    public class PULAHandler: HandlerBase
+    {
+       
+        #region Routed Methods
+
+        #region GetMethods
+
+        /// 
+        /// Force the user to provide authentication 
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<ACTIVEINGREDIENTPULA> PULAs = new List<ACTIVEINGREDIENTPULA>();
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    PULAs = aBLTE.ACTIVEINGREDIENTPULAs.OrderBy(pula => pula.PULAID)
+                                 .ToList();
+
+                    if (PULAs != null)
+                        PULAs.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_group));
+
+
+                }// end using
+            }//end useing
+
+            return new OperationResult.OK { ResponseResource = PULAs };
+        }//end httpMethod.GET
+
+        /// 
+        /// Force the user to provide authentication
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(ForUriName = "GetShapeIDs")]
+        public OperationResult GetShapes()
+        {
+            using (EasySecureString securedPassword = new EasySecureString(
+                                              BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                   
+                }
+
+             //   if(sites != null)
+               //     sites.Sites.ForEach(x => x.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_group));
+
+                return new OperationResult.OK { ResponseResource = null }; //sites };
+            }
+        }
+
+        /// 
+        /// Force the user to provide authentication 
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 pulaId)
+        {
+
+            ACTIVEINGREDIENTPULA aPULA;
+
+            //Return BadRequest if there is no ID
+            if (pulaId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(
+                                                            string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    aBLTE.ContextOptions.LazyLoadingEnabled = false;
+                    aPULA = aBLTE.ACTIVEINGREDIENTPULAs.SingleOrDefault(
+                                        pula => pula.PULAID == pulaId);
+
+                    if (aPULA != null)
+                        aPULA.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+
+                }
+            }
+            return new OperationResult.OK { ResponseResource = aPULA };
+        }
+
+
+        /// 
+        /// Force the user to provide authentication
+        /// 
+        [RequiresAuthentication]
+        [HttpOperation(ForUriName = "GetPULAby")]
+        public OperationResult GetSiteBy(String siteNo)
+        {
+
+            return new OperationResult.OK { ResponseResource = null };            
+        }//end httpMethod.GET
+
+        #endregion
+
+        #region PostMethods
+
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.POST, ForUriName = "CreatePULA")]
+        public OperationResult Post(ACTIVEINGREDIENTPULA aPULA)
+        {
+            //Return BadRequest if missing required fields
+            //No req fields
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    var lastKey = aBLTE.ACTIVEINGREDIENTPULAs.OrderByDescending(pula => pula.PULAID).First();
+                    decimal nextKey = lastKey.PULAID + 1;
+                    aPULA.PULAID = nextKey;
+                    aBLTE.ACTIVEINGREDIENTPULAs.AddObject(aPULA);
+                    aBLTE.SaveChanges();
+
+                    if (aPULA != null)
+                        aPULA.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+                }//end using
+            }//end using
+
+            //Return OK instead of created, Flex incorrectly treats 201 as error
+            return new OperationResult.OK { ResponseResource = aPULA };
+        }//end HttpMethod.POST
+        #endregion
+
+        #region PutMethods
+
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(new string[] { AdminRole, FieldRole })]
+        [HttpOperation(HttpMethod.PUT)]
+        public OperationResult Put(Int32 pulaId, ACTIVEINGREDIENTPULA aPULA)
+        {
+            ACTIVEINGREDIENTPULA updatedPULA;
+
+            //Return BadRequest if missing required fields
+            if (pulaId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                   BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+                using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    updatedPULA = aBLTE.ACTIVEINGREDIENTPULAs.SingleOrDefault(
+                                        pula => pula.PULAID == pulaId);
+                    updatedPULA.BASIS = aPULA.BASIS;
+                    updatedPULA.MODIFIERS = aPULA.MODIFIERS;
+                    updatedPULA.BASEMAP = aPULA.BASEMAP;
+                    updatedPULA.BIOPDATE = aPULA.BIOPDATE;
+                    updatedPULA.REGISTRATIONREVIEWDOCDATE = aPULA.REGISTRATIONREVIEWDOCDATE;
+                    updatedPULA.OTHERCREATIONREASONS = aPULA.OTHERCREATIONREASONS;
+                    updatedPULA.PULASHAPEID = aPULA.PULASHAPEID;
+                    updatedPULA.VERSIONID = aPULA.VERSIONID;
+                    aBLTE.SaveChanges();
+
+                    if (aPULA != null)
+                        aPULA.LoadLinks(Context.ApplicationBaseUri.AbsoluteUri, linkType.e_individual);
+
+                }//end using
+            }//end using
+
+            return new OperationResult.OK { ResponseResource = aPULA };
+        }// end HttpMethod.PUT
+        #endregion
+
+        #region DeleteMethods
+        /// 
+        /// Force the user to provide authentication and authorization 
+        /// 
+        [WiMRequiresRole(AdminRole)]
+        [HttpOperation(HttpMethod.DELETE, ForUriName = "DeleteSite")]
+        public OperationResult Delete(Int32 pulaId)
+        {
+            //Return BadRequest if missing required fields
+            if (pulaId <= 0)
+            {
+                return new OperationResult.BadRequest();
+            }
+
+
+            //Get basic authentication password
+            using (EasySecureString securedPassword = new EasySecureString(
+                                  BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password))
+            {
+            using (BLTRDSEntities aBLTE = new BLTRDSEntities(string.Format(connectionString, Context.User.Identity.Name, securedPassword.decryptString())))
+                {
+                    //fetch the object to be updated (assuming that it exists)
+                    ACTIVEINGREDIENTPULA ObjectToBeDeleted = aBLTE.ACTIVEINGREDIENTPULAs.SingleOrDefault(c => c.PULAID == pulaId);
+                    //delete it
+                    aBLTE.ACTIVEINGREDIENTPULAs.DeleteObject(ObjectToBeDeleted);
+
+                    aBLTE.SaveChanges();
+
+                }// end using
+
+
+            } //end using
+
+            //Return object to verify persisitance
+            return new OperationResult.OK { };
+        }//end HttpMethod.DELETE
+
+        #endregion
+        
+        #endregion
+    }//end class SiteHandler
+
+}//end namespace

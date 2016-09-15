@@ -1,0 +1,452 @@
+﻿@* Comments:
+05.28.13 - TR - Hooked into services
+05.03.12 - TR - Created
+
+*@
+
+@*
+/* Authors:
+ *      Tonia Roddick (troddick@usgs.gov)
+ * Copyright:
+ *      2012 USGS - WiM
+ * Purpose:
+ *      Display Popup for Mapper when a PULA is clicked (published already = details)
+ */
+ *@
+
+@using BLTServices;
+@using BLTServices.Resources;
+@using BLTWeb.Models;
+
+@model BLTServices.ACTIVE_INGREDIENT_PULA
+
+           
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#loading").fadeOut();
+        UpdateMapper();
+        $('#LimitTable').tablesorter();
+        
+    });   
+</script>
+
+</head>
+<body>
+    <div style="padding-left:15px">
+@*
+           @using (Html.BeginForm("PULA_New", "PULA", 
+            <input style="background-color:#4B6C9E;color:white" type="button" onclick="PULA_NEW();" value="Copy To New" class="popup-button" />
+            @Html.ActionLink("Copy To New", "PULA_New", "PULA", new {@class="BLTButton blue"})
+        *@
+
+        <div style="font-family:'BryantBold';font-size:x-large;">Details</div>
+        @{
+             VERSION thisVersion = ViewData["Version"] as VERSION; 
+            USER_ loggedIn = ViewData["loggedIn"] as USER_;
+            string updateShapes = ViewData.ContainsKey("UpdatePULA") ? "true" : "false";
+          }
+          <input type="hidden" value="@updateShapes" id="updateMap" />
+          <input type="hidden" value="@Model.PULA_ID" id="PulaID" />
+          <input type="hidden" value="@Model.ID" id="pID" />
+          <div id="tab1-Gen"> 
+        <h3 style="color:#59595C; font-weight:bold">General Information</h3>
+            <div>
+                <span class="Dlabel">Event:</span>
+                <label class="DetailsInline">@ViewData["EventName"]</label>
+            </div>
+           
+            <div>
+                <span class="Dlabel">Effective Date:</span>
+                <label class="DetailsInline">@( ViewData.ContainsKey("EffectMonthYr") ? ViewData["EffectMonthYr"] : "")</label>
+            </div>
+            <input type="hidden" id="effectDate" value="@( Model.EFFECTIVE_DATE != null ? Model.EFFECTIVE_DATE.ToString() : "")" />
+            <div>
+               <span class="Dlabel">Creation Date:</span>
+               <label class="DetailsInline">@( thisVersion.CREATED_TIME_STAMP != null ? ((DateTime)thisVersion.CREATED_TIME_STAMP).ToShortDateString() : "" )</label>
+            </div>
+                
+            <div>
+                <span class="Dlabel">Created By:</span>
+	            <label class="DetailsInline">@ViewData["CreatorName"]</label>
+            </div>
+            
+            @if (Model.IS_PUBLISHED == 1)
+            {
+                <div>
+	                <span class="Dlabel">Published Date:</span>
+	                <label class="DetailsInline">@(thisVersion.PUBLISHED_TIME_STAMP != null ? ((DateTime)thisVersion.PUBLISHED_TIME_STAMP).ToShortDateString():"")</label>
+	            </div>
+            
+                <div>
+                    <span class="Dlabel">Published By:</span>
+	                <label class="DetailsInline">@ViewData["publisherName"]</label>
+	            </div>
+
+            }
+            
+            <div>
+                <span class="Dlabel">Expiration Date:</span>
+                <div id="expiredInfo">
+                    @if (thisVersion.EXPIRED_TIME_STAMP != null)
+                    {
+                       <label class="DetailsInline">@(((DateTime)thisVersion.EXPIRED_TIME_STAMP).ToShortDateString())</label>
+                    }
+                    else
+                    {
+                        <div style="width:50%" class="ui-block-b">                        
+                            @Html.DropDownList("Months", null, "--Month--", new {@class="bltTextInput ui-shadow-inset", @style="width:50%"})
+                            <br /><br />
+                            @Html.DropDownList("Years", null, "--Year--", new { @class = "bltTextInput ui-shadow-inset", @style = "width:50%; margin-bottom:5px" })
+                            <input type="button" value="Add Expiration Date" onclick="AddExpiration()" />        
+                        </div>
+                    }
+                </div>
+            </div>            
+            
+            @if (thisVersion.EXPIRER_ID != null & thisVersion.EXPIRER_ID != 0)
+            {
+                <div>
+                    <span class="Dlabel">Expired By:</span>
+	                <label class="DetailsInline">@ViewData["expirerName"]</label>
+	            </div>
+                }
+            <br clear="all" />
+               
+
+        @*Justification Tab*@
+              <h3 style="color:#59595C; font-weight:bold">PULA Justification</h3>
+
+            @if (!String.IsNullOrEmpty(Model.OTHER_JUSTIFICATION))
+            {
+                <div>
+                    <span class="Dlabel">Other:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.OTHER_JUSTIFICATION</textarea>
+                </div>
+            }
+            
+            @if (!String.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_LIT))
+            {
+                <div>
+                    <span class="Dlabel">Litigation, Biological Opinion:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.BIOLOGICAL_OPINION_LIT</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.FOCUS_MEETING))
+            {
+                <div>
+                    <span class="Dlabel">Registration Review, Focus Meeting:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.FOCUS_MEETING</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.INTERIM_PROPOSED_DECISION))
+            {
+                <div>
+                    <span class="Dlabel">Registration Review, Proposed Interim Decision:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.INTERIM_PROPOSED_DECISION</textarea>
+                </div>
+            }
+            
+            @if (!String.IsNullOrEmpty(Model.PROPOSED_DECISION))
+            {
+                <div>
+                    <span class="Dlabel">Registration Review, Proposed Decision:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.PROPOSED_DECISION</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.FINAL_DECISION))
+            {
+                <div>
+                    <span class="Dlabel">Registration Review, Final Decision:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.FINAL_DECISION</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.BIOLOGICAL_OPINION_REGREVIEW))
+            {
+                <div>
+                    <span class="Dlabel">Registration Review, Biological Opinion:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.BIOLOGICAL_OPINION_REGREVIEW</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.SEC3_NEWCHEM))
+            {
+                <div>
+                    <span class="Dlabel">Registration Action, Section 3 New Chemical:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.SEC3_NEWCHEM</textarea>
+                </div>
+            }
+            
+            @if (!String.IsNullOrEmpty(Model.SEC3_NEWUSE))
+            {
+                <div>
+                    <span class="Dlabel">Registration Action, Section 3 New Use:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.SEC3_NEWUSE</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.SEC24))
+            {
+                <div>
+                    <span class="Dlabel">Registration Action, Section 24 (c):</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.SEC24</textarea>
+                </div>
+            }
+            @if (!String.IsNullOrEmpty(Model.SEC18))
+            {
+                <div>
+                    <span class="Dlabel">Registration Action, Section 18:</span>
+	                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.SEC18</textarea>
+                </div>
+            }
+            
+            <div>
+                <span class="Dlabel">Base Data:</span>
+                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.BASE_DATA</textarea>
+            </div>
+            
+             <div>
+                <span class="Dlabel">Base Data Modifiers:</span>
+                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.BASE_DATA_MODIFIERS</textarea>
+             </div>
+                
+             <div>
+                <span class="Dlabel">Additional Information:</span>
+                <textarea rows="4" readonly="readonly" class="textareaDInline">@Model.ADDITIONAL_INFORMATION</textarea>
+             </div>
+                         
+             
+
+            @* AI Limitation Tab class="peak-table-a"*@
+            @{ List<PULALimitation> pubPULAModel = ViewData["PULAlimitationList"] as List<PULALimitation>; }
+            <h3 style="color:#59595C; font-weight:bold">Limitations</h3> 
+            <table id="LimitTable" style="width:98%;border-collapse:collapse" class="tablesorter">
+                <thead>
+                    <tr>
+                        <th class="header">Active Ingredient/Product</th>
+                        <th class="header">Crop Use</th>
+                        <th class="header">Application Method</th>
+                        <th class="header">Formulation</th>
+                        <th class="header">Code</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (PULALimitation ppm in pubPULAModel)
+                 {
+                    <tr>
+                        @if (ppm.Product != null)
+                        { 
+                            if (ppm.Product.Length > 20)
+                            {
+                                <td title="@ppm.Product">@(ppm.Product.Substring(0,20)) [RegNum:@(ppm.Prod_RegNum)]</td>
+                            }
+                            else { <td  title="@ppm.Product">@(ppm.Product) [RegNum:@(ppm.Prod_RegNum)]</td> }
+                        }
+                        else 
+                        { 
+                           if (ppm.AI.Length > 40)
+                           {
+                               <td title="@ppm.AI">@ppm.AI.Substring(0, 40)</td>
+                           }
+                           else
+                           {
+                             <td title="@ppm.AI">@ppm.AI</td>
+                           }
+                        }
+                        <td>@ppm.CropUse</td>
+                        <td>@ppm.AppMethod</td>
+                        <td>@ppm.Formulation</td>
+                        <td title="@ppm.Limitation">@ppm.Code</td>
+                    </tr>
+                 }
+                </tbody>
+            </table>
+
+     
+            @* Species Tab *@
+             <h3 style="color:#59595C; font-weight:bold">Species</h3>   
+             
+             @if (ViewData.ContainsKey("PULASpp")) 
+             {
+                List<SimpleSpecies> PULAsppList = ViewData["PULASpp"] as List<SimpleSpecies>;
+                <ul>
+                @foreach (var sp in PULAsppList)
+                {
+                    var spcode = "http://ecos.fws.gov/speciesProfile/profile/speciesProfile?spcode=" + sp.SPCODE;
+                    <li>@(sp.COMNAME) | @(sp.SCINAME) &nbsp;&nbsp; <a style="color:#F37A49" href="@spcode" target="_blank">(Link to Species Profile page)</a></li>
+                }
+                </ul>
+             }
+             else if (ViewData.ContainsKey("TESSError"))
+             {
+                <ul><li>Tess Services are Currently Down</li></ul>  
+             }
+               
+
+
+               @if (ViewData.ContainsKey("Comments"))
+               {
+                   <h3 style="color:#59595C; font-weight:bold">Contributor Comments</h3>  
+                   <table class="peak-table-a">
+                      <thead>
+                          <tr>
+                            <th style="width:25%" scope="col">Name</th>
+                            <th scope="col">Organization</th>
+                            <th style="width:50%" scope="col">Comment</th>                        
+                        </tr>
+                      </thead>
+                      <tbody>
+                         @foreach (CommentsModel s in ViewData["Comments"] as List<CommentsModel>)
+                         {
+                             <tr>
+                                <td>@s.Name</td>
+                                <td>@s.Org</td>
+                                <td>@s.Comment</td>
+                             </tr>
+                         }
+                      </tbody>
+                   </table>
+                         using (Html.BeginForm("ExportCSV", "PULA", new { pulaId = Model.ID }, FormMethod.Post, new { target = "_blank" }))
+                         {
+                        <input type="submit" class="BLTButton blue" style="padding:3px" value="Export to CSV" />
+                         }
+
+               }
+
+        @{         
+            if (Model.IS_PUBLISHED == 0)
+            {
+
+                using (Ajax.BeginForm("PULA_Edit", "PULA", new { shapeId = Model.PULA_SHAPE_ID }, new AjaxOptions() { UpdateTargetId = "content", HttpMethod = "GET" }, new { id = "editForm", @style = "float:left" }))
+                {
+                   <div id="formSubmitDiv">
+                       <div class="submitDiv"><div class="">
+                           <input type="submit" class="BLTButton blue" onclick="thinking();" value="Edit PULA" name="Create" />
+                       </div></div>
+                   </div>
+                   
+                }
+
+                if (Model.EVENT_ID != null && Model.EVENT_ID >= 1)
+                {
+                    <input type="submit" class="BLTButton blue" style="margin:25px 0 0 8px; float:left" onclick="showPassword();" value="Generate Contributor Password" />
+                }
+
+                if (loggedIn.ROLE_ID <= 2)
+                {
+                    using (Ajax.BeginForm("PULA_Publish", "PULA", new { id = Model.ID }, new AjaxOptions() { OnBegin = "return loading('DetailsPublish')", UpdateTargetId = "content", HttpMethod = "GET" }, new { id = "publishForm", @style = "float:left; width:15%; margin-left: 8px" }))
+                    {
+                       <div id="formSubmitDiv">
+                          <div class="submitDiv"><div class="darkButtonBorder">
+                               <input type="submit" class="BLTButton blue" value="Publish PULA" name="Create" />
+                          </div></div>
+                       </div>
+                    }
+                }
+
+            }
+        }
+<br clear="all" />
+        
+        </div> @* end id="tabs" div*@
+        <br clear="all" />
+    </div>
+    
+        
+</body>
+</html>
+
+<script type="text/javascript">
+
+    
+    function thinking() {
+        $("#loading").fadeIn();
+    }
+    function loading(pub) {
+        if (pub != null) {
+            if (pub == "DetailsPublish") {
+                var effectiveDate = $("#effectDate").val();
+                if (effectiveDate == "") {
+                    alert("Please specify an Effective Date before Publishing");
+                    return false;
+                }
+                else {
+                    $("#loading").fadeIn();
+                    return true;
+                }
+            }
+            if (pub == "EditPublish") {
+                var theForm = $('#publishForm').serializeArray();
+
+                if (theForm[30].value == "save" || theForm[30].value == "cancel") {
+                    $("#loading").fadeIn();
+                    return true;
+                }
+                else {
+                    var monthValue = $("#EffMonths").val();
+                    if (monthValue == "") {
+                        alert("Please specify an Effective Date before Publishing");
+                        return false;
+                    }
+                    else {
+                        return true;
+                        $("#loading").fadeIn();
+                    }
+                }
+            }
+        }
+    };
+
+//    function UpdateMapper() {
+//        var updat = $("#updateMap").val();
+//        if (updat == "true") {
+//            document.getElementById("theIframe").contentWindow.ReloadShapes();
+//        }
+//    }
+
+    function showPassword() {
+        var n = 4;
+        var text = '';
+        var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        for (var i=0; i<n; i++) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        alert("Provide the following information to contributors:\n\nLogin: guest\nPassword: AbEv" + '@Model.EVENT_ID' + "$BLTDefau1t" + text);
+     }    
+    
+    function AddExpiration() {
+        var VersionID = '@thisVersion.VERSION_ID';
+        var Month = $("#Months").val();
+        var Year = $("#Years").val();
+        var pID = $("#pID").val();
+        if (Month != 0 | Year != 0) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("AddExpiration", "PULA")',
+                data: { month: Month, year: Year, PulaID: pID, loggedInID: '@loggedIn.USER_ID' },
+                success: function (response) {
+                    $("#expiredInfo").html(response);
+                    //update iframe symbology in case expiration date is now
+                    document.getElementById("theIframe").contentWindow.ReloadShapes();
+                }
+            });
+        }
+        else {
+            alert("Pick a Month and Year before clicking on Add Expiration Date Button");
+        }
+    }
+</script>
+
+<style type="text/css">
+    #LimitTable tr:nth-child(even)
+    {
+        background: #F2F2F2;
+    }
+    #LimitTable tr:nth-child(odd)
+    {
+        background: #fff;
+    }
+</style>

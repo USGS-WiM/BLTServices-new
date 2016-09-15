@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="29a6413a7af54bb999cc8196ea4d752f" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="bltModel.active_ingredient" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.active_ingredient_ai_class" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.active_ingredient_pula" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.ai_class" Width="1.5" PointX="2.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.application_method" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.crop_use" Width="1.5" PointX="12.625" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.division" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.event" Width="1.5" PointX="2.5" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.formulation" Width="1.5" PointX="11.25" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.limitation" Width="1.5" PointX="4.25" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.organization" Width="1.5" PointX="6.875" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.product" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.product_active_ingredient" Width="1.5" PointX="8.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.pula_limitations" Width="1.5" PointX="8.625" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.role" Width="1.5" PointX="2.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.species_active_ingredient_pula" Width="1.5" PointX="4.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.user_" Width="1.5" PointX="10.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.version" Width="1.5" PointX="5.75" PointY="3.375" IsExpanded="true" />
+        <AssociationConnector Association="bltModel.versionactive_ingredient_pula" />
+        <AssociationConnector Association="bltModel.versionpula_limitations" />
+        <AssociationConnector Association="bltModel.versionformulation" />
+        <AssociationConnector Association="bltModel.versionapplication_method" />
+        <AssociationConnector Association="bltModel.versioncrop_use" />
+        <AssociationConnector Association="bltModel.versionlimitation" />
+        <AssociationConnector Association="bltModel.species_active_ingredient_pulaversion" />
+        <AssociationConnector Association="bltModel.user_version" />
+        <AssociationConnector Association="bltModel.user_version1" />
+        <AssociationConnector Association="bltModel.user_version2" />
+        <AssociationConnector Association="bltModel.versionai_class" />
+        <AssociationConnector Association="bltModel.versionactive_ingredient_ai_class" />
+        <AssociationConnector Association="bltModel.versionproduct_active_ingredient" />
+        <AssociationConnector Association="bltModel.productversion" />
+        <AssociationConnector Association="bltModel.versionactive_ingredient" />
+        <AssociationConnector Association="bltModel.eventactive_ingredient_pula" />
+        <AssociationConnector Association="bltModel.organizationuser_" />
+        <AssociationConnector Association="bltModel.divisionuser_" />
+        <AssociationConnector Association="bltModel.roleuser_" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

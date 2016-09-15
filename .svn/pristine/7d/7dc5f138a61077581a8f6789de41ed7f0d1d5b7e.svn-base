@@ -1,0 +1,544 @@
+﻿//------------------------------------------------------------------------------
+//----- PartsController.cs-----------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Display a master PULA page and link to individual parts pages (all in popup)
+//
+//discussion:   
+//
+//     
+
+#region Comments
+// 05.03.13 - TR - Created
+
+#endregion
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Objects.DataClasses;
+using System.Text;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Xml;
+using System.Text.RegularExpressions;
+
+using RestSharp;
+using BLTServices;
+using BLTServices.Authentication;
+using BLTWeb.Utilities;
+using BLTWeb.Models;
+using BLTWeb.Helpers;
+
+namespace BLTWeb.Controllers
+{
+    [RequireSSL]
+    [Authorize]
+    public class PULAController : Controller
+    {
+        //pula was clicked in mapper, show info in popup
+        // GET: /PULA_Details/11
+        public PartialViewResult PULA_Details(int shapeId)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+
+            //get the ACTIVE_INGREDIENT_PULA
+            request.Resource = "/PULAs/POI/{shapeId}?ActiveDate={date}";
+            request.RootElement = "ArrayOfACTIVE_INGREDIENT_PULA";
+            request.AddParameter("shapeId", shapeId, ParameterType.UrlSegment);
+            List<ACTIVE_INGREDIENT_PULA> thisAIPULA = serviceCaller.Execute<List<ACTIVE_INGREDIENT_PULA>>(request);
+            ACTIVE_INGREDIENT_PULA thisPULA = thisAIPULA.FirstOrDefault();
+
+            //get the AI_LIMITATION
+            request = new RestRequest();
+            request.Resource = "PULAs/{pulaID}/AILimitations?ActiveDate={date}";
+            request.RootElement = "ArrayOfAI_LIMITATIONS";
+            request.AddParameter("pulaID", thisPULA.PULA_ID, ParameterType.UrlSegment);
+            List<AI_LIMITATIONS> AILimitationList = serviceCaller.Execute<List<AI_LIMITATIONS>>(request);
+            
+            //get the version info
+            request = new RestRequest();
+            request.Resource = "/Version/{entityID}";
+            request.RootElement = "VERSION";
+            request.AddParameter("entityID", thisPULA.VERSION_ID, ParameterType.UrlSegment);
+            VERSION thisVersion = serviceCaller.Execute<VERSION>(request);
+
+            //to store each row in the table for display
+            List<PublishedPULA> PubPulaLists = new List<PublishedPULA>();
+            List<PRODUCT> AI_ProductList = new List<PRODUCT>();
+            List<SPECIES_ACTIVE_INGREDIENT_PULA> AI_SppList = new List<SPECIES_ACTIVE_INGREDIENT_PULA>();
+
+            //get all the parts
+            //CROP_USE for each aiLimitation
+            foreach (AI_LIMITATIONS ai in AILimitationList)
+            {
+                PublishedPULA thisPubPULA = new PublishedPULA();
+                
+                //get Active Ingredient
+                request = new RestRequest();
+                request.Resource = "/ActiveIngredients?aiID={activeIngredientID}&ActiveDate={date}";
+                request.RootElement = "ArrayOfACTIVE_INGREDIENT";
+                request.AddParameter("activeIngredientID", ai.ACTIVE_INGREDIENT_ID, ParameterType.UrlSegment);
+                List<ACTIVE_INGREDIENT> aiList = serviceCaller.Execute<List<ACTIVE_INGREDIENT>>(request);
+                //give me newest version
+                ACTIVE_INGREDIENT thisAI = aiList.OrderByDescending(a => a.VERSION_ID).FirstOrDefault();
+                //store in model
+                thisPubPULA.AI = thisAI.INGREDIENT_NAME;
+                thisPubPULA.CAS = thisAI.CAS_NUMBER;
+
+                //get ai class
+                request = new RestRequest();
+                request.Resource = "/AIClasses?aiClassID={aiClassID}&ActiveDate={date}";
+                request.RootElement = "ArrayOfAI_CLASS";
+                request.AddParameter("aiClassID", thisAI.AI_CLASS_ID, ParameterType.UrlSegment);
+                List<AI_CLASS> aiclassList = serviceCaller.Execute<List<AI_CLASS>>(request);
+                //give me newest version
+                AI_CLASS thisAIclass = aiclassList.OrderByDescending(aicl => aicl.VERSION_ID).FirstOrDefault();
+                //store in model
+                thisPubPULA.AIClass = thisAIclass.AI_CLASS_NAME;
+                
+                //get modifier
+                request = new RestRequest();
+                request.Resource = "/Modifiers?ModifierID={modifierID}&ActiveDate={date}";
+                request.RootElement = "ArrayOfMODIFIER";
+                request.AddParameter("modifierID", ai.MODIFIER_ID, ParameterType.UrlSegment);
+                List<MODIFIER> moList = serviceCaller.Execute<List<MODIFIER>>(request);
+                //give me the newest version
+                MODIFIER thisModifier = moList.OrderByDescending(m => m.VERSION_ID).FirstOrDefault();
+                //store in model
+                thisPubPULA.Modifier = thisModifier.MODIFIER1;
+
+                //get crop use
+                request = new RestRequest();
+                request.Resource = "/CropUses?CropUseID={cropUseID}&ActiveDate={date}";
+                request.RootElement = "ArrayOfCROP_USE";
+                request.AddParameter("cropUseID", ai.CROP_USE_ID, ParameterType.UrlSegment);
+                List<CROP_USE> cuList = serviceCaller.Execute<List<CROP_USE>>(request);
+                //give me the newest version
+                CROP_USE thisCropUse = cuList.OrderByDescending(cu => cu.VERSION_ID).FirstOrDefault();
+                //store in model
+                thisPubPULA.CropUse = thisCropUse.USE;
+
+                //get limitation code
+                request = new RestRequest();
+                request.Resource = "/Limitations?LimitationID={limitationID}&ActiveDate={date}";
+                request.RootElement = "ArrayOfLIMITATION";
+                request.AddParameter("limitationID", ai.LIMITATION_ID, ParameterType.UrlSegment);
+                List<LIMITATION> lList = serviceCaller.Execute<List<LIMITATION>>(request);
+                //give me the newest version
+                LIMITATION thislimitation = lList.OrderByDescending(l => l.VERSION_ID).FirstOrDefault();
+                //store in model
+                thisPubPULA.Code = thislimitation.CODE;
+
+                PubPulaLists.Add(thisPubPULA);
+
+                //get ProductAI
+                //request = new RestRequest();
+                //request.Resource = "/ActiveIngredients/{activeIngredientID}/Product?ActiveDate={date}";
+                //request.RootElement = "ArrayOfPRODUCT";
+                //request.AddParameter("activeIngredientID", ai.ACTIVE_INGREDIENT_ID, ParameterType.UrlSegment);
+                //List<PRODUCT> theseAIProducts = serviceCaller.Execute<List<PRODUCT>>(request);
+                //foreach (PRODUCT aiPr in theseAIProducts)
+                //{
+                //    AI_ProductList.Add(aiPr);
+                //}
+
+                //get SppAI
+
+            }
+            
+            //
+            //GENERAL TAB
+            ViewData["Version"] = thisVersion;
+
+            //get the creator and their org/div
+            request = new RestRequest();
+            request.Resource = "/Users/{userID}";
+            request.RootElement = "ArrayOfUSER_";
+            request.AddParameter("userID", thisVersion.CREATOR_ID, ParameterType.UrlSegment);
+            List<USER_> creatList = serviceCaller.Execute<List<USER_>>(request);
+            USER_ creator = creatList.FirstOrDefault();
+            ViewData["creator"] = creator;
+
+            if (creator != null)
+            {
+                if (creator.ORGANIZATION_ID != 0 && creator.ORGANIZATION_ID != null)
+                {
+                    request = new RestRequest();
+                    request.Resource = "/Organizations/{organizationID}";
+                    request.RootElement = "ORGANIZATION";
+                    request.AddParameter("organizationID", creator.ORGANIZATION_ID, ParameterType.UrlSegment);
+                    ViewData["creatorOrg"] = serviceCaller.Execute<ORGANIZATION>(request).NAME;
+                }
+                if (creator.DIVISION_ID != 0 && creator.DIVISION_ID != null)
+                {
+                    request = new RestRequest();
+                    request.Resource = "/Divisions/{divisionID}";
+                    request.RootElement = "DIVISION";
+                    request.AddParameter("divisionID", creator.DIVISION_ID, ParameterType.UrlSegment);
+                    ViewData["creatorDiv"] = serviceCaller.Execute<DIVISION>(request).DIVISION_NAME;
+                }
+            }
+            //get the publisher and their org/div
+            if (thisVersion.PUBLISHER_ID != null && thisVersion.PUBLISHER_ID != 0)
+            {
+                request = new RestRequest();
+                request.Resource = "/Users/{userID}";
+                request.RootElement = "ArrayOfUSER_";
+                request.AddParameter("userID", thisVersion.PUBLISHER_ID, ParameterType.UrlSegment);
+                List<USER_> pubList = serviceCaller.Execute<List<USER_>>(request);
+                USER_ publisher = pubList.FirstOrDefault();
+                ViewData["publisher"] = publisher;
+            
+                if (publisher.ORGANIZATION_ID != 0 && publisher.ORGANIZATION_ID != null)
+                {
+                    request = new RestRequest();
+                    request.Resource = "/Organizations/{organizationID}";
+                    request.RootElement = "ORGANIZATION";
+                    request.AddParameter("organizationID", publisher.ORGANIZATION_ID, ParameterType.UrlSegment);
+                    ViewData["publisherOrg"] = serviceCaller.Execute<ORGANIZATION>(request).NAME;
+                }
+                if (publisher.DIVISION_ID != 0 && publisher.DIVISION_ID != null)
+                {
+                    request = new RestRequest();
+                    request.Resource = "/Divisions/{divisionID}";
+                    request.RootElement = "DIVISION";
+                    request.AddParameter("divisionID", publisher.DIVISION_ID, ParameterType.UrlSegment);
+                    ViewData["publisherDiv"] = serviceCaller.Execute<DIVISION>(request).DIVISION_NAME;
+                }
+            }
+            //AI TAB
+            ViewData["AIPULA"] = thisPULA;
+            ViewData["PulaModel"] = PubPulaLists;
+
+            //SPECIES TAB
+                //Species
+
+            //PRODUCT TAB
+            ViewData["AIProducts"] = AI_ProductList;
+
+            return PartialView();
+        }
+
+        //pula was clicked in map
+        public ActionResult PULA_Click(int shapeId, DateTime? date, string ingredient, string product)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+
+            //what do they want to see? 
+            //1: Create an empty PULA (shapeID doesn't exist yet in db)
+            //2: Publish a saved PULA or make changes to created pula (shapeId exists, but not published)
+            //3: Look at details of a published PULA
+
+            request.Resource = "/PULAs/POI/{shapeId}?ActiveDate={date}";
+            request.RootElement = "ArrayOfACTIVE_INGREDIENT_PULA";
+            request.AddParameter("shapeId", shapeId, ParameterType.UrlSegment);
+            List<ACTIVE_INGREDIENT_PULA> thisPULA = serviceCaller.Execute<List<ACTIVE_INGREDIENT_PULA>>(request);
+            
+            //get most recent version and if exists,
+                // check if Published, 
+                    // true = Details
+                // else go to PULA_Publish
+            // else go to PULA_Create
+            if (thisPULA.Count != 0) 
+            {
+                ACTIVE_INGREDIENT_PULA recentPULA = thisPULA.OrderByDescending(p => p.VERSION_ID).FirstOrDefault();
+                
+                //pula is created (in the db). see if it's published
+                request = new RestRequest();
+                request.Resource = "/Version/{entityID}";
+                request.RootElement = "VERSION";
+                request.AddParameter("entityID", recentPULA.VERSION_ID, ParameterType.UrlSegment);
+                VERSION aVersion = serviceCaller.Execute<VERSION>(request);
+                if (aVersion.PUBLISHED_TIME_STAMP != null)
+                {
+                    //pula has been published, send to details
+                    return RedirectToAction("PULA_Details", new { shapeId = shapeId });
+                }
+                else
+                {
+                    //pula has not been published, but does exist , send to PULA_Publish
+                    return RedirectToAction("PULA_Publish", new { shapeId = shapeId });
+                }                
+            }
+            else
+            {
+                //pula hasn't been created yet, send to PULA_Create
+                return RedirectToAction("PULA_Create", new { shapeId = shapeId });
+            }
+        }
+         
+        //determined that shapeId doesn't exist yet in db, here's create popup
+        public ActionResult PULA_Create(int shapeId)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+
+            //store the logged in user
+            USER_ loggedIn = GetLoggedInUser();
+            ViewData["User"] = loggedIn;
+            ViewData["shapeId"] = shapeId; //store shape id to pass on
+                
+            //get organization and division (if one)            
+            if (loggedIn.ORGANIZATION_ID != 0 && loggedIn.ORGANIZATION_ID != null)
+            {
+                request.Resource = "Organizations/{organizationID}";
+                request.RootElement = "ORGANIZATION";
+                request.AddParameter("organizationID", loggedIn.ORGANIZATION_ID, ParameterType.UrlSegment);
+                ViewData["Organization"] = serviceCaller.Execute<ORGANIZATION>(request).NAME;
+            }
+            if (loggedIn.DIVISION_ID != 0 && loggedIn.DIVISION_ID != null)
+            {
+                request = new RestRequest();
+                request.Resource = "Divisions/{divisionID}";
+                request.RootElement = "DIVISION";
+                request.AddParameter("divisionID", loggedIn.DIVISION_ID, ParameterType.UrlSegment);
+                ViewData["Division"] = serviceCaller.Execute<DIVISION>(request).DIVISION_NAME;
+            }
+            else
+            {
+                request = new RestRequest();
+                request.Resource = "Divisions";
+                request.RootElement = "ArrayOfDIVISION";
+                List<DIVISION> divList = serviceCaller.Execute<List<DIVISION>>(request);
+                ViewData["DivisionList"] = divList;
+            }
+
+            //get lists for AI, Modifiers, Crop Use, Code, AI CLass and CAS
+            request = new RestRequest();
+            request.Resource = "ActiveIngredients";
+            request.RootElement = "ArrayOfACTIVE_INGREDIENT";
+            List<ACTIVE_INGREDIENT> aiList = serviceCaller.Execute<List<ACTIVE_INGREDIENT>>(request);
+            ViewData["AIList"] = aiList;
+
+            request = new RestRequest();
+            request.Resource = "CropUses";
+            request.RootElement = "ArrayOfCROP_USE";
+            List<CROP_USE> CUList = serviceCaller.Execute<List<CROP_USE>>(request);
+            ViewData["CUList"] = CUList;
+
+            request = new RestRequest();
+            request.Resource = "Modifiers";
+            request.RootElement = "ArrayOfMODIFIER";
+            List<MODIFIER> modList = serviceCaller.Execute<List<MODIFIER>>(request);
+            ViewData["ModList"] = modList;
+
+            request = new RestRequest();
+            request.Resource = "Limitations";
+            request.RootElement = "ArrayOfLIMITATION";
+            List<LIMITATION> CodeList = serviceCaller.Execute<List<LIMITATION>>(request);
+            ViewData["CodeList"] = CodeList;
+
+            //get species
+            request = new RestRequest();
+            request.Resource = "SpeciesGroups";
+            request.RootElement = "ArrayOfSPECIES_GROUP";
+            List<SPECIES_GROUP> SppGrpList = serviceCaller.Execute<List<SPECIES_GROUP>>(request);
+            ViewData["SppGrpList"] = SppGrpList;
+
+            //get products
+            request = new RestRequest();
+            request.Resource = "Products";
+            request.RootElement = "ArrayOfProduct";
+            List<PRODUCT> ProductList = serviceCaller.Execute<List<PRODUCT>>(request);
+            ViewData["ProductList"] = ProductList;
+
+            //populate a list for Months and years
+            List<string> Months = new List<string>();
+            Months.Add("January"); Months.Add("February"); Months.Add("March"); Months.Add("April");
+            Months.Add("May"); Months.Add("June"); Months.Add("July"); Months.Add("August");
+            Months.Add("September"); Months.Add("October"); Months.Add("November"); Months.Add("December");
+            ViewData["Months"] = Months;
+
+            List<string> Years = new List<string>();
+            Years.Add("2011"); Years.Add("2012");
+            Years.Add("2013"); Years.Add("2014"); Years.Add("2015");
+            ViewData["Years"] = Years;
+
+            return PartialView();
+        }
+
+         //post to create (populate) the pula
+        [HttpPost]
+        public Boolean CreatePULA(FormCollection fc)
+        {
+            //pull everything from the fc and sort
+            //ACTIVE_INGREDIENT_PULA
+            int shapeId = Convert.ToInt32(fc["shapeId"]);
+            if (fc["Alpula.EFFECTIVE_MONTH"] != "")
+            { 
+                string effectiveMonth = fc["Alpula.EFFECTIVE_MONTH"];
+                string effectiveYear = fc["Alpula.EFFECTIVE_YEAR"];
+            }
+            string additionalInfo = fc["AI_PULA.ADDITIONAL_INFORMATION"];
+            string justification = fc["AI_PULA.JUSTIFICATION"];
+
+            //VERSION
+            DateTime creationDate = Convert.ToDateTime(fc["V.CREATED_TIME_STAMP"]);
+            int creatorID = Convert.ToInt32(fc["Creator.CREATOR_ID"]);
+            if (fc["V.PUBLISHIED_TIME_STAMP"] != "")
+            { DateTime publishedDate = Convert.ToDateTime(fc["V.PUBLISHIED_TIME_STAMP"]); }
+            int publisherID = Convert.ToInt32(fc["Publisher.PUBLISHER_ID"]);
+            int expirerID = Convert.ToInt32(fc["Expirer.EXPIRER_ID"]);
+            if (fc["V.EXPIRED_MONTH"] != "")
+            { 
+                string expiredMonth = fc["V.EXPIRED_MONTH"];
+                string expiredYear = fc["V.EXPIRED_YEAR"];
+            }
+
+            //SPECIES_ACTIVE_INGREDIENT_PULA
+            string addedSpecies = fc["SpeciesToAdd"];
+            if (addedSpecies != "" && addedSpecies != null)
+            {
+                //parse
+                string[] spp = Regex.Split(addedSpecies, ",");
+                foreach (string s in spp)
+                {
+                    //s = species ID. post to species_active_ingredient_pula with above created pula id and this species id..
+                }
+            }
+
+            //AI_LIMITATIONS
+            string addedAIs = fc["aiIDsToAdd"];
+            string addedUses = fc["useIDsToAdd"];
+            string addedMods = fc["modIDsToAdd"];
+            string addedCodes = fc["codeIDsToAdd"];
+            List<AI_LIMITATIONS> limitations = new List<AI_LIMITATIONS>();
+            //parse
+            if (addedAIs != "" && addedAIs != null)
+            {
+                string[] AIs = Regex.Split(addedAIs, ",");
+                if (addedUses != "" && addedUses != null)
+                {
+                    string[] Uses = Regex.Split(addedUses, ",");
+                    if (addedMods != "" && addedMods != null)
+                    {
+                        string[] Mods = Regex.Split(addedMods, ",");
+                        if (addedCodes != "" && addedCodes != null)
+                        {
+                            string[] Codes = Regex.Split(addedCodes, ",");
+                            //now i have all 4 string[]'s here, populated.
+                            
+                            for (int i = 0; i < AIs.Length; i++)
+                            {
+                                AI_LIMITATIONS aLimitation = new AI_LIMITATIONS();
+                                aLimitation.ACTIVE_INGREDIENT_ID = Convert.ToDecimal(AIs[i]);
+                                aLimitation.CROP_USE_ID = Convert.ToDecimal(Uses[i]);
+                                aLimitation.MODIFIER_ID = Convert.ToDecimal(Mods[i]);
+                                aLimitation.LIMITATION_ID = Convert.ToDecimal(Codes[i]);
+                                limitations.Add(aLimitation);
+                            }
+                        }
+                    }
+                }
+            }
+            //now that i have the ai-limitations, post them
+            foreach (AI_LIMITATIONS ail in limitations)
+            {
+                //post it
+            }
+            
+
+            //PRODUCT_ACTIVE_INGREDIENT
+            string addedProducts = fc["ProdsToAdd"];
+            if (addedProducts != "" && addedProducts != null)
+            {
+                //parse
+                string[] prods = Regex.Split(addedProducts, ",");
+                foreach (string p in prods)
+                {
+                    //p = product ID. post to product_active_ingredient with 
+                }
+            }
+
+            //USER_
+            int creatorDivision = Convert.ToInt32(fc["Creator.DIVISION_ID"]);
+            int publisherDivision = Convert.ToInt32(fc["Publisher.DIVISION_ID"]);
+            
+            return true;
+        }
+        
+        //picked a group from dropdown, return list of species that are of that group
+        public JsonResult GetSpeciesByGroup(int id)
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "Species";
+            request.RootElement = "ArrayOfSpecies";
+            List<SPECIES> SppList = serviceCaller.Execute<List<SPECIES>>(request);
+
+            List<SPECIES> GrpSpp = SppList.Where(s => s.SPECIES_GROUP_ID == id).ToList();
+
+            return Json(GrpSpp);
+        }
+
+
+       
+        //edit button clicked in pula_details
+        //GET: /PULA_Edit/11
+        public ActionResult PULA_Edit(int id)
+        {
+            //return a form populated with all the same info as details, but editable
+            //this new pula will have a new versionID
+            return View();
+        }
+
+        //post the new pula
+        //POST: /PULA_Edit/11
+        [HttpPost]
+        public ActionResult PULA_Edit(ACTIVE_INGREDIENT_PULA newPULA, int id)
+        {
+            //save the new pula, not yet publish it
+            //old one this one is based off of - set expires date 1 month prior to this active date
+            return RedirectToAction("ThankYou");
+        }
+
+        //pula has been saved, thank you page
+        //GET: /ThankYou
+        public ActionResult ThankYou()
+        {
+            //pula was successfully saved, here's the thank you page with a close button. when user clicks pula again, will
+            //have publish option available.
+            return View();
+        }
+        
+
+        //called often to get user logged in
+        //call for who the member logged in is 
+        public USER_ GetLoggedInUser()
+        {
+            BLTServiceCaller serviceCaller = BLTServiceCaller.Instance;
+            var request = new RestRequest();
+            request.Resource = "Users?username={userName}";
+            request.RootElement = "USER_";
+            request.AddParameter("userName", User.Identity.Name, ParameterType.UrlSegment);
+            USER_ loggedInUser = serviceCaller.Execute<USER_>(request);
+            //int loggedInMember = Convert.ToInt32(loggedInUser.ROLE_ID);
+            //string Role = string.Empty;
+            //switch (loggedInMember)
+            //{
+            //    case 1: Role = "Admin"; break;
+            //    case 2: Role = "Publish"; break;
+            //    case 3: Role = "Create"; break;
+            //    case 4: Role = "Enforce"; break;
+            //    case 5: Role = "Public"; break;
+            //    default: Role = "error"; break;
+            //}
+
+            return loggedInUser;
+        }
+
+    }
+}

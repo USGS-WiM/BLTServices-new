@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="bltModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityType Name="active_ingredient">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="active_ingredient_id" Type="Double" Nullable="false" />
+    <Property Name="ingredient_name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="pc_code" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="cas_number" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="active_ingredient_ai_class">
+    <Key>
+      <PropertyRef Name="active_ingredient_ai_class_id" />
+    </Key>
+    <Property Name="active_ingredient_ai_class_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version_id" Type="Double" Nullable="false" />
+    <Property Name="active_ingredient_id" Type="Int32" Nullable="false" />
+    <Property Name="ai_class_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="active_ingredient_pula">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="other_justification" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="base_data" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="base_data_modifiers" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="interim_proposed_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="focus_meeting" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="biological_opinion_regreview" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="biological_opinion_lit" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="proposed_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="effective_date" Type="DateTime" Precision="6" />
+    <Property Name="event_id" Type="Double" />
+    <Property Name="comments" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="sec3_newchem" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="sec3_newuse" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="sec24" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="final_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="sec18" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="interim_decision" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="additional_information" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="pula_id" Type="Int32" Nullable="false" />
+    <Property Name="pula_shape_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+    <Property Name="is_published" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ai_class">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="ai_class_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ai_class_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="application_method">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="method" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="application_method_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="crop_use">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="use" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="crop_use_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="division">
+    <Key>
+      <PropertyRef Name="division_id" />
+    </Key>
+    <Property Name="division_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="division_name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+  </EntityType>
+  <EntityType Name="event">
+    <Key>
+      <PropertyRef Name="event_id" />
+    </Key>
+    <Property Name="event_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+  </EntityType>
+  <EntityType Name="formulation">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="form" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="formulation_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="limitation">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="code" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+    <Property Name="limitation1" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="limitation_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="organization">
+    <Key>
+      <PropertyRef Name="organization_id" />
+    </Key>
+    <Property Name="organization_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+  </EntityType>
+  <EntityType Name="product">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="product_registration_number" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="product_name" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="product_name_status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="product_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="product_active_ingredient">
+    <Key>
+      <PropertyRef Name="product_active_ingredient_id" />
+    </Key>
+    <Property Name="product_active_ingredient_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="product_id" Type="Int32" Nullable="false" />
+    <Property Name="active_ingredient_id" Type="Int32" Nullable="false" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="pula_limitations">
+    <Key>
+      <PropertyRef Name="pula_limitation_id" />
+    </Key>
+    <Property Name="pula_limitation_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="active_ingredient_id" Type="Int32" />
+    <Property Name="limitation_id" Type="Int32" />
+    <Property Name="crop_use_id" Type="Int32" />
+    <Property Name="application_method_id" Type="Int32" />
+    <Property Name="version_id" Type="Int32" Nullable="false" />
+    <Property Name="pula_id" Type="Int32" Nullable="false" />
+    <Property Name="formulation_id" Type="Int32" />
+    <Property Name="product_id" Type="Int32" />
+  </EntityType>
+  <EntityType Name="role">
+    <Key>
+      <PropertyRef Name="role_id" />
+    </Key>
+    <Property Name="role_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="role_name" Type="String" MaxLength="25" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="role_description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="species_active_ingredient_pula">
+    <Key>
+      <PropertyRef Name="species_activeingrepula_id" />
+    </Key>
+    <Property Name="species_activeingrepula_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version_id" Type="Double" Nullable="false" />
+    <Property Name="species_id" Type="Int32" Nullable="false" />
+    <Property Name="pula_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="user_">
+    <Key>
+      <PropertyRef Name="user_id" />
+    </Key>
+    <Property Name="user_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="username" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Name="fname" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+    <Property Name="lname" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+    <Property Name="organization_id" Type="Int32" />
+    <Property Name="division_id" Type="Int32" />
+    <Property Name="role_id" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="version">
+    <Key>
+      <PropertyRef Name="version_id" />
+    </Key>
+    <Property Name="version_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="created_time_stamp" Type="DateTime" Precision="6" />
+    <Property Name="published_time_stamp" Type="DateTime" Precision="6" />
+    <Property Name="expired_time_stamp" Type="DateTime" Precision="6" />
+    <Property Name="reviewed_time_stamp" Type="DateTime" Precision="6" />
+    <Property Name="creator_id" Type="Int32" />
+    <Property Name="publisher_id" Type="Int32" />
+    <Property Name="expirer_id" Type="Int32" />
+    <Property Name="reviewer_id" Type="Int32" />
+  </EntityType>
+  <EntityContainer Name="bltEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="active_ingredient" EntityType="Self.active_ingredient" />
+    <EntitySet Name="active_ingredient_ai_class" EntityType="Self.active_ingredient_ai_class" />
+    <EntitySet Name="active_ingredient_pula" EntityType="Self.active_ingredient_pula" />
+    <EntitySet Name="ai_class" EntityType="Self.ai_class" />
+    <EntitySet Name="application_method" EntityType="Self.application_method" />
+    <EntitySet Name="crop_use" EntityType="Self.crop_use" />
+    <EntitySet Name="divisions" EntityType="Self.division" />
+    <EntitySet Name="events" EntityType="Self.event" />
+    <EntitySet Name="formulations" EntityType="Self.formulation" />
+    <EntitySet Name="limitations" EntityType="Self.limitation" />
+    <EntitySet Name="organizations" EntityType="Self.organization" />
+    <EntitySet Name="products" EntityType="Self.product" />
+    <EntitySet Name="product_active_ingredient" EntityType="Self.product_active_ingredient" />
+    <EntitySet Name="pula_limitations" EntityType="Self.pula_limitations" />
+    <EntitySet Name="roles" EntityType="Self.role" />
+    <EntitySet Name="species_active_ingredient_pula" EntityType="Self.species_active_ingredient_pula" />
+    <EntitySet Name="user_" EntityType="Self.user_" />
+    <EntitySet Name="versions" EntityType="Self.version" />
+  </EntityContainer>
+</Schema>

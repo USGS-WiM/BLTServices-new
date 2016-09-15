@@ -1,0 +1,117 @@
+﻿//------------------------------------------------------------------------------
+//----- Configuration -----------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2012 WiM - USGS
+
+//    authors:  Jonathan Baier
+//              
+//  
+//   purpose:   Configuration implements the IConfiurationSource interface. OpenRasta
+//              will call the Configure method and use it to configure the application 
+//              through a fluent interface using the Resource space as root objects. 
+//
+//discussion:   The ResourceSpace is where you can define the resources in the application and what
+//              handles them and how thy are represented. 
+//              https://github.com/openrasta/openrasta/wiki/Configuration
+//
+//     
+#region Comments
+// 11.09.12 - TR - Added PULA and AILimitations Resources
+// 10.10.12 - JB - Created
+#endregion                          
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Data.Objects.DataClasses;
+
+using OpenRasta.Authentication;
+using OpenRasta.Authentication.Basic;
+using OpenRasta.Configuration;
+using OpenRasta.DI;
+
+using BLTServices.Authentication;
+using BLTServices.Handlers;
+using BLTServices.Codecs;
+
+
+namespace BLTServices
+{
+    public class Configuration:IConfigurationSource
+    {
+        public void Configure()
+        {
+            using (OpenRastaConfiguration.Manual)
+            {
+
+                // specify the authentication scheme you want to use, you can register multiple ones
+                ResourceSpace.Uses.CustomDependency<IAuthenticationScheme, BasicAuthenticationScheme>(DependencyLifetime.Singleton);
+
+                // register your basic authenticator in the DI resolver
+                ResourceSpace.Uses.CustomDependency<IBasicAuthenticator, BLTBasicAuthentication>(DependencyLifetime.Transient);
+
+
+                AddPULA_Resources();
+                AddAILimitations_Resources();
+                AddActiveIngredients_Resources();
+
+            }//End using OpenRastaConfiguration.Manual
+
+
+        }//End Configure()
+
+        #region Helper methods
+             
+        private void AddPULA_Resources()
+        {
+            //PULAs
+            ResourceSpace.Has.ResourcesOfType<ACTIVEINGREDIENTPULA>()
+                .AtUri("/PULAs/{pulaId}")
+                .HandledBy<PULAHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<List<ACTIVEINGREDIENTPULA>>()
+                .AtUri("/PULAs")
+                .HandledBy<PULAHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+        } //end AddPULA_Resources
+
+        private void AddAILimitations_Resources()
+        {
+            //AILimitations
+            ResourceSpace.Has.ResourcesOfType<AI_LIMITATIONS>()
+                .AtUri("/AILimitation/{AILimitID}")
+                .HandledBy<AILimitationsHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<List<AI_LIMITATIONS>>()
+                .AtUri("/AILimitations")
+                .HandledBy<AILimitationsHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+        }
+
+        private void AddActiveIngredients_Resources()
+        {
+            //Active Ingredients (AI)
+            ResourceSpace.Has.ResourcesOfType<ACTIVEINGREDIENT>()
+                .AtUri("ActiveIngredient/{ActiveIngredientID}")
+                .HandledBy<ActiveIngredientHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+
+            ResourceSpace.Has.ResourcesOfType<List<ACTIVEINGREDIENT>>()
+                .AtUri("/ActiveIngredients")
+                .HandledBy<ActiveIngredientHandler>()
+                .TranscodedBy<SimpleUTF8XmlSerializerCodec>();
+            
+        }
+
+        #endregion
+
+    }//End class Configuration
+}//End namespace

@@ -1,0 +1,260 @@
+﻿//------------------------------------------------------------------------------
+//----- Species Family Handler --------------------------------------------------------
+//------------------------------------------------------------------------------
+
+//-------1---------2---------3---------4---------5---------6---------7---------8
+//       01234567890123456789012345678901234567890123456789012345678901234567890
+//-------+---------+---------+---------+---------+---------+---------+---------+
+
+// copyright:   2013 WiM - USGS
+
+//    authors:  Tonia Roddick USGS Wisconsin Internet Mapping
+//              
+//  
+//   purpose:   Handles Site resources through the HTTP uniform interface.
+//              Equivalent to the controller in MVC.
+//
+//discussion:   Handlers are objects which handle all interaction with resources in 
+//              this case the resources are POCO classes derived from the EF. 
+//              https://github.com/openrasta/openrasta/wiki/Handlers
+//
+//     
+
+#region Comments
+// 05.30.13 - TR - Created
+#endregion
+
+using BLTServices.Authentication;
+
+using OpenRasta.Web;
+using OpenRasta.Security;
+
+using System;
+using System.Data;
+using System.Data.EntityClient;
+using System.Data.Metadata.Edm;
+using System.Data.Objects;
+using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using System.Web;
+using System.Runtime.InteropServices;
+
+namespace BLTServices.Handlers
+{
+    public class SpeciesFamilyHandler: HandlerBase
+    {
+        #region Properties
+        public override string entityName
+        {
+            get { return "SPECIES_FAMILY"; }
+        }
+        #endregion
+        #region Routed Methods
+        #region GetMethods
+        // returns all Divisions
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get()
+        {
+            List<SPECIES_FAMILY> speciesFamilyList;
+            try
+            {
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        speciesFamilyList = GetEntities<SPECIES_FAMILY>(aBLTE).ToList();
+                    }//end using
+                }//end using
+
+                activateLinks<SPECIES_FAMILY>(speciesFamilyList);
+
+                return new OperationResult.OK { ResponseResource = speciesFamilyList };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+
+        [WiMRequiresRole(new string[] { AdminRole, PublisherRole, CreaterRole })]
+        [HttpOperation(HttpMethod.GET)]
+        public OperationResult Get(Int32 speciesFamilyID)
+        {
+            SPECIES_FAMILY aSppFam;
+            try
+            {
+                if (speciesFamilyID <= 0)
+                { return new OperationResult.BadRequest(); }
+                using (EasySecureString securedPassword = GetSecuredPassword())
+                {
+                    using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+                    {
+                        aSppFam = GetEntities<SPECIES_FAMILY>(aBLTE).SingleOrDefault(d => d.SPECIES_FAMILY_ID == speciesFamilyID);
+
+                    }//end using
+                }//end using
+                activateLinks<SPECIES_FAMILY>(aSppFam);
+
+                return new OperationResult.OK { ResponseResource = aSppFam };
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+            }
+        }//end HttpMethod.GET
+        #endregion
+        //#region POST Methods
+        //  [WiMRequiresRole(new string[] { AdminRole })]
+        //[HttpOperation(HttpMethod.POST)]
+        //public OperationResult POST(SPECIES anEntity)
+        //{
+        //    try
+        //    {
+        //        //Return BadRequest if missing required fields
+        //        if (string.IsNullOrEmpty(anEntity.COMMON_NAME))
+        //        { return new OperationResult.BadRequest(); }
+
+        //        using (EasySecureString securedPassword = GetSecuredPassword())
+        //        {
+        //            using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+        //            {
+        //                //Prior to running stored procedure, check if username exists
+        //                if (!Exists(aBLTE.SPECIES, ref anEntity))
+        //                {
+        //                    aBLTE.SPECIES.AddObject(anEntity);
+        //                    aBLTE.SaveChanges();
+        //                }
+
+        //                activateLinks<SPECIES>(anEntity);
+
+        //            }//end using
+        //        }//end using
+
+        //        return new OperationResult.OK { ResponseResource = anEntity };
+        //    }
+        //    catch (Exception)
+        //    { return new OperationResult.BadRequest(); }
+
+        //}//end HttpMethod.GET
+
+        //#endregion
+        //#region PUT Methods
+        //[WiMRequiresRole(new string[] { AdminRole })]
+        //[HttpOperation(HttpMethod.PUT)]
+        //public OperationResult PUT(Int32 speciesID, SPECIES instance)
+        //{
+        //    try
+        //    {
+        //        if (speciesID <= 0)
+        //        { return new OperationResult.BadRequest(); }
+
+        //        using (EasySecureString securedPassword = GetSecuredPassword())
+        //        {
+        //            using (BLTRDSEntities aBLTE = GetRDS(securedPassword))
+        //            {
+        //                SPECIES ObjectToBeUpdated = aBLTE.SPECIES.SingleOrDefault(o => o.SPECIES_ID == speciesID);
+
+        //                if (ObjectToBeUpdated == null) { return new OperationResult.BadRequest(); }
+
+        //                //update
+        //                ObjectToBeUpdated.COMMON_NAME = instance.COMMON_NAME;
+        //                ObjectToBeUpdated.SCIENTIFIC_NAME = instance.SCIENTIFIC_NAME;
+        //                ObjectToBeUpdated.SPECIES_FAMILY_ID = instance.SPECIES_FAMILY_ID;
+        //                ObjectToBeUpdated.SPECIES_TAXA_ID = instance.SPECIES_TAXA_ID;
+
+        //            }// end using
+        //        }// end using
+
+        //        activateLinks<SPECIES>(instance);
+
+        //        return new OperationResult.OK { ResponseResource = instance };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
+        //    }
+        //}//end HttpMethod.GET
+        //#endregion
+
+        //#region DELETE Methods
+        //[RequiresRole(AdminRole)]
+        //[HttpOperation(HttpMethod.DELETE)]
+        //public OperationResult Delete(Int32 divisionID)
+        //{
+        //    DIVISION ObjectToBeDeleted = null;
+
+        //    //Return BadRequest if missing required fields
+        //    if (divisionID <= 0)
+        //    { return new OperationResult.BadRequest(); }
+
+
+        //    //Get basic authentication password
+        //    using (EasySecureString securedPassword = GetSecuredPassword())
+        //    {
+        //        using (BLTRDSEntities aBLTRDS = GetRDS(securedPassword))
+        //        {
+
+        //            // create user profile using db stored proceedure
+        //            try
+        //            {
+        //                //fetch the object to be updated (assuming that it exists)
+        //                ObjectToBeDeleted = aBLTRDS.DIVISIONS.SingleOrDefault(
+        //                                        m => m.DIVISION_ID == divisionID);
+
+        //                //delete it
+        //                aBLTRDS.DIVISIONS.DeleteObject(ObjectToBeDeleted);
+        //                aBLTRDS.SaveChanges();
+        //                //Return object to verify persisitance
+
+        //                return new OperationResult.OK { };
+
+        //            }
+        //            catch (Exception)
+        //            {
+        //                //TODO: relay failure type message 
+        //                // EX. if profile failed to be removed
+        //                return new OperationResult.BadRequest();
+        //            }
+
+        //        }// end using
+        //    } //end using
+        //}//end HTTP.DELETE
+        //#endregion
+        #endregion
+
+        #region Helper Methods
+        //private Boolean Exists(System.Data.Objects.IObjectSet<SPECIES> species, ref SPECIES aSpecies)
+        //{
+        //    SPECIES existingSpp;
+        //    SPECIES thisSpp = aSpecies;
+        //    //check if it exists
+        //    try
+        //    {
+        //        existingSpp = species.FirstOrDefault(o => o.COMMON_NAME == thisSpp.COMMON_NAME);
+
+        //        if (existingSpp == null)
+        //            return false;
+
+        //        //if exists then update ref contact
+        //        aSpecies = existingSpp;
+        //        return true;
+
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        #endregion
+
+        protected override void ExpireEntities(BLTRDSEntities aBLTE, decimal userId, decimal Id, DateTime dt)
+        {
+            throw new NotImplementedException();
+        }
+    }// end class divisionHandler
+}//end namespace

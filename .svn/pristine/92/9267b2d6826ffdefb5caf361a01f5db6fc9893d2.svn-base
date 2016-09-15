@@ -1,0 +1,454 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BLTModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="BLTRDSEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="SPECIES" EntityType="BLTModel.SPECIES" />
+    <EntitySet Name="SPECIES_ACTIVEINGREDIENTPULA" EntityType="BLTModel.SPECIES_ACTIVEINGREDIENTPULA" />
+    <AssociationSet Name="SPECIES_ACTIVEINGREDIENTPULASPECIES" Association="BLTModel.SPECIES_ACTIVEINGREDIENTPULASPECIES">
+      <End Role="SPECIES_ACTIVEINGREDIENTPULA" EntitySet="SPECIES_ACTIVEINGREDIENTPULA" />
+      <End Role="SPECIES" EntitySet="SPECIES" />
+    </AssociationSet>
+    <EntitySet Name="ACTIVEINGREDIENTs" EntityType="BLTModel.ACTIVEINGREDIENT" />
+    <EntitySet Name="PRODUCTs" EntityType="BLTModel.PRODUCT" />
+    <EntitySet Name="PRODUCT_ACTIVEINGREDIENT" EntityType="BLTModel.PRODUCT_ACTIVEINGREDIENT" />
+    <EntitySet Name="AICLASSes" EntityType="BLTModel.AICLASS" />
+    <AssociationSet Name="AICLASSACTIVEINGREDIENT" Association="BLTModel.AICLASSACTIVEINGREDIENT">
+      <End Role="AICLASS" EntitySet="AICLASSes" />
+      <End Role="ACTIVEINGREDIENT" EntitySet="ACTIVEINGREDIENTs" />
+    </AssociationSet>
+    <AssociationSet Name="ACTIVEINGREDIENTPRODUCT_ACTIVEINGREDIENT" Association="BLTModel.ACTIVEINGREDIENTPRODUCT_ACTIVEINGREDIENT">
+      <End Role="ACTIVEINGREDIENT" EntitySet="ACTIVEINGREDIENTs" />
+      <End Role="PRODUCT_ACTIVEINGREDIENT" EntitySet="PRODUCT_ACTIVEINGREDIENT" />
+    </AssociationSet>
+    <AssociationSet Name="PRODUCT_ACTIVEINGREDIENTPRODUCT" Association="BLTModel.PRODUCT_ACTIVEINGREDIENTPRODUCT">
+      <End Role="PRODUCT_ACTIVEINGREDIENT" EntitySet="PRODUCT_ACTIVEINGREDIENT" />
+      <End Role="PRODUCT" EntitySet="PRODUCTs" />
+    </AssociationSet>
+    <EntitySet Name="CROPUSEs" EntityType="BLTModel.CROPUSE" />
+    <EntitySet Name="LIMITATIONS" EntityType="BLTModel.LIMITATION" />
+    <EntitySet Name="MODIFIERs" EntityType="BLTModel.MODIFIER" />
+    <EntitySet Name="DIVISIONS" EntityType="BLTModel.DIVISION" />
+    <EntitySet Name="SPECIES_SPECIESIMAGES" EntityType="BLTModel.SPECIES_SPECIESIMAGES" />
+    <EntitySet Name="SPECIESFWSINFOes" EntityType="BLTModel.SPECIESFWSINFO" />
+    <EntitySet Name="SPECIESIMAGES" EntityType="BLTModel.SPECIESIMAGE" />
+    <EntitySet Name="TAXONOMICCLASSes" EntityType="BLTModel.TAXONOMICCLASS" />
+    <EntitySet Name="TAXONOMICTYPEs" EntityType="BLTModel.TAXONOMICTYPE" />
+    <AssociationSet Name="TAXONOMICCLASSSPECIES" Association="BLTModel.TAXONOMICCLASSSPECIES">
+      <End Role="TAXONOMICCLASS" EntitySet="TAXONOMICCLASSes" />
+      <End Role="SPECIES" EntitySet="SPECIES" />
+    </AssociationSet>
+    <AssociationSet Name="TAXONOMICTYPETAXONOMICCLASS" Association="BLTModel.TAXONOMICTYPETAXONOMICCLASS">
+      <End Role="TAXONOMICTYPE" EntitySet="TAXONOMICTYPEs" />
+      <End Role="TAXONOMICCLASS" EntitySet="TAXONOMICCLASSes" />
+    </AssociationSet>
+    <AssociationSet Name="SPECIESSPECIES_SPECIESIMAGES" Association="BLTModel.SPECIESSPECIES_SPECIESIMAGES">
+      <End Role="SPECIES" EntitySet="SPECIES" />
+      <End Role="SPECIES_SPECIESIMAGES" EntitySet="SPECIES_SPECIESIMAGES" />
+    </AssociationSet>
+    <AssociationSet Name="SPECIES_SPECIESIMAGESSPECIESIMAGE" Association="BLTModel.SPECIES_SPECIESIMAGESSPECIESIMAGE">
+      <End Role="SPECIES_SPECIESIMAGES" EntitySet="SPECIES_SPECIESIMAGES" />
+      <End Role="SPECIESIMAGE" EntitySet="SPECIESIMAGES" />
+    </AssociationSet>
+    <EntitySet Name="USER_" EntityType="BLTModel.USER_" />
+    <EntitySet Name="VERSIONs" EntityType="BLTModel.VERSION" />
+    <AssociationSet Name="USER_DIVISION" Association="BLTModel.USER_DIVISION">
+      <End Role="USER_" EntitySet="USER_" />
+      <End Role="DIVISION" EntitySet="DIVISIONS" />
+    </AssociationSet>
+    <EntitySet Name="AI_LIMITATIONS" EntityType="BLTModel.AI_LIMITATIONS" />
+    <AssociationSet Name="ACTIVEINGREDIENTAI_LIMITATIONS" Association="BLTModel.ACTIVEINGREDIENTAI_LIMITATIONS">
+      <End Role="ACTIVEINGREDIENT" EntitySet="ACTIVEINGREDIENTs" />
+      <End Role="AI_LIMITATIONS" EntitySet="AI_LIMITATIONS" />
+    </AssociationSet>
+    <AssociationSet Name="SPECIESFWSINFOSPECIES" Association="BLTModel.SPECIESFWSINFOSPECIES">
+      <End Role="SPECIESFWSINFO" EntitySet="SPECIESFWSINFOes" />
+      <End Role="SPECIES" EntitySet="SPECIES" />
+    </AssociationSet>
+    <EntitySet Name="ACTIVEINGREDIENTPULAs" EntityType="BLTModel.ACTIVEINGREDIENTPULA" />
+    <AssociationSet Name="ACTIVEINGREDIENTPULASPECIES_ACTIVEINGREDIENTPULA" Association="BLTModel.ACTIVEINGREDIENTPULASPECIES_ACTIVEINGREDIENTPULA">
+      <End Role="ACTIVEINGREDIENTPULA" EntitySet="ACTIVEINGREDIENTPULAs" />
+      <End Role="SPECIES_ACTIVEINGREDIENTPULA" EntitySet="SPECIES_ACTIVEINGREDIENTPULA" />
+    </AssociationSet>
+    <AssociationSet Name="ACTIVEINGREDIENTPULAAI_LIMITATIONS" Association="BLTModel.ACTIVEINGREDIENTPULAAI_LIMITATIONS">
+      <End Role="ACTIVEINGREDIENTPULA" EntitySet="ACTIVEINGREDIENTPULAs" />
+      <End Role="AI_LIMITATIONS" EntitySet="AI_LIMITATIONS" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="SPECIES">
+    <Key>
+      <PropertyRef Name="ITIS_TSN" />
+    </Key>
+    <Property Type="Decimal" Name="ITIS_TSN" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="DESCRIPTIONTEXT" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FACTSHEETURL" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FEDERALREGISTRATIONNUMBER" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="CLASSID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES_ACTIVEINGREDIENTPULA" Relationship="BLTModel.SPECIES_ACTIVEINGREDIENTPULASPECIES" FromRole="SPECIES" ToRole="SPECIES_ACTIVEINGREDIENTPULA" />
+    <NavigationProperty Name="TAXONOMICCLASS" Relationship="BLTModel.TAXONOMICCLASSSPECIES" FromRole="SPECIES" ToRole="TAXONOMICCLASS" />
+    <NavigationProperty Name="SPECIES_SPECIESIMAGES" Relationship="BLTModel.SPECIESSPECIES_SPECIESIMAGES" FromRole="SPECIES" ToRole="SPECIES_SPECIESIMAGES" />
+    <NavigationProperty Name="SPECIESFWSINFOes" Relationship="BLTModel.SPECIESFWSINFOSPECIES" FromRole="SPECIES" ToRole="SPECIESFWSINFO" />
+  </EntityType>
+  <EntityType Name="SPECIES_ACTIVEINGREDIENTPULA">
+    <Key>
+      <PropertyRef Name="PULAID" />
+      <PropertyRef Name="ITIS_TSN" />
+    </Key>
+    <Property Type="Decimal" Name="PULAID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="ITIS_TSN" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Int16" Name="CRITICALHABITATINPULA" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES" Relationship="BLTModel.SPECIES_ACTIVEINGREDIENTPULASPECIES" FromRole="SPECIES_ACTIVEINGREDIENTPULA" ToRole="SPECIES" />
+    <NavigationProperty Name="ACTIVEINGREDIENTPULA" Relationship="BLTModel.ACTIVEINGREDIENTPULASPECIES_ACTIVEINGREDIENTPULA" FromRole="SPECIES_ACTIVEINGREDIENTPULA" ToRole="ACTIVEINGREDIENTPULA" />
+  </EntityType>
+  <Association Name="SPECIES_ACTIVEINGREDIENTPULASPECIES">
+    <End Type="BLTModel.SPECIES_ACTIVEINGREDIENTPULA" Role="SPECIES_ACTIVEINGREDIENTPULA" Multiplicity="*" />
+    <End Type="BLTModel.SPECIES" Role="SPECIES" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="SPECIES">
+        <PropertyRef Name="ITIS_TSN" />
+      </Principal>
+      <Dependent Role="SPECIES_ACTIVEINGREDIENTPULA">
+        <PropertyRef Name="ITIS_TSN" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="ACTIVEINGREDIENT">
+    <Key>
+      <PropertyRef Name="PCCODE" />
+    </Key>
+    <Property Type="String" Name="INGREDIENTNAME" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CAS" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PCCODE" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="AICLASSID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="AICLASS" Relationship="BLTModel.AICLASSACTIVEINGREDIENT" FromRole="ACTIVEINGREDIENT" ToRole="AICLASS" />
+    <NavigationProperty Name="PRODUCT_ACTIVEINGREDIENT" Relationship="BLTModel.ACTIVEINGREDIENTPRODUCT_ACTIVEINGREDIENT" FromRole="ACTIVEINGREDIENT" ToRole="PRODUCT_ACTIVEINGREDIENT" />
+    <NavigationProperty Name="AI_LIMITATIONS" Relationship="BLTModel.ACTIVEINGREDIENTAI_LIMITATIONS" FromRole="ACTIVEINGREDIENT" ToRole="AI_LIMITATIONS" />
+  </EntityType>
+  <EntityType Name="PRODUCT">
+    <Key>
+      <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+    </Key>
+    <Property Type="String" Name="PRODUCTNAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PRODUCTREGISTRATIONNUMBER" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="PRODUCT_ACTIVEINGREDIENT" Relationship="BLTModel.PRODUCT_ACTIVEINGREDIENTPRODUCT" FromRole="PRODUCT" ToRole="PRODUCT_ACTIVEINGREDIENT" />
+  </EntityType>
+  <EntityType Name="PRODUCT_ACTIVEINGREDIENT">
+    <Key>
+      <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+      <PropertyRef Name="PCCODE" />
+    </Key>
+    <Property Type="String" Name="PRODUCTREGISTRATIONNUMBER" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PCCODE" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="ACTIVEINGREDIENTs" Relationship="BLTModel.ACTIVEINGREDIENTPRODUCT_ACTIVEINGREDIENT" FromRole="PRODUCT_ACTIVEINGREDIENT" ToRole="ACTIVEINGREDIENT" />
+    <NavigationProperty Name="PRODUCTs" Relationship="BLTModel.PRODUCT_ACTIVEINGREDIENTPRODUCT" FromRole="PRODUCT_ACTIVEINGREDIENT" ToRole="PRODUCT" />
+  </EntityType>
+  <EntityType Name="AICLASS">
+    <Key>
+      <PropertyRef Name="AICLASSID" />
+    </Key>
+    <Property Type="Decimal" Name="AICLASSID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="AICLASSNAME" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="ACTIVEINGREDIENTs" Relationship="BLTModel.AICLASSACTIVEINGREDIENT" FromRole="AICLASS" ToRole="ACTIVEINGREDIENT" />
+  </EntityType>
+  <Association Name="AICLASSACTIVEINGREDIENT">
+    <End Type="BLTModel.AICLASS" Role="AICLASS" Multiplicity="0..1" />
+    <End Type="BLTModel.ACTIVEINGREDIENT" Role="ACTIVEINGREDIENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="AICLASS">
+        <PropertyRef Name="AICLASSID" />
+      </Principal>
+      <Dependent Role="ACTIVEINGREDIENT">
+        <PropertyRef Name="AICLASSID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ACTIVEINGREDIENTPRODUCT_ACTIVEINGREDIENT">
+    <End Type="BLTModel.ACTIVEINGREDIENT" Role="ACTIVEINGREDIENT" Multiplicity="1" />
+    <End Type="BLTModel.PRODUCT_ACTIVEINGREDIENT" Role="PRODUCT_ACTIVEINGREDIENT" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ACTIVEINGREDIENT">
+        <PropertyRef Name="PCCODE" />
+      </Principal>
+      <Dependent Role="PRODUCT_ACTIVEINGREDIENT">
+        <PropertyRef Name="PCCODE" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PRODUCT_ACTIVEINGREDIENTPRODUCT">
+    <End Type="BLTModel.PRODUCT_ACTIVEINGREDIENT" Role="PRODUCT_ACTIVEINGREDIENT" Multiplicity="*" />
+    <End Type="BLTModel.PRODUCT" Role="PRODUCT" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="PRODUCT">
+        <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+      </Principal>
+      <Dependent Role="PRODUCT_ACTIVEINGREDIENT">
+        <PropertyRef Name="PRODUCTREGISTRATIONNUMBER" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="CROPUSE">
+    <Key>
+      <PropertyRef Name="CROPUSEID" />
+    </Key>
+    <Property Type="Decimal" Name="CROPUSEID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="USE" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FORMULATION" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+  </EntityType>
+  <EntityType Name="LIMITATION">
+    <Key>
+      <PropertyRef Name="LIMITATIONID" />
+    </Key>
+    <Property Type="Decimal" Name="LIMITATIONID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="CODE" MaxLength="5" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="LIMITATION1" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+  </EntityType>
+  <EntityType Name="MODIFIER">
+    <Key>
+      <PropertyRef Name="MODIFIERID" />
+    </Key>
+    <Property Type="Decimal" Name="MODIFIERID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="MODIFIER1" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+  </EntityType>
+  <EntityType Name="DIVISION">
+    <Key>
+      <PropertyRef Name="DIVISIONID" />
+    </Key>
+    <Property Type="Decimal" Name="DIVISIONID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="DIVISIONNAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="USER_" Relationship="BLTModel.USER_DIVISION" FromRole="DIVISION" ToRole="USER_" />
+  </EntityType>
+  <EntityType Name="SPECIES_SPECIESIMAGES">
+    <Key>
+      <PropertyRef Name="ITIS_TSN" />
+      <PropertyRef Name="IMAGEID" />
+    </Key>
+    <Property Type="Decimal" Name="ITIS_TSN" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="IMAGEID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES" Relationship="BLTModel.SPECIESSPECIES_SPECIESIMAGES" FromRole="SPECIES_SPECIESIMAGES" ToRole="SPECIES" />
+    <NavigationProperty Name="SPECIESIMAGE" Relationship="BLTModel.SPECIES_SPECIESIMAGESSPECIESIMAGE" FromRole="SPECIES_SPECIESIMAGES" ToRole="SPECIESIMAGE" />
+  </EntityType>
+  <EntityType Name="SPECIESFWSINFO">
+    <Key>
+      <PropertyRef Name="FWSINFOID" />
+    </Key>
+    <Property Type="Decimal" Name="FWSINFOID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="ITIS_TSN" Precision="38" Scale="0" />
+    <Property Type="String" Name="SPECIES_CODE" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="COMMON_NAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="SCIENTIFIC_NAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="INVERTED_COMMON_NAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CRITICAL_HABITAT" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="CURRENT_DISTRIBUTION" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="FAMILY" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="SPECIES_GROUP" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="LEAD_REGION" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="LISTING_STATUS" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="VERTEBRATE__INVERTEBRATE_PLANT" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="WHERE_LISTED" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES" Relationship="BLTModel.SPECIESFWSINFOSPECIES" FromRole="SPECIESFWSINFO" ToRole="SPECIES" />
+  </EntityType>
+  <EntityType Name="SPECIESIMAGE">
+    <Key>
+      <PropertyRef Name="IMAGEID" />
+    </Key>
+    <Property Type="Decimal" Name="IMAGEID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="IMAGE" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES_SPECIESIMAGES" Relationship="BLTModel.SPECIES_SPECIESIMAGESSPECIESIMAGE" FromRole="SPECIESIMAGE" ToRole="SPECIES_SPECIESIMAGES" />
+  </EntityType>
+  <EntityType Name="TAXONOMICCLASS">
+    <Key>
+      <PropertyRef Name="CLASSID" />
+    </Key>
+    <Property Type="Decimal" Name="CLASSID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="CLASSNAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="PARENTID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="TYPEID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES" Relationship="BLTModel.TAXONOMICCLASSSPECIES" FromRole="TAXONOMICCLASS" ToRole="SPECIES" />
+    <NavigationProperty Name="TAXONOMICTYPE" Relationship="BLTModel.TAXONOMICTYPETAXONOMICCLASS" FromRole="TAXONOMICCLASS" ToRole="TAXONOMICTYPE" />
+  </EntityType>
+  <EntityType Name="TAXONOMICTYPE">
+    <Key>
+      <PropertyRef Name="TYPEID" />
+    </Key>
+    <Property Type="Decimal" Name="TYPEID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="TYPE" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="TAXONOMICCLASSes" Relationship="BLTModel.TAXONOMICTYPETAXONOMICCLASS" FromRole="TAXONOMICTYPE" ToRole="TAXONOMICCLASS" />
+  </EntityType>
+  <Association Name="TAXONOMICCLASSSPECIES">
+    <End Type="BLTModel.TAXONOMICCLASS" Role="TAXONOMICCLASS" Multiplicity="0..1" />
+    <End Type="BLTModel.SPECIES" Role="SPECIES" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TAXONOMICCLASS">
+        <PropertyRef Name="CLASSID" />
+      </Principal>
+      <Dependent Role="SPECIES">
+        <PropertyRef Name="CLASSID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="TAXONOMICTYPETAXONOMICCLASS">
+    <End Type="BLTModel.TAXONOMICTYPE" Role="TAXONOMICTYPE" Multiplicity="0..1" />
+    <End Type="BLTModel.TAXONOMICCLASS" Role="TAXONOMICCLASS" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TAXONOMICTYPE">
+        <PropertyRef Name="TYPEID" />
+      </Principal>
+      <Dependent Role="TAXONOMICCLASS">
+        <PropertyRef Name="TYPEID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SPECIESSPECIES_SPECIESIMAGES">
+    <End Type="BLTModel.SPECIES" Role="SPECIES" Multiplicity="1" />
+    <End Type="BLTModel.SPECIES_SPECIESIMAGES" Role="SPECIES_SPECIESIMAGES" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="SPECIES">
+        <PropertyRef Name="ITIS_TSN" />
+      </Principal>
+      <Dependent Role="SPECIES_SPECIESIMAGES">
+        <PropertyRef Name="ITIS_TSN" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SPECIES_SPECIESIMAGESSPECIESIMAGE">
+    <End Type="BLTModel.SPECIES_SPECIESIMAGES" Role="SPECIES_SPECIESIMAGES" Multiplicity="*" />
+    <End Type="BLTModel.SPECIESIMAGE" Role="SPECIESIMAGE" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="SPECIESIMAGE">
+        <PropertyRef Name="IMAGEID" />
+      </Principal>
+      <Dependent Role="SPECIES_SPECIESIMAGES">
+        <PropertyRef Name="IMAGEID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="USER_">
+    <Key>
+      <PropertyRef Name="USERID" />
+    </Key>
+    <Property Type="Decimal" Name="USERID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="USERNAME" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="EMAIL" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="PHONE" MaxLength="20" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="ORGANIZATION" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="DIVISIONID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="DIVISION" Relationship="BLTModel.USER_DIVISION" FromRole="USER_" ToRole="DIVISION" />
+  </EntityType>
+  <EntityType Name="VERSION">
+    <Key>
+      <PropertyRef Name="VERSIONID" />
+    </Key>
+    <Property Type="Decimal" Name="VERSIONID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="AUTHORID" Precision="38" Scale="0" />
+    <Property Type="DateTime" Name="CREATED" />
+    <Property Type="DateTime" Name="EXPIRES" />
+    <Property Type="Int16" Name="PUBLISHED" />
+    <Property Type="Decimal" Name="USERID" Precision="38" Scale="0" />
+  </EntityType>
+  <Association Name="USER_DIVISION">
+    <End Type="BLTModel.USER_" Role="USER_" Multiplicity="*" />
+    <End Type="BLTModel.DIVISION" Role="DIVISION" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="DIVISION">
+        <PropertyRef Name="DIVISIONID" />
+      </Principal>
+      <Dependent Role="USER_">
+        <PropertyRef Name="DIVISIONID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="AI_LIMITATIONS">
+    <Key>
+      <PropertyRef Name="APPID" />
+    </Key>
+    <Property Type="Decimal" Name="APPID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="PCCODE" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="LIMITATIONID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="CROPUSEID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="MODIFIERID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="PULAID" Nullable="false" Precision="38" Scale="0" />
+    <NavigationProperty Name="ACTIVEINGREDIENT" Relationship="BLTModel.ACTIVEINGREDIENTAI_LIMITATIONS" FromRole="AI_LIMITATIONS" ToRole="ACTIVEINGREDIENT" />
+    <NavigationProperty Name="ACTIVEINGREDIENTPULA" Relationship="BLTModel.ACTIVEINGREDIENTPULAAI_LIMITATIONS" FromRole="AI_LIMITATIONS" ToRole="ACTIVEINGREDIENTPULA" />
+  </EntityType>
+  <Association Name="ACTIVEINGREDIENTAI_LIMITATIONS">
+    <End Type="BLTModel.ACTIVEINGREDIENT" Role="ACTIVEINGREDIENT" Multiplicity="1" />
+    <End Type="BLTModel.AI_LIMITATIONS" Role="AI_LIMITATIONS" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ACTIVEINGREDIENT">
+        <PropertyRef Name="PCCODE" />
+      </Principal>
+      <Dependent Role="AI_LIMITATIONS">
+        <PropertyRef Name="PCCODE" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SPECIESFWSINFOSPECIES">
+    <End Type="BLTModel.SPECIESFWSINFO" Role="SPECIESFWSINFO" Multiplicity="*" />
+    <End Type="BLTModel.SPECIES" Role="SPECIES" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="SPECIES">
+        <PropertyRef Name="ITIS_TSN" />
+      </Principal>
+      <Dependent Role="SPECIESFWSINFO">
+        <PropertyRef Name="ITIS_TSN" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="ACTIVEINGREDIENTPULA">
+    <Key>
+      <PropertyRef Name="PULAID" />
+    </Key>
+    <Property Type="Decimal" Name="PULAID" Nullable="false" Precision="38" Scale="0" />
+    <Property Type="String" Name="BASIS" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MODIFIERS" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BASEMAP" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="DateTime" Name="BIOPDATE" />
+    <Property Type="DateTime" Name="REGISTRATIONREVIEWDOCDATE" />
+    <Property Type="String" Name="OTHERCREATIONREASONS" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Type="Decimal" Name="PULASHAPEID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="APPID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="PRODUCTID" Precision="38" Scale="0" />
+    <Property Type="Decimal" Name="VERSIONID" Precision="38" Scale="0" />
+    <NavigationProperty Name="SPECIES_ACTIVEINGREDIENTPULA" Relationship="BLTModel.ACTIVEINGREDIENTPULASPECIES_ACTIVEINGREDIENTPULA" FromRole="ACTIVEINGREDIENTPULA" ToRole="SPECIES_ACTIVEINGREDIENTPULA" />
+    <NavigationProperty Name="AI_LIMITATIONS" Relationship="BLTModel.ACTIVEINGREDIENTPULAAI_LIMITATIONS" FromRole="ACTIVEINGREDIENTPULA" ToRole="AI_LIMITATIONS" />
+  </EntityType>
+  <Association Name="ACTIVEINGREDIENTPULASPECIES_ACTIVEINGREDIENTPULA">
+    <End Type="BLTModel.ACTIVEINGREDIENTPULA" Role="ACTIVEINGREDIENTPULA" Multiplicity="1" />
+    <End Type="BLTModel.SPECIES_ACTIVEINGREDIENTPULA" Role="SPECIES_ACTIVEINGREDIENTPULA" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ACTIVEINGREDIENTPULA">
+        <PropertyRef Name="PULAID" />
+      </Principal>
+      <Dependent Role="SPECIES_ACTIVEINGREDIENTPULA">
+        <PropertyRef Name="PULAID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ACTIVEINGREDIENTPULAAI_LIMITATIONS">
+    <End Type="BLTModel.ACTIVEINGREDIENTPULA" Role="ACTIVEINGREDIENTPULA" Multiplicity="1" />
+    <End Type="BLTModel.AI_LIMITATIONS" Role="AI_LIMITATIONS" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ACTIVEINGREDIENTPULA">
+        <PropertyRef Name="PULAID" />
+      </Principal>
+      <Dependent Role="AI_LIMITATIONS">
+        <PropertyRef Name="PULAID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
