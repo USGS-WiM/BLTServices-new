@@ -48,39 +48,9 @@ namespace BLTServices.Handlers
         #endregion
        #region Base Queries
 
-       protected ObjectQuery<T> GetEntities<T>(bltEntities aBLTE) where T : System.Data.Objects.DataClasses.EntityObject
+       protected IQueryable<T> GetEntities<T>(bltEntities aBLTE) where T : class,new()
        {
-           ObjectContext objectContext = ((IObjectContextAdapter)aBLTE).ObjectContext;
-           ObjectSet<T> objectSet = objectContext.CreateObjectSet<T>("Requests");
-
-           return objectSet;
-
-           //ObjectQuery<T> entities = null;
-
-           ////Get basic authentication password
-           
-           //        // Get the metadata workspace from the connection.
-           //        MetadataWorkspace workspace = aBLTE.MetadataWorkspace;
-
-           //        // Get a collection of the entity containers.
-           //        ReadOnlyCollection<EntityContainer> containers =
-           //                 workspace.GetItems<EntityContainer>(
-           //                                    DataSpace.CSpace);
-
-           //        EntitySet es;
-           //        if (containers[0].TryGetEntitySetByName(entityName, true, out es))
-           //        {
-           //            string queryString =
-           //                @"SELECT VALUE anEntity FROM BLTRDSEntities1." + es.Name + " as anEntity";
-
-           //            ObjectQuery<T> entityQuery = aBLTE.CreateQuery<T>(queryString, new ObjectParameter("ent", es.ElementType.Name));
-                       
-           //            entities = entityQuery;
-
-           //        }//end if
-  
-           //return entities;
-           ////return new OperationResult.OK { ResponseResource = entities };
+           return aBLTE.Set<T>().AsQueryable();
        }//end GetSecuredEntities
 
        protected IQueryable<active_ingredient_pula> GetActive(IQueryable<active_ingredient_pula> Obj, DateTime thisDate)
@@ -135,8 +105,8 @@ namespace BLTServices.Handlers
        protected IQueryable<product> GetActive(IQueryable<product> Obj, DateTime thisDate)
        {
 
-           return Obj.Where(p => (p.version.published_time_stamp.HasValue && thisDate >= p.version.published_time_stamp) &&
-                                 ((!p.version.expired_time_stamp.HasValue) || thisDate < p.version.expired_time_stamp));
+           return Obj.Where(p => (p.versions.published_time_stamp.HasValue && thisDate >= p.versions.published_time_stamp) &&
+                                 ((!p.versions.expired_time_stamp.HasValue) || thisDate < p.versions.expired_time_stamp));
            
        }//end GetActive
        protected IQueryable<product_active_ingredient> GetActive(IQueryable<product_active_ingredient> Obj, DateTime thisDate)
@@ -293,7 +263,10 @@ namespace BLTServices.Handlers
 
        protected bltEntities GetRDS()
        {
-           return new bltEntities(string.Format(connectionString, "BLTPUBLIC", "B1TPu673sS"));
+           string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnewtest.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
+        
+           //return new bltEntities(string.Format(connectionString, "BLTPUBLIC", "B1TPu673sS"));
+           return new bltEntities(string.Format(connectionString, "bltadmin", "1MhTGVxs"));
        }
 
        protected EasySecureString GetSecuredPassword()
