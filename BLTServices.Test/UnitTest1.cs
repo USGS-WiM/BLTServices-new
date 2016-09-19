@@ -24,6 +24,11 @@ namespace BLTServices.Test
         #endregion
         #region Test Methods
         [TestMethod]
+        public void TEST()
+        {
+            Assert.IsTrue(true);
+        }//end method
+        [TestMethod]
         public void AIRequest()
         {
             //GET LIST
@@ -48,7 +53,7 @@ namespace BLTServices.Test
 
             //POST
             active_ingredient postObj;
-            postObj = this.POSTRequest<active_ingredient>(host + "/ActiveIngredients", new active_ingredient() { ingredient_name  = "post-test" }, basicAuth);
+            postObj = this.POSTRequest<active_ingredient>(host + "/ActiveIngredients", new active_ingredient() { ingredient_name = "post-test" }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.active_ingredient_id.ToString());
 
             //GET POSTed item
@@ -97,7 +102,7 @@ namespace BLTServices.Test
 
             //POST
             active_ingredient_pula postObj;
-            postObj = this.POSTRequest<active_ingredient_pula>(host + "/PULAs", new active_ingredient_pula() { pula_shape_id = 1, base_data = "post-test", event_id = 1}, basicAuth);
+            postObj = this.POSTRequest<active_ingredient_pula>(host + "/PULAs", new active_ingredient_pula() { pula_shape_id = 1, base_data = "post-test", event_id = 1 }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.pula_id.ToString());
 
             //GET POSTed item
@@ -119,7 +124,7 @@ namespace BLTServices.Test
 
             //AddComments
             postObj.base_data = "put-test";
-            active_ingredient_pula putCommentObj = this.PUTRequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id + "/AddComments", new active_ingredient_pula() { comments = "AddComment-test"}, basicAuth);
+            active_ingredient_pula putCommentObj = this.PUTRequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id + "/AddComments", new active_ingredient_pula() { comments = "AddComment-test" }, basicAuth);
             Assert.IsNotNull(putCommentObj);
 
             //Delete POSTed item
@@ -222,7 +227,7 @@ namespace BLTServices.Test
         }//end method
         [TestMethod]
         public void authRequest()
-        {            
+        {
             //login
             user_ RequestObj = this.GETRequest<user_>(host + "/login", basicAuth);
             Assert.IsNotNull(RequestObj);
@@ -275,7 +280,7 @@ namespace BLTServices.Test
             //GET LIST
             List<division> RequestList = this.GETRequest<List<division>>(host + "/Divisions");
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
-                        
+
             //POST
             division postObj;
             postObj = this.POSTRequest<division>(host + "/Divisions", new division() { division_name = "post-test" }, basicAuth);
@@ -289,7 +294,7 @@ namespace BLTServices.Test
             postObj.division_name = "put-test";
             division putObj = this.PUTRequest<division>(host + "/Divisions/" + postObj.division_id, postObj, basicAuth);
             Assert.IsNotNull(RequestObj);
-                        
+
         }//end method
         [TestMethod]
         public void eventRequest()
@@ -452,7 +457,7 @@ namespace BLTServices.Test
             //active_ingredient useThisOne = this.GETRequest<active_ingredient>(host + "/ActiveIngredients/{entityId}");
             //postP2AIObj = this.POSTRequest<active_ingredient>(host + "/Products/{product_id}/AddProductToAI", useThisOne, basicAuth);
             //Assert.IsNotNull(postP2AIObj, "ID: " + postObj.product_id.ToString());
-            
+
             //GET POSTed item
             product RequestObj = this.GETRequest<product>(host + "/Products/" + postObj.id);
             Assert.IsNotNull(RequestObj);
@@ -495,15 +500,15 @@ namespace BLTServices.Test
 
             //POST
             pula_limitations postObj;
-            postObj = this.POSTRequest<pula_limitations>(host + "/PULALimitation", new pula_limitations() { pula_id=1, active_ingredient_id = 1, formulation_id = 1, crop_use_id = 1, limitation_id = 1 }, basicAuth);
+            postObj = this.POSTRequest<pula_limitations>(host + "/PULALimitation", new pula_limitations() { pula_id = 1, active_ingredient_id = 1, formulation_id = 1, crop_use_id = 1, limitation_id = 1 }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.formulation_id.ToString());
-                        
+
             //GET POSTed item
             pula_limitations RequestObj = this.GETRequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id);
             Assert.IsNotNull(RequestObj);
 
             //GET POSTed item
-            pula_limitations RequestUpdateObj = this.GETRequest<pula_limitations>(host + "/PULALimitation/" +postObj.pula_limitation_id + "/updateStatus/PUBLISHED&statusDate=09/14/2016", basicAuth );
+            pula_limitations RequestUpdateObj = this.GETRequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id + "/updateStatus/PUBLISHED&statusDate=09/14/2016", basicAuth);
             Assert.IsNotNull(RequestUpdateObj);
 
             //PUT POSTed item
@@ -573,14 +578,15 @@ namespace BLTServices.Test
 
             //POST
             user_ postObj;
-            postObj = this.POSTRequest<user_>(host + "/Users", new user_() { 
+            postObj = this.POSTRequest<user_>(host + "/Users", new user_()
+            {
                 username = "newUser",
                 fname = "post-test",
                 lname = "user",
                 phone = "123-456-7890",
                 email = "test@usgs.gov",
-                organization_id= 1,
-                password = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("BLTDef@u1t"))
+                organization_id = 1,
+                //password = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("BLTDef@u1t"))
             }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.user_id.ToString());
 
@@ -595,8 +601,8 @@ namespace BLTServices.Test
             //PUT POSTed item
             postObj.fname = "put-test";
             user_ putObj = this.PUTRequest<user_>(host + "/Users/" + postObj.user_id, postObj, basicAuth);
-            Assert.IsNotNull(RequestObj);            
-            
+            Assert.IsNotNull(RequestObj);
+
             //Delete POSTed item
             bool success = this.DELETERequest<user_>(host + "Users/" + postObj.user_id, basicAuth);
             Assert.IsTrue(success);
@@ -610,7 +616,7 @@ namespace BLTServices.Test
 
             //GET LIST
             List<version> RequestpubVList = this.GETRequest<List<version>>(host + "/Versions?publishedDate={date}");
-            Assert.IsNotNull(RequestpubVList, RequestList.Count.ToString());           
+            Assert.IsNotNull(RequestpubVList, RequestList.Count.ToString());
 
             //GET item
             version RequestObj1 = this.GETRequest<version>(host + "/ActiveIngredients/{aiEntityID}/Version");

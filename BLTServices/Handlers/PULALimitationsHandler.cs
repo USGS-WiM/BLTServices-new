@@ -71,8 +71,6 @@ namespace BLTServices.Handlers
                     pulaLimit = GetEntities<pula_limitations>(aBLTE).ToList();
                 }//end using
 
-                activateLinks<pula_limitations>(pulaLimit);
-
                 return new OperationResult.OK { ResponseResource = pulaLimit };
             }
             catch (Exception ex)
@@ -85,7 +83,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedPULALimitations")]
         public OperationResult GetVersionedPULALimitations(string status, string date)
         {
-            ObjectQuery<pula_limitations> pulaLimitQuery;
+            IQueryable<pula_limitations> pulaLimitQuery;
             List<pula_limitations> pulaLimitList;
             try
             {
@@ -119,9 +117,6 @@ namespace BLTServices.Handlers
                     pulaLimitList = pulaLimitQuery.ToList();
 
                 }//end using
-
-                activateLinks<pula_limitations>(pulaLimitList);
-
                 return new OperationResult.OK { ResponseResource = pulaLimitList };
             }
             catch (Exception ex)
@@ -148,9 +143,6 @@ namespace BLTServices.Handlers
                 {
                     pulaLimit = GetActive(GetEntities<pula_limitations>(aBLTE), thisDate.Value.Date).ToList();
                 }//end using
-
-                activateLinks<pula_limitations>(pulaLimit);
-
                 return new OperationResult.OK { ResponseResource = pulaLimit };
             }
             catch (Exception ex)
@@ -184,7 +176,7 @@ namespace BLTServices.Handlers
                     pulaLimitationList = query.ToList();
                 }//end using
 
-                activateLinks<pula_limitations>(pulaLimitationList);
+                //activateLinks<pula_limitations>(pulaLimitationList);
 
                 return new OperationResult.OK { ResponseResource = pulaLimitationList };
             }
@@ -213,8 +205,6 @@ namespace BLTServices.Handlers
                     IQueryable<pula_limitations> query1 = GetEntities<pula_limitations>(aBLTE).Where(a => a.pula_id == pulaId);
 
                     pulaLimitationList = GetActive(query1, thisDate.Value.Date).ToList();
-
-                    activateLinks<pula_limitations>(pulaLimitationList);
 
                 }//end using
 
@@ -282,9 +272,7 @@ namespace BLTServices.Handlers
                     aPULALimit = GetEntities<pula_limitations>(aBLTE).SingleOrDefault(ai => ai.pula_limitation_id == entityID);
 
                 }//end using
-
-                activateLinks<pula_limitations>(aPULALimit);
-
+                
                 return new OperationResult.OK { ResponseResource = aPULALimit };
             }
             catch (Exception ex)
@@ -330,8 +318,6 @@ namespace BLTServices.Handlers
                         aPULALimitation.version_id = SetVersion(aBLTE, aPULALimitation.version_id, loggedInUser.user_id, statusType, thisDate.Value.Date).version_id;
 
                         aBLTE.SaveChanges();
-                        activateLinks<pula_limitations>(aPULALimitation);
-
                     }//end using
                 }//end using
 
@@ -365,7 +351,6 @@ namespace BLTServices.Handlers
 
                             aBLTE.SaveChanges();
                         }//end if
-                        activateLinks<pula_limitations>(anEntity);
                     }//end using
                 }//end using
 
@@ -426,7 +411,7 @@ namespace BLTServices.Handlers
                             
                         aBLTE.SaveChanges();
 
-                        activateLinks<pula_limitations>(anEntity);
+                        //activateLinks<pula_limitations>(anEntity);
                     }//end using
                 }//end using
 

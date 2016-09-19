@@ -72,9 +72,6 @@ namespace BLTServices.Handlers
                         productList = GetEntities<product>(aBLTE).ToList();
                     }//end using
                 //}//end using
-
-                    activateLinks<product>(productList);
-
                 return new OperationResult.OK { ResponseResource = productList };
             }
             catch (Exception ex)
@@ -87,7 +84,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedProducts")]
         public OperationResult GetVersionedProducts(string status, string date)
         {
-            ObjectQuery<product> productQuery;
+            IQueryable<product> productQuery;
             List<product> products;
             try
             {
@@ -102,27 +99,25 @@ namespace BLTServices.Handlers
                     switch (statustype)
                     {
                         case (StatusType.Published):
-                            productQuery.Where(ai => ai.version.published_time_stamp != null);
+                            productQuery.Where(ai => ai.versions.published_time_stamp != null);
                             break;
                         case (StatusType.Reviewed):
-                            productQuery.Where(ai => ai.version.reviewed_time_stamp != null &&
-                                            ai.version.published_time_stamp == null);
+                            productQuery.Where(ai => ai.versions.reviewed_time_stamp != null &&
+                                            ai.versions.published_time_stamp == null);
                             break;
                         //created
                         default:
-                            productQuery.Where(ai => ai.version.reviewed_time_stamp == null &&
-                                            ai.version.published_time_stamp == null);
+                            productQuery.Where(ai => ai.versions.reviewed_time_stamp == null &&
+                                            ai.versions.published_time_stamp == null);
                             break;
                     }//end switch
 
-                    productQuery.Where(ai => !ai.version.expired_time_stamp.HasValue ||
-                                        ai.version.expired_time_stamp < thisDate.Value.Date);
+                    productQuery.Where(ai => !ai.versions.expired_time_stamp.HasValue ||
+                                        ai.versions.expired_time_stamp < thisDate.Value.Date);
 
                     products = productQuery.ToList();
 
                 }//end using
-
-                activateLinks<product>(products);
 
                 return new OperationResult.OK { ResponseResource = products };
             }
@@ -154,7 +149,7 @@ namespace BLTServices.Handlers
                     aProductList = GetActive(GetEntities<product>(aBLTE), thisDate.Value.Date).OrderBy(a => a.product_name).ToList();
                 }//end using                
 
-                activateLinks<product>(aProductList);
+                ////activateLinks<product>(aProductList);
 
                 return new OperationResult.OK { ResponseResource = aProductList };
             }
@@ -203,9 +198,6 @@ namespace BLTServices.Handlers
                     aProductList = query.ToList();
 
                 }//end using                
-
-                activateLinks<product>(aProductList);
-
                 return new OperationResult.OK { ResponseResource = aProductList };
             }
             catch (Exception ex)
@@ -244,7 +236,7 @@ namespace BLTServices.Handlers
                     productList = query.ToList();
                 }//end using
 
-                activateLinks<product>(productList);
+                //activateLinks<product>(productList);
 
                 return new OperationResult.OK { ResponseResource = productList };
             }
@@ -279,7 +271,7 @@ namespace BLTServices.Handlers
                     //only return published
                     productList = GetActive(query1, thisDate.Value.Date).ToList();
                     
-                    activateLinks<product>(productList);
+                    ////activateLinks<product>(productList);
 
                 }//end using
 
@@ -317,7 +309,7 @@ namespace BLTServices.Handlers
 
                     productList = GetActive(query1, thisDate.Value.Date).ToList();
 
-                    activateLinks<product>(productList);
+                    ////activateLinks<product>(productList);
 
                 }//end using
 
@@ -342,9 +334,6 @@ namespace BLTServices.Handlers
                     aProduct = GetEntities<product>(aBLTE).SingleOrDefault(c => c.id == entityID);
 
                 }//end using
-
-                activateLinks<product>(aProduct);
-
                 return new OperationResult.OK { ResponseResource = aProduct };
             }
             catch (Exception ex)
@@ -386,7 +375,7 @@ namespace BLTServices.Handlers
                         }
                         else
                         {//it exists, check if expired
-                            if (anEntity.version.expired_time_stamp.HasValue)
+                            if (anEntity.versions.expired_time_stamp.HasValue)
                             {
                                 product newP = new product();
                                 newP.product_name = anEntity.product_name;
@@ -398,8 +387,6 @@ namespace BLTServices.Handlers
                                 aBLTE.SaveChanges();
                             }//end if
                         }//end if//end if//end if
-
-                        activateLinks<product>(anEntity); 
                     }//end using
                 }//end using
 
@@ -489,7 +476,7 @@ namespace BLTServices.Handlers
                         if (aProduct == null)
                         { return new OperationResult.BadRequest(); }
 
-                        if (aProduct.version.published_time_stamp.HasValue)
+                        if (aProduct.versions.published_time_stamp.HasValue)
                         {
                             //can not edit a published entity. Create new
                             //assign next pulaID
@@ -507,8 +494,6 @@ namespace BLTServices.Handlers
                         }//end if
 
                         aBLTE.SaveChanges();
-
-                        activateLinks<product>(anEntity);
                     }//end using
                 }//end using
 
@@ -541,7 +526,7 @@ namespace BLTServices.Handlers
                     { return new OperationResult.BadRequest(); }
 
                     //NOTE: ShapeID can not be changed
-                    if (ObjectToBeDelete.version.published_time_stamp.HasValue)
+                    if (ObjectToBeDelete.versions.published_time_stamp.HasValue)
                     {
                         //set the date to be first of following month 
                         //int nextMo = DateTime.Now.Month + 1;
@@ -687,25 +672,25 @@ namespace BLTServices.Handlers
         {
             //get all published, should only be 1
             List<product> aiList = aBLTE.products.Where(p => p.product_id == product.product_id &&
-                                                        p.version.published_time_stamp <= dt.Date).ToList();
+                                                        p.versions.published_time_stamp <= dt.Date).ToList();
             if (aiList == null) return;
 
             foreach (var p in aiList)
             {
                 if (!p.Equals(product))
-                    p.version = SetVersion(aBLTE, p.version_id, userId, StatusType.Expired, dt.Date);
+                    p.versions = SetVersion(aBLTE, p.version_id, userId, StatusType.Expired, dt.Date);
             }//next
         }//end ExpireOtherEntities
         protected override void ExpireEntities(bltEntities aBLTE, Int32 userId, Int32 Id, DateTime dt)
         {
             //get all published, should only be 1
             List<product> aiList = aBLTE.products.Where(p => p.product_id == Id &&
-                                                        p.version.published_time_stamp <= dt).ToList();
+                                                        p.versions.published_time_stamp <= dt).ToList();
             if (aiList == null) return;
 
             foreach (var p in aiList)
             {
-                p.version = SetVersion(aBLTE, p.version_id, userId, StatusType.Expired, dt.Date);
+                p.versions = SetVersion(aBLTE, p.version_id, userId, StatusType.Expired, dt.Date);
             }//next
         }
         #endregion

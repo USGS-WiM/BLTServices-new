@@ -68,8 +68,6 @@ namespace BLTServices.Handlers
                     roleList = GetEntities<role>(aBLTE).ToList();
                 }//end using
 
-                activateLinks<role>(roleList);
-
                 return new OperationResult.OK { ResponseResource = roleList };
             }
             catch (Exception ex)
@@ -93,9 +91,7 @@ namespace BLTServices.Handlers
                 {
                     aRole = GetEntities<role>(aBLTE).FirstOrDefault(r => r.role_id == roleID);
                 }//end using                
-
-                activateLinks<role>(aRole);
-
+                
                 return new OperationResult.OK { ResponseResource = aRole };
             }
             catch (Exception ex)

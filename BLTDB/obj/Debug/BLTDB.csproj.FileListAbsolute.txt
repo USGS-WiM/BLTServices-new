@@ -18,3 +18,23 @@ D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\ja\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\zh-CN\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\obj\Debug\BLTDB.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\obj\Debug\BLTDB.pdb
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\BLTDB.dll.config
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\BLTDB.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\BLTDB.pdb
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\EntityFramework.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\Mono.Security.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\Npgsql.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\Npgsql.EntityFrameworkLegacy.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\OpenRasta.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\OpenRasta.Hosting.AspNet.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\EntityFramework.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\Npgsql.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\Npgsql.EntityFrameworkLegacy.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\de\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\es\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\fi\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\fr\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\ja\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\bin\Debug\zh-CN\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\obj\Debug\BLTDB.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB\obj\Debug\BLTDB.pdb

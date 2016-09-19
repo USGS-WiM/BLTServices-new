@@ -67,7 +67,7 @@ namespace BLTServices.Handlers
                     divList = GetEntities<division>(aBLTE).OrderBy(a=>a.division_name).ToList();
                 }//end using                
 
-                activateLinks<division>(divList);
+                //activateLinks<division>(divList);
 
                 return new OperationResult.OK { ResponseResource = divList };
             }
@@ -91,7 +91,7 @@ namespace BLTServices.Handlers
                     anDiv = GetEntities<division>(aBLTE).SingleOrDefault(d=>d.division_id==divisionID);
 
                 }//end using
-                activateLinks<division>(anDiv);
+                //activateLinks<division>(anDiv);
 
                 return new OperationResult.OK { ResponseResource = anDiv };
             }
@@ -124,7 +124,7 @@ namespace BLTServices.Handlers
                             aBLTE.SaveChanges();
                         }
 
-                        activateLinks<division>(anEntity);
+                        //activateLinks<division>(anEntity);
 
                     }//end using
                 }//end using
@@ -163,7 +163,7 @@ namespace BLTServices.Handlers
                     }// end using
                 }// end using
 
-                activateLinks<division>(instance);
+                //activateLinks<division>(instance);
 
                 return new OperationResult.OK { ResponseResource = instance };
             }
