@@ -66,7 +66,7 @@ namespace BLTServices.Handlers
                     eventList  = GetEntities<@event>(aBLTE).OrderBy(a=>a.name).ToList();
                 }//end using
                 
-                activateLinks<@event>(eventList);
+                //activateLinks<@event>(eventList);
 
                 return new OperationResult.OK { ResponseResource = eventList };
             }
@@ -91,7 +91,7 @@ namespace BLTServices.Handlers
                     anEvent = GetEntities<@event>(aBLTE).SingleOrDefault(o=>o.event_id == eventID);
                 }//end using
                 
-                activateLinks<@event>(anEvent);
+                //activateLinks<@event>(anEvent);
 
                 return new OperationResult.OK { ResponseResource = anEvent };
             }
@@ -124,7 +124,7 @@ namespace BLTServices.Handlers
                             aBLTE.SaveChanges();
                         }
 
-                        activateLinks<@event>(anEntity);
+                        //activateLinks<@event>(anEntity);
 
                     }//end using
                 }//end using
@@ -164,7 +164,7 @@ namespace BLTServices.Handlers
                     }// end using
                 }// end using
 
-                activateLinks<@event>(instance);
+                //activateLinks<@event>(instance);
 
                 return new OperationResult.OK { ResponseResource = instance };
             }

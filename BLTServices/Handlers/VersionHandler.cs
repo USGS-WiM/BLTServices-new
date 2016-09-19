@@ -68,7 +68,6 @@ namespace BLTServices.Handlers
                     versionList = GetEntities<version>(aBLTE).ToList();
                 }//end using
 
-                activateLinks<version>(versionList);
 
                 return new OperationResult.OK { ResponseResource = versionList };
             }
@@ -98,7 +97,6 @@ namespace BLTServices.Handlers
                     versionList = GetActive(GetEntities<version>(aBLTE), thisDate.Value).ToList();
                 }//end using
 
-                activateLinks<version>(versionList);
 
                 return new OperationResult.OK { ResponseResource = versionList };
             }
@@ -125,9 +123,7 @@ namespace BLTServices.Handlers
                     aVersion = GetEntities<active_ingredient>(aBLTE).FirstOrDefault(ai => ai.id == aiEntityID).version;
 
                 }//end using
-
-                activateLinks<version>(aVersion);
-
+                
                 return new OperationResult.OK { ResponseResource = aVersion };
             }
             catch (Exception ex)
@@ -154,7 +150,6 @@ namespace BLTServices.Handlers
 
                 }//end using
 
-                activateLinks<version>(aVersion);
 
                 return new OperationResult.OK { ResponseResource = aVersion };
             }

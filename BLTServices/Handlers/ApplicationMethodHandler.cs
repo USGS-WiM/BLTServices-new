@@ -72,7 +72,7 @@ namespace BLTServices.Handlers
                         anApplicationMethod = GetEntities<application_method>(aBLTE).ToList();
                     }//end using
               //  }//end using
-                activateLinks<application_method>(anApplicationMethod);
+                //activateLinks<application_method>(anApplicationMethod);
 
                 return new OperationResult.OK { ResponseResource = anApplicationMethod };
             }
@@ -86,7 +86,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedApplicationMethods")]
         public OperationResult GetVersionedApplicationMethods(string status, string date)
         {
-            ObjectQuery<application_method> appMethQuery;
+            IQueryable<application_method> appMethQuery;
             List<application_method> appMethods;
             try
             {
@@ -122,7 +122,7 @@ namespace BLTServices.Handlers
                 }//end using
                 
 
-                activateLinks<application_method>(appMethods);
+                //activateLinks<application_method>(appMethods);
 
                 return new OperationResult.OK { ResponseResource = appMethods };
             }
@@ -151,7 +151,7 @@ namespace BLTServices.Handlers
                     anApplicationMethodList = GetActive(GetEntities<application_method>(aBLTE), thisDate.Value.Date).OrderBy(a=>a.method).ToList();
                 }//end using
 
-                activateLinks<application_method>(anApplicationMethodList);
+                //activateLinks<application_method>(anApplicationMethodList);
 
                 return new OperationResult.OK { ResponseResource = anApplicationMethodList };
             }
@@ -192,7 +192,7 @@ namespace BLTServices.Handlers
                 }//end using
                 
 
-                activateLinks<application_method>(applicationMethodList);
+                //activateLinks<application_method>(applicationMethodList);
 
                 return new OperationResult.OK { ResponseResource = applicationMethodList };
             }
@@ -226,7 +226,7 @@ namespace BLTServices.Handlers
 
                     applicationMethodList = GetActive(query1, thisDate.Value.Date).ToList();
 
-                    activateLinks<application_method>(applicationMethodList);
+                    //activateLinks<application_method>(applicationMethodList);
 
                 }//end using
 
@@ -251,7 +251,7 @@ namespace BLTServices.Handlers
 
                 }//end using                
 
-                activateLinks<application_method>(anApplicationMethod);
+                //activateLinks<application_method>(anApplicationMethod);
 
                 return new OperationResult.OK { ResponseResource = anApplicationMethod };
             }
@@ -299,7 +299,7 @@ namespace BLTServices.Handlers
                                 aBLTE.SaveChanges();
                             }//end if
                         }
-                        activateLinks<application_method>(anEntity);
+                        //activateLinks<application_method>(anEntity);
                     }//end using
                 }//end using
 
@@ -356,7 +356,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<application_method>(anApplicationMethod);
+                        //activateLinks<application_method>(anApplicationMethod);
                     }//end using
                 }//end using
 
