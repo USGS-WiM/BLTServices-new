@@ -70,7 +70,6 @@ namespace BLTServices.Handlers
                        userList  = GetEntities<user_>(aBLTE).ToList();
                     }//end using
                 }//end using
-                activateLinks<user_>(userList);
 
                 return new OperationResult.OK { ResponseResource = userList };
             }
@@ -96,9 +95,7 @@ namespace BLTServices.Handlers
                         userList = GetEntities<user_>(aBLTE).Where(u => u.user_id== userID).ToList();
                     }//end using
                 }//end using
-
-                activateLinks<user_>(userList);
-
+                
                 return new OperationResult.OK { ResponseResource = userList };
             }
             catch (Exception ex)
@@ -125,9 +122,7 @@ namespace BLTServices.Handlers
                                                                                     u.versions2.Any(v => v.version_id == versionID)).ToList();
                     }//end using
                 }//end using
-
-                activateLinks<user_>(userList);
-
+                
                 return new OperationResult.OK { ResponseResource = userList };
             }
             catch (Exception ex)
@@ -152,8 +147,6 @@ namespace BLTServices.Handlers
                        aUser = GetEntities<user_>(aBLTE).FirstOrDefault(u => string.Equals(u.username.ToUpper(), username.ToUpper()));
                     }//end using
                 }//end using
-                activateLinks<user_>(aUser);
-
                 return new OperationResult.OK { ResponseResource = aUser };
             }
             catch (Exception ex)
@@ -206,8 +199,6 @@ namespace BLTServices.Handlers
                             anEntity.password = string.Empty;
                             anEntity.salt = string.Empty;
                         }
-
-                        activateLinks<user_>(anEntity);
 
                     }//end using
                 }//end using

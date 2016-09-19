@@ -71,7 +71,7 @@ namespace BLTServices.Handlers
                     aFormulation = GetEntities<formulation>(aBLTE).ToList();
                 }//end using
 
-                activateLinks<formulation>(aFormulation);
+                //activateLinks<formulation>(aFormulation);
 
                 return new OperationResult.OK { ResponseResource = aFormulation };
             }
@@ -86,7 +86,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedFormulations")]
         public OperationResult GetVersionedFormulations(string status, string date)
         {
-            ObjectQuery<formulation> formulaQuery;
+            IQueryable<formulation> formulaQuery;
             List<formulation> formulaList;
             try
             {
@@ -121,7 +121,7 @@ namespace BLTServices.Handlers
 
                 }//end using
                 
-                activateLinks<formulation>(formulaList);
+                //activateLinks<formulation>(formulaList);
 
                 return new OperationResult.OK { ResponseResource = formulaList };
             }
@@ -150,7 +150,7 @@ namespace BLTServices.Handlers
                     aFormulationList = GetActive(GetEntities<formulation>(aBLTE), thisDate.Value.Date).OrderBy(a=>a.form).ToList();
                 }//end using
 
-                activateLinks<formulation>(aFormulationList);
+                //activateLinks<formulation>(aFormulationList);
 
                 return new OperationResult.OK { ResponseResource = aFormulationList };
             }
@@ -185,7 +185,7 @@ namespace BLTServices.Handlers
                     formulationList = query.ToList();
                 }//end using
                 
-                activateLinks<formulation>(formulationList);
+                //activateLinks<formulation>(formulationList);
 
                 return new OperationResult.OK { ResponseResource = formulationList };
             }
@@ -220,7 +220,7 @@ namespace BLTServices.Handlers
 
                     formulationList = GetActive(query1, thisDate.Value.Date).ToList();
 
-                    activateLinks<formulation>(formulationList);
+                    //activateLinks<formulation>(formulationList);
 
                 }//end using
 
@@ -246,7 +246,7 @@ namespace BLTServices.Handlers
 
                 }//end using
 
-                activateLinks<formulation>(aFormulation);
+                //activateLinks<formulation>(aFormulation);
 
                 return new OperationResult.OK { ResponseResource = aFormulation };
             }
@@ -295,7 +295,7 @@ namespace BLTServices.Handlers
                             }//end if
                         }//end if//end if
 
-                        activateLinks<formulation>(anEntity);
+                        //activateLinks<formulation>(anEntity);
                     }//end using
                 }//end using
 
@@ -352,7 +352,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<formulation>(aFormulation);
+                        //activateLinks<formulation>(aFormulation);
                     }//end using
                 }//end using
 

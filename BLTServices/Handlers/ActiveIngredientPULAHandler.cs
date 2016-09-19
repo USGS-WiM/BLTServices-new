@@ -75,7 +75,7 @@ namespace BLTServices.Handlers
                     }//end using
                // }//end using
 
-                    activateLinks<active_ingredient_pula>(aiPula);
+                    //activateLinks<active_ingredient_pula>(aiPula);
 
                 return new OperationResult.OK { ResponseResource = aiPula };
             }
@@ -89,7 +89,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedPulas")]
         public OperationResult GetVersionedPulas(string status, string date)
         {
-            ObjectQuery<active_ingredient_pula> aiQuery;
+            IQueryable<active_ingredient_pula> aiQuery;
             List<active_ingredient_pula> aiPula;
             try
             {
@@ -127,7 +127,7 @@ namespace BLTServices.Handlers
                     }//end using
                // }//end using
 
-                    activateLinks<active_ingredient_pula>(aiPula);
+                    //activateLinks<active_ingredient_pula>(aiPula);
 
                 return new OperationResult.OK { ResponseResource = aiPula };
             }
@@ -155,7 +155,7 @@ namespace BLTServices.Handlers
                 {
                     aiPula = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).ToList();
                 }//end using
-                activateLinks<active_ingredient_pula>(aiPula);
+                //activateLinks<active_ingredient_pula>(aiPula);
 
                 return new OperationResult.OK { ResponseResource = aiPula };
             }
@@ -188,7 +188,7 @@ namespace BLTServices.Handlers
                     aiPulas = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).Where(p => p.pula_shape_id == pulaId).ToList();
                 }//end using
 
-                activateLinks<active_ingredient_pula>(aiPulas);
+                //activateLinks<active_ingredient_pula>(aiPulas);
 
                 return new OperationResult.OK { ResponseResource = aiPulas };
             }
@@ -229,7 +229,7 @@ namespace BLTServices.Handlers
                     }).ToList<SimplePULA>();
                 }//end using   
 
-                //activateLinks<SimplePULA>(aiPulas.PULA);
+                ////activateLinks<SimplePULA>(aiPulas.PULA);
 
                 return new OperationResult.OK { ResponseResource = aiPulas };
             }
@@ -306,7 +306,7 @@ namespace BLTServices.Handlers
 
                 }//end using   
 
-                //activateLinks<SimplePULA>(aiList.PULA);
+                ////activateLinks<SimplePULA>(aiList.PULA);
 
                 return new OperationResult.OK { ResponseResource = aiList };
             }
@@ -374,7 +374,7 @@ namespace BLTServices.Handlers
 
                 }//end using   
 
-                //activateLinks<SimplePULA>(aiList.PULA);
+                ////activateLinks<SimplePULA>(aiList.PULA);
 
                 return new OperationResult.OK { ResponseResource = aiList };
             }
@@ -435,7 +435,7 @@ namespace BLTServices.Handlers
                 
                 }//end using   
 
-                activateLinks<active_ingredient_pula>(aiPula);
+                //activateLinks<active_ingredient_pula>(aiPula);
 
                 return new OperationResult.OK { ResponseResource = aiPula };
             }
@@ -469,7 +469,7 @@ namespace BLTServices.Handlers
                     }).ToList<SimplePULA>();
                 }//end using   
 
-                //activateLinks<SimplePULA>(aiPulas.PULA);
+                ////activateLinks<SimplePULA>(aiPulas.PULA);
 
                 return new OperationResult.OK { ResponseResource = aiPulas };
             }
@@ -495,7 +495,7 @@ namespace BLTServices.Handlers
                     }//end using
                // }//end using
 
-                    activateLinks<active_ingredient_pula>(anAIPULA);
+                    //activateLinks<active_ingredient_pula>(anAIPULA);
 
                 return new OperationResult.OK { ResponseResource = anAIPULA };
             }
@@ -561,7 +561,7 @@ namespace BLTServices.Handlers
                         }//end if
 
                         aBLTE.SaveChanges();
-                        activateLinks<active_ingredient_pula>(aPULA);
+                        //activateLinks<active_ingredient_pula>(aPULA);
 
                     }//end using
                 }//end using
@@ -684,7 +684,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<active_ingredient_pula>(aPULA);
+                        //activateLinks<active_ingredient_pula>(aPULA);
 
                     }//end using
                 }//end using
