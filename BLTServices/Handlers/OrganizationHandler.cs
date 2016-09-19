@@ -67,7 +67,7 @@ namespace BLTServices.Handlers
                     orgList = GetEntities<organization>(aBLTE).OrderBy(a => a.name).ToList();
                 }//end using
 
-                activateLinks<organization>(orgList);
+                //activateLinks<organization>(orgList);
 
                 return new OperationResult.OK { ResponseResource = orgList };
             }
@@ -92,7 +92,7 @@ namespace BLTServices.Handlers
                     anOrg = GetEntities<organization>(aBLTE).SingleOrDefault(o => o.organization_id == organizationID);
                 }//end using
 
-                activateLinks<organization>(anOrg);
+                //activateLinks<organization>(anOrg);
 
                 return new OperationResult.OK { ResponseResource = anOrg };
             }
@@ -125,7 +125,7 @@ namespace BLTServices.Handlers
                             aBLTE.SaveChanges();
                         }
 
-                        activateLinks<organization>(anEntity);
+                        //activateLinks<organization>(anEntity);
 
                     }//end using
                 }//end using
@@ -164,7 +164,7 @@ namespace BLTServices.Handlers
                     }// end using
                 }// end using
 
-                activateLinks<organization>(instance);
+                //activateLinks<organization>(instance);
 
                 return new OperationResult.OK { ResponseResource = instance };
             }

@@ -36,7 +36,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -148,12 +148,6 @@
     <Compile Include="Authentication\WiMRequiresRoleAttribute.cs" />
     <Compile Include="Authentication\WiMRequiresRoleInterceptor.cs" />
     <Compile Include="Codecs\application\json\JsonDotNetCodec.cs" />
-    <Compile Include="Codecs\application\xml\BLTXmlSerializerCodec.cs" />
-    <Compile Include="Codecs\application\xml\SimpleUTF8XmlSerializerCodec.cs" />
-    <Compile Include="Codecs\application\xml\UTF8XmlCodec.cs" />
-    <Compile Include="Codecs\application\xml\UTF8XmlSerializerCodec.cs" />
-    <Compile Include="Codecs\application\xml\WiMXmlCodec.cs" />
-    <Compile Include="Codecs\application\xml\WiMXmlSerializerCodec.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -178,7 +172,6 @@
     <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Handlers\OrganizationHandler.cs" />
     <Compile Include="Handlers\RoleHandler.cs" />
-    <Compile Include="Handlers\UserHandler.cs" />
     <Compile Include="Handlers\VersionHandler.cs" />
     <Compile Include="Hypermedia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -77,7 +77,7 @@ namespace BLTServices.Handlers
                     }//end using
                 //}//end using
 
-                activateLinks<active_ingredient>(aiList);
+                //activateLinks<active_ingredient>(aiList);
 
                 return new OperationResult.OK { ResponseResource = aiList };
             }
@@ -92,7 +92,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedActiveIngredients")]
         public OperationResult GetVersionedActiveIngredients(string status, string date)
         {
-            ObjectQuery<active_ingredient> aiQuery;
+            IQueryable<active_ingredient> aiQuery;
             List<active_ingredient> activeIngredient;
             try
             {
@@ -130,7 +130,7 @@ namespace BLTServices.Handlers
                     }//end using
                 }//end using
 
-                activateLinks<active_ingredient>(activeIngredient);
+                //activateLinks<active_ingredient>(activeIngredient);
 
                 return new OperationResult.OK { ResponseResource = activeIngredient };
             }
@@ -159,7 +159,7 @@ namespace BLTServices.Handlers
                 {
                     aiList = GetActive(GetEntities<active_ingredient>(aBLTE), thisDate.Value).OrderBy(a => a.ingredient_name).ToList();
                 }//end using
-                activateLinks<active_ingredient>(aiList);
+                //activateLinks<active_ingredient>(aiList);
 
                 return new OperationResult.OK { ResponseResource = aiList };
             }
@@ -202,7 +202,7 @@ namespace BLTServices.Handlers
                     }//end using
                 //}//end using
 
-                    activateLinks<active_ingredient>(aiList);
+                    //activateLinks<active_ingredient>(aiList);
 
                 return new OperationResult.OK { ResponseResource = aiList };
             }
@@ -237,7 +237,7 @@ namespace BLTServices.Handlers
 
                     aiList = GetActive(query1,thisDate.Value).ToList();
 
-                    activateLinks<active_ingredient>(aiList);
+                    //activateLinks<active_ingredient>(aiList);
 
                 }//end using
 
@@ -267,7 +267,7 @@ namespace BLTServices.Handlers
                     }//end using
                 //}//end using
 
-                    activateLinks<active_ingredient>(anAI);
+                    //activateLinks<active_ingredient>(anAI);
 
                 return new OperationResult.OK { ResponseResource = anAI };
             }
@@ -318,7 +318,7 @@ namespace BLTServices.Handlers
                             }
                         }//end if
 
-                        activateLinks<active_ingredient>(anEntity);                       
+                        //activateLinks<active_ingredient>(anEntity);                       
                     }//end using
                 }//end using
 
@@ -380,7 +380,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<active_ingredient>(anEntity);
+                        //activateLinks<active_ingredient>(anEntity);
                     }//end using
                 }//end using
 

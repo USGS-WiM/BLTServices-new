@@ -25,3 +25,30 @@ D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\zh-CN\Npgsql.resources.d
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.csprojResolveAssemblyReference.cache
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.pdb
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\BLTDB.Test.dll.config
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\BLTDB.Test.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\BLTDB.Test.pdb
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\BLTDB.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\EntityFramework.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Mono.Security.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Newtonsoft.Json.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Npgsql.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Npgsql.EntityFrameworkLegacy.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\OpenRasta.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\OpenRasta.Hosting.AspNet.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\RestSharp.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\BLTDB.pdb
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\EntityFramework.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Newtonsoft.Json.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Npgsql.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\Npgsql.EntityFrameworkLegacy.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\RestSharp.xml
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\de\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\es\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\fi\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\fr\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\ja\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\bin\Debug\zh-CN\Npgsql.resources.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.csprojResolveAssemblyReference.cache
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.dll
+C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTDB.Test\obj\Debug\BLTDB.Test.pdb
