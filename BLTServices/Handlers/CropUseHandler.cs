@@ -69,7 +69,7 @@ namespace BLTServices.Handlers
                     cropUseList = GetEntities<crop_use>(aBLTE).ToList();
                 }//end using
                 
-                activateLinks<crop_use>(cropUseList);
+                //activateLinks<crop_use>(cropUseList);
 
                 return new OperationResult.OK { ResponseResource = cropUseList };
             }
@@ -84,7 +84,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedCropUses")]
         public OperationResult GetVersionedCropUses(string status, string date)
         {
-            ObjectQuery<crop_use> cropUseQuery;
+            IQueryable<crop_use> cropUseQuery;
             List<crop_use> cropUses;
             try
             {
@@ -120,7 +120,7 @@ namespace BLTServices.Handlers
                 }//end using
                
 
-                activateLinks<crop_use>(cropUses);
+                //activateLinks<crop_use>(cropUses);
 
                 return new OperationResult.OK { ResponseResource = cropUses };
             }
@@ -150,7 +150,7 @@ namespace BLTServices.Handlers
                    
                 }//end using
 
-                activateLinks<crop_use>(aCropUseList);
+                //activateLinks<crop_use>(aCropUseList);
 
                 return new OperationResult.OK { ResponseResource = aCropUseList };
             }
@@ -190,7 +190,7 @@ namespace BLTServices.Handlers
                     cropUseList = query.ToList();
                 }//end using               
 
-                activateLinks<crop_use>(cropUseList);
+                //activateLinks<crop_use>(cropUseList);
 
                 return new OperationResult.OK { ResponseResource = cropUseList };
             }
@@ -225,7 +225,7 @@ namespace BLTServices.Handlers
 
                     cropUseList = GetActive(query1, thisDate.Value.Date).ToList();
 
-                    activateLinks<crop_use>(cropUseList);
+                    //activateLinks<crop_use>(cropUseList);
 
                 }//end using
 
@@ -252,7 +252,7 @@ namespace BLTServices.Handlers
                 }//end using
                 
 
-                activateLinks<crop_use>(anCropUse);
+                //activateLinks<crop_use>(anCropUse);
 
                 return new OperationResult.OK { ResponseResource = anCropUse };
             }
@@ -300,7 +300,7 @@ namespace BLTServices.Handlers
                             }//end if
                         }//end if
 
-                        activateLinks<crop_use>(anEntity); 
+                        //activateLinks<crop_use>(anEntity); 
                     }//end using
                 }//end using
 
@@ -358,7 +358,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<crop_use>(anEntity);
+                        //activateLinks<crop_use>(anEntity);
                     }//end using
                 }//end using
 

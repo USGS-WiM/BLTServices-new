@@ -69,7 +69,7 @@ namespace BLTServices.Handlers
                         aiClassList = GetEntities<ai_class>(aBLTE).ToList();
                     }//end using
                // }//end using
-                    activateLinks<ai_class>(aiClassList);
+                    //activateLinks<ai_class>(aiClassList);
 
                 return new OperationResult.OK { ResponseResource = aiClassList };
             }
@@ -83,7 +83,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedAIClasss")]
         public OperationResult GetVersionedAIClasses(string status, string date)
         {
-            ObjectQuery<ai_class> aiClassQuery;
+            IQueryable<ai_class> aiClassQuery;
             List<ai_class> aiClasses;
             try
             {
@@ -121,7 +121,7 @@ namespace BLTServices.Handlers
                     }//end using
                 //}//end using
 
-                activateLinks<ai_class>(aiClasses);
+                //activateLinks<ai_class>(aiClasses);
 
                 return new OperationResult.OK { ResponseResource = aiClasses };
             }
@@ -151,7 +151,7 @@ namespace BLTServices.Handlers
                     
                 }//end using
 
-                activateLinks<ai_class>(aiClassList);
+                //activateLinks<ai_class>(aiClassList);
 
                 return new OperationResult.OK { ResponseResource = aiClassList };
             }
@@ -193,7 +193,7 @@ namespace BLTServices.Handlers
                     }//end using
               //  }//end using
 
-                activateLinks<ai_class>(aiClassList);
+                //activateLinks<ai_class>(aiClassList);
 
                 return new OperationResult.OK { ResponseResource = aiClassList };
             }
@@ -227,7 +227,7 @@ namespace BLTServices.Handlers
 
                     aiClassList = GetActive(query1, thisDate.Value.Date).ToList();
 
-                    activateLinks<ai_class>(aiClassList);
+                    //activateLinks<ai_class>(aiClassList);
 
                 }//end using
 
@@ -256,7 +256,7 @@ namespace BLTServices.Handlers
                     }//end using
              //   }//end using
             
-                activateLinks<ai_class>(anAIClass);
+                //activateLinks<ai_class>(anAIClass);
 
                 return new OperationResult.OK { ResponseResource = anAIClass };
             }
@@ -304,7 +304,7 @@ namespace BLTServices.Handlers
                                 aBLTE.SaveChanges();
                             }
                         }
-                        activateLinks<ai_class>(anEntity);
+                        //activateLinks<ai_class>(anEntity);
                     }//end using
                 }//end using
 
@@ -410,7 +410,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<ai_class>(anAIClass);
+                        //activateLinks<ai_class>(anAIClass);
                     }//end using
                 }//end using
 

@@ -68,7 +68,7 @@ namespace BLTServices.Handlers
                     limitationList = GetEntities<limitation>(aBLTE).ToList();
                 }//end using
 
-                activateLinks<limitation>(limitationList);
+                //activateLinks<limitation>(limitationList);
 
                 return new OperationResult.OK { ResponseResource = limitationList };
             }
@@ -83,7 +83,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET, ForUriName = "GetVersionedLimitations")]
         public OperationResult GetVersionedLimitations(string status, string date)
         {
-            ObjectQuery<limitation> limitQuery;
+            IQueryable<limitation> limitQuery;
             List<limitation> limitation;
             try
             {
@@ -118,7 +118,7 @@ namespace BLTServices.Handlers
 
                 }//end using
 
-                activateLinks<limitation>(limitation);
+                //activateLinks<limitation>(limitation);
 
                 return new OperationResult.OK { ResponseResource = limitation };
             }
@@ -148,7 +148,7 @@ namespace BLTServices.Handlers
                 }//end using
                 
 
-                activateLinks<limitation>(limitationList);
+                //activateLinks<limitation>(limitationList);
 
                 return new OperationResult.OK { ResponseResource = limitationList };
             }
@@ -183,7 +183,7 @@ namespace BLTServices.Handlers
                     limitationList = query.ToList();
                 }//end using
 
-                activateLinks<limitation>(limitationList);
+                //activateLinks<limitation>(limitationList);
 
                 return new OperationResult.OK { ResponseResource = limitationList };
             }
@@ -218,7 +218,7 @@ namespace BLTServices.Handlers
 
                     limitationsList = GetActive(query1, thisDate.Value).ToList();
 
-                    activateLinks<limitation>(limitationsList);
+                    //activateLinks<limitation>(limitationsList);
 
                 }//end using
 
@@ -244,7 +244,7 @@ namespace BLTServices.Handlers
 
                 }//end using
                 
-                activateLinks<limitation>(aLimitation);
+                //activateLinks<limitation>(aLimitation);
 
                 return new OperationResult.OK { ResponseResource = aLimitation };
             }
@@ -280,7 +280,7 @@ namespace BLTServices.Handlers
                             aBLTE.SaveChanges();
                         }//end if
 
-                        activateLinks<limitation>(anEntity);
+                        //activateLinks<limitation>(anEntity);
                     }//end using
                 }//end using
 
@@ -337,7 +337,7 @@ namespace BLTServices.Handlers
 
                         aBLTE.SaveChanges();
 
-                        activateLinks<limitation>(aLimitation);
+                        //activateLinks<limitation>(aLimitation);
                     }//end using
                 }//end using
 
