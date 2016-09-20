@@ -203,7 +203,7 @@ namespace BLTServices.Handlers
         }//end HttpMethod.GET
 
         [HttpOperation(HttpMethod.GET, ForUriName = "GetPULALimitationsApplicationMethod")]
-        public OperationResult GetPULALimitationsApplicationMethod(Int32 pulaLimitatationsID, [Optional]string date)
+        public OperationResult GetPULALimitationsApplicationMethod(Int32 pulaLimitationID, [Optional]string date)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace BLTServices.Handlers
                 {
 
                     IQueryable<application_method> query1 =
-                            (from PULALimit in GetActive(aBLTE.pula_limitations.Where(p => p.pula_limitation_id == pulaLimitatationsID), thisDate.Value.Date)
+                            (from PULALimit in GetActive(aBLTE.pula_limitations.Where(p => p.pula_limitation_id == pulaLimitationID), thisDate.Value.Date)
                              join am in aBLTE.application_method
                              on PULALimit.application_method_id equals am.application_method_id
                              select am).Distinct();

@@ -195,7 +195,7 @@ namespace BLTServices.Handlers
 
         // returns active Active Ingredients for the given pulaID
         [HttpOperation(HttpMethod.GET, ForUriName = "GetPULALimitationsLimitation")]
-        public OperationResult GetPULALimitationsLimitation(Int32 pulaLimitatationsID, [Optional]string date)
+        public OperationResult GetPULALimitationsLimitation(Int32 pulaLimitationID, [Optional]string date)
         {
             try
             {
@@ -211,7 +211,7 @@ namespace BLTServices.Handlers
                 {
 
                     IQueryable<limitation> query1 =
-                            (from PULALimit in GetActive(aBLTE.pula_limitations.Where(p => p.pula_limitation_id == pulaLimitatationsID), thisDate.Value.Date)
+                            (from PULALimit in GetActive(aBLTE.pula_limitations.Where(p => p.pula_limitation_id == pulaLimitationID), thisDate.Value.Date)
                              join l in aBLTE.limitations
                              on PULALimit.limitation_id equals l.limitation_id
                              select l).Distinct();

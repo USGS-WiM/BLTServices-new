@@ -100,35 +100,33 @@ namespace BLTServices.Handlers
                 DateTime? thisDate = ValidDate(date);
                 if (!thisDate.HasValue)
                     thisDate = DateTime.Now;
-
-                using (EasySecureString securedPassword = GetSecuredPassword())
+                
+                using (bltEntities aBLTE = GetRDS())
                 {
-                    using (bltEntities aBLTE = GetRDS(securedPassword))
+                    aiQuery = GetEntities<active_ingredient>(aBLTE);
+                    switch (statustype)
                     {
-                        aiQuery = GetEntities<active_ingredient>(aBLTE);
-                        switch (statustype)
-                        {
-                            case (StatusType.Published):
-                                aiQuery.Where(ai => ai.version.published_time_stamp != null);
-                                break;
-                            case (StatusType.Reviewed):
-                                aiQuery.Where(ai => ai.version.reviewed_time_stamp != null &&
-                                                ai.version.published_time_stamp == null);
-                                break;
-                            //created
-                            default:
-                                aiQuery.Where(ai => ai.version.reviewed_time_stamp == null &&
-                                                ai.version.published_time_stamp == null);
-                                break;
-                        }//end switch
+                        case (StatusType.Published):
+                            aiQuery.Where(ai => ai.version.published_time_stamp != null);
+                            break;
+                        case (StatusType.Reviewed):
+                            aiQuery.Where(ai => ai.version.reviewed_time_stamp != null &&
+                                            ai.version.published_time_stamp == null);
+                            break;
+                        //created
+                        default:
+                            aiQuery.Where(ai => ai.version.reviewed_time_stamp == null &&
+                                            ai.version.published_time_stamp == null);
+                            break;
+                    }//end switch
 
-                        aiQuery.Where(ai => !ai.version.expired_time_stamp.HasValue ||
-                                            ai.version.expired_time_stamp < thisDate.Value);
+                    aiQuery.Where(ai => !ai.version.expired_time_stamp.HasValue ||
+                                        ai.version.expired_time_stamp < thisDate.Value);
 
-                        activeIngredient = aiQuery.ToList();
-                        activeIngredient = activeIngredient.OrderBy(a => a.ingredient_name).ToList();
-                    }//end using
+                    activeIngredient = aiQuery.ToList();
+                    activeIngredient = activeIngredient.OrderBy(a => a.ingredient_name).ToList();
                 }//end using
+                
 
                 //activateLinks<active_ingredient>(activeIngredient);
 
