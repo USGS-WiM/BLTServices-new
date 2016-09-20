@@ -1,4 +1,3 @@
-D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\obj\Debug\BLTServices.Test.csprojResolveAssemblyReference.cache
 C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTServices.Test\bin\Debug\BLTServices.Test.dll.config
 C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTServices.Test\bin\Debug\BLTServices.Test.dll
 C:\WIM\Documents\Visual Studio\Projects\WiMGitHub\BLTServices\BLTServices.Test\bin\Debug\BLTServices.Test.pdb
@@ -56,5 +55,6 @@ D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\bin\Debug\fi\Npgsql.resource
 D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\bin\Debug\fr\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\bin\Debug\ja\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\bin\Debug\zh-CN\Npgsql.resources.dll
+D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\obj\Debug\BLTServices.Test.csprojResolveAssemblyReference.cache
 D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\obj\Debug\BLTServices.Test.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices.Test\obj\Debug\BLTServices.Test.pdb

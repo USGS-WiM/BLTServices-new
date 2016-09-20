@@ -127,8 +127,8 @@ namespace BLTServices.Codecs
 
 
             if (!prop.PropertyType.IsPrimitive && !String.Equals(prop.PropertyType.Name, "Nullable`1") && !String.Equals(prop.PropertyType.Name, "Decimal") &&
-                !prop.PropertyType.Equals(typeof(string)) && !prop.PropertyType.Equals(typeof(DateTime)) && !String.Equals(prop.PropertyName, "Results") &&
-                !prop.PropertyName.Contains("Links"))
+                !prop.PropertyType.Equals(typeof(string)) && !prop.PropertyType.Equals(typeof(DateTime)) && !String.Equals(prop.PropertyName, "Results") && !String.Equals(prop.PropertyName, "MapperLimits") &&
+                !String.Equals(prop.PropertyName, "PULA") && !String.Equals(prop.PropertyName, "SPECIES") && !String.Equals(prop.PropertyName, "LIMIT") && !prop.PropertyName.Contains("Links"))
             {
                 prop.ShouldSerialize = obj => false;
             }

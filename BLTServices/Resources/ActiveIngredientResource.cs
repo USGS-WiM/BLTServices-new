@@ -32,12 +32,7 @@ namespace BLTServices.Resources
 {
     public class AIBase : HypermediaEntity
     {
-        [XmlElement(DataType = "int",
-        ElementName = "ACTIVE_INGREDIENT_ID")]
         public Int32 ACTIVE_INGREDIENT_ID { get; set; }
-
-        [XmlElement(DataType = "string",
-        ElementName = "INGREDIENT_NAME")]
         public String INGREDIENT_NAME { get; set; }
     }
 
