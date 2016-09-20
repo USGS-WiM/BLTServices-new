@@ -37,7 +37,7 @@ using BLTServices.Authentication;
 using BLTServices.Resources;
 using BLTServices.Handlers;
 using BLTServices.Codecs;
-
+using BLTServices.PipelineContributors;
 
 namespace BLTServices
 {
@@ -53,6 +53,7 @@ namespace BLTServices
                 ResourceSpace.Uses.CustomDependency<IBasicAuthenticator, BLTBasicAuthentication>(DependencyLifetime.Transient);
                 // Allow codec choice by extension 
                 ResourceSpace.Uses.UriDecorator<ContentTypeExtensionUriDecorator>();
+                ResourceSpace.Uses.PipelineContributor<CrossDomainPipelineContributor>();
 
                 AddAUTHENTICATION_Resources();
                 AddACTIVE_INGREDIENT_Resources();
@@ -102,8 +103,8 @@ namespace BLTServices
             ResourceSpace.Has.ResourcesOfType<List<active_ingredient_pula>>()
                 .AtUri("/PULAs").Named("GetAll")
                 .And.AtUri("/PULAs?status={status}&date={date}").Named("GetVersionedPulas")
-                .And.AtUri("/PULAs?publishedDate={date}")
-                .And.AtUri("/PULAs?pulaId={pulaId}&publishedDate={date}").Named("GetAIPULAS")
+                .And.AtUri("/PULAs?publishedDate={date}").Named("GetPublishedPulas")
+                .And.AtUri("/PULAs/AIPulas?PulaShapeId={pulaShapeId}&PublishedDate={date}").Named("GetAIPULAS")
                 .HandledBy<ActiveIngredientPULAHander>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
@@ -154,7 +155,7 @@ namespace BLTServices
                 .And.AtUri("/ApplicationMethods?status={status}&date={date}").Named("GetVersionedApplicationMethods")
                 .And.AtUri("/ApplicationMethods?publishedDate={date}")
                 .And.AtUri("/ApplicationMethods?applicationMethodID={applicationMethodID}&publishedDate={date}").Named("GetApplicationMethods")
-                .And.AtUri("/PULALimitations/{pulaLimitationsID}/ApplicationMethod?publishedDate={date}").Named("GetPULALimitationsApplicationMethod")
+                .And.AtUri("/PULALimitations/ApplicationMethod?PulaLimitationId={pulaLimitationID}&PublishedDate={date}").Named("GetPULALimitationsApplicationMethod")
                 .HandledBy<ApplicationMethodHandler>().TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
             ResourceSpace.Has.ResourcesOfType<application_method>()
@@ -181,7 +182,7 @@ namespace BLTServices
                 .And.AtUri("/CropUses?status={status}&date={date}").Named("GetVersionedCropUses")
                 .And.AtUri("/CropUses?publishedDate={date}")
                 .And.AtUri("/CropUses?CropUseID={cropUseID}&publishedDate={date}")
-                .And.AtUri("/PULALimitations/{pulaLimitationsID}/CropUse?publishedDate={date}").Named("GetPULALimitationsCropUse")
+                .And.AtUri("/PULALimitations/CropUse?PulaLimitationId={pulaLimitationID}&PublishedDate={date}").Named("GetPULALimitationsCropUse")
                 .HandledBy<CropUseHandler>()
                 
             .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
@@ -228,7 +229,7 @@ namespace BLTServices
                 .And.AtUri("/Formulations?status={status}&date={date}").Named("GetVersionedFormulations")
                 .And.AtUri("/Formulations?publishedDate={date}")
                 .And.AtUri("/Formulations?FormulationID={formulationID}&publishedDate={date}")
-                .And.AtUri("/PULALimitations/{pulaLimitationsID}/Formulation?publishedDate={date}").Named("GetPULALimitationsFormulation")
+                .And.AtUri("/PULALimitations/Formulation?PulaLimitationId={pulaLimitationID}&PublishedDate={date}").Named("GetPULALimitationsFormulation")
                 .HandledBy<FormulationHandler>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
@@ -246,7 +247,7 @@ namespace BLTServices
                 .And.AtUri("/Limitations?status={status}&date={date}").Named("GetVersionedLimitations")
                 .And.AtUri("/Limitations?publishedDate={date}")
                 .And.AtUri("/Limitations/{limitationID}?publishedDate={date}").Named("GetLimitations")
-                .And.AtUri("/PULALimitations/{pulaLimitationsID}/Limitation?publishedDate={date}").Named("GetPULALimitationsLimitation")
+                .And.AtUri("/PULALimitations/Limitation?PulaLimitationId={pulaLimitationID}&PublishedDate={date}").Named("GetPULALimitationsLimitation")
                 .HandledBy<LimitationHandler>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
@@ -303,8 +304,8 @@ namespace BLTServices
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
             ResourceSpace.Has.ResourcesOfType<pula_limitations>()
-                .AtUri("/PULALimitation/{entityID}").Named("GetEntity")
-                .And.AtUri("/PULALimitation/{entityID}/updateStatus/{status}&statusDate={date}").Named("UpdatePulaLimitationsStatus")
+                .AtUri("/PULALimitations/{entityID}").Named("GetEntity")
+                .And.AtUri("/PULALimitations/{entityID}/updateStatus/{status}&statusDate={date}").Named("UpdatePulaLimitationsStatus")
                 .HandledBy<PULALimitationsHandler>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 

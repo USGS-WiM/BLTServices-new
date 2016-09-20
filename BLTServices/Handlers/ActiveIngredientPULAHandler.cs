@@ -138,7 +138,7 @@ namespace BLTServices.Handlers
         }//end HttpMethod.GET
         
         // returns all active PULAs
-        [HttpOperation(HttpMethod.GET)]
+        [HttpOperation(HttpMethod.GET, ForUriName = "GetPublishedPulas")]
         public OperationResult Get(string date)
         {
             List<active_ingredient_pula> aiPula = null;
@@ -168,12 +168,12 @@ namespace BLTServices.Handlers
 
         // returns the active PULAS for the given PULAID
         [HttpOperation(HttpMethod.GET, ForUriName = "GetAIPULA")]
-        public OperationResult GetAIPULA(Int32 pulaId, [Optional] string date)
+        public OperationResult GetAIPULA(Int32 pulaShapeId, [Optional] string date)
         {
             List<active_ingredient_pula> aiPulas;
             try
             {
-                if (pulaId <= 0)
+                if (pulaShapeId <= 0)
                 { return new OperationResult.BadRequest { }; }
 
                 DateTime? thisDate = ValidDate(date);
@@ -185,7 +185,7 @@ namespace BLTServices.Handlers
 
                 using (bltEntities aBLTE = GetRDS())
                 {
-                    aiPulas = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).Where(p => p.pula_shape_id == pulaId).ToList();
+                    aiPulas = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).Where(p => p.pula_shape_id == pulaShapeId).ToList();
                 }//end using
 
                 //activateLinks<active_ingredient_pula>(aiPulas);
@@ -215,10 +215,9 @@ namespace BLTServices.Handlers
 
                 using (bltEntities aBLTE = GetRDS())
                 {
-                    IQueryable<active_ingredient_pula> query = GetEntities<active_ingredient_pula>(aBLTE);
-
-
-                    aiPulas.PULA = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).AsEnumerable().Select(p => new SimplePULA()
+                    //IQueryable<active_ingredient_pula> query = GetEntities<active_ingredient_pula>(aBLTE);
+                    
+                    aiPulas.PULA = GetActive(GetEntities<active_ingredient_pula>(aBLTE), thisDate.Value.Date).ToList().Select(p => new SimplePULA()
                     {
                         entityID = p.id,
                         ShapeID = p.pula_shape_id,
@@ -226,7 +225,7 @@ namespace BLTServices.Handlers
                         Created = p.version.created_time_stamp,
                         Published = p.version.published_time_stamp,
                         Expired = p.version.expired_time_stamp
-                    }).ToList<SimplePULA>();
+                    }).ToList();
                 }//end using   
 
                 ////activateLinks<SimplePULA>(aiPulas.PULA);
@@ -241,7 +240,7 @@ namespace BLTServices.Handlers
 
         // returns active PULAS for these filter choices for internal app
         [HttpOperation(HttpMethod.GET, ForUriName = "GetFilteredSimplePULAs")]
-        public OperationResult GetFilteredSimplePULAs([Optional] string date, [Optional] Int32 activeIngredientID, [Optional] Int32 productID, [Optional] Int32 eventID)
+        public OperationResult GetFilteredSimplePULAs([Optional] string date, [Optional] string activeIngredientID, [Optional] string productID, [Optional] string eventID)
         {
              PULAList aiList = new PULAList();
              IQueryable<active_ingredient_pula> query = null;
@@ -253,9 +252,9 @@ namespace BLTServices.Handlers
                     thisDate = ValidDate(date); 
                 }
                 
-                Int32 FilteredActiveIngredient = (activeIngredientID > 0) ? activeIngredientID : -1;
-                Int32 FilteredProduct = (productID > 0) ? productID : -1;
-                Int32 FilteredEvent = (eventID > 0) ? eventID : -1;
+                Int32 FilteredActiveIngredient = !string.IsNullOrEmpty(activeIngredientID) ? Convert.ToInt32(activeIngredientID) : -1;
+                Int32 FilteredProduct = !string.IsNullOrEmpty(productID) ? Convert.ToInt32(productID) : -1;
+                Int32 FilteredEvent = !string.IsNullOrEmpty(eventID) ? Convert.ToInt32(eventID) : -1;
                 
                 //changed validateDate to return today if null.. since need to return effective pulas
                 if (!thisDate.HasValue)
@@ -263,7 +262,6 @@ namespace BLTServices.Handlers
 
                 using (bltEntities aBLTE = GetRDS())
                 {
-                   // query = GetEntities<ACTIVE_INGREDIENT_PULA>(aBLTE).Where(p=> p.VERSION.PUBLISHED_TIME_STAMP.Value <= thisDate.Value);
                     query = GetEntities<active_ingredient_pula>(aBLTE).Where(p => p.effective_date.Value <= thisDate.Value);
 
                     if (FilteredEvent > 0)
@@ -293,7 +291,7 @@ namespace BLTServices.Handlers
                     }//end if
 
 
-                    aiList.PULA = query.AsEnumerable().Select(p => new SimplePULA()
+                    aiList.PULA = query.ToList().Select(p => new SimplePULA()
                         {
                             entityID = p.id,
                             ShapeID = p.pula_shape_id,
@@ -302,7 +300,7 @@ namespace BLTServices.Handlers
                             Published = p.version.published_time_stamp,
                             Effective = p.effective_date,
                             Expired = p.version.expired_time_stamp
-                        }).ToList<SimplePULA>();
+                        }).ToList();
 
                 }//end using   
 

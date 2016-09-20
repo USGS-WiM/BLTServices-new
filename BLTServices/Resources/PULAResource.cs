@@ -31,37 +31,26 @@ using BLTDB;
 using System.Xml.Serialization;
 
 namespace BLTServices.Resources
-{
-    [XmlRoot("ArrayOfPULA")]
+{    
     public class PULAList
-    {
-        [XmlElement(typeof(SimplePULA),
-        ElementName = "PULA")]
+    {        
         public List<SimplePULA> PULA { get; set; }
     }//end PULAList
 
     public class SimplePULA:PULABase
-    {
-        [XmlElement(typeof(DateTime),
-            ElementName = "CreatedDate")]
+    {        
         public DateTime? Created { get; set; }
         public bool ShouldSerializeCreated()
         { return Created.HasValue; }
 
-        [XmlElement(typeof(DateTime),
-            ElementName = "PublishedDate")]
         public DateTime? Published { get; set; }
         public bool ShouldSerializePublished()
         { return Published.HasValue; }
 
-        [XmlElement(typeof(DateTime),
-            ElementName = "EffectiveDate")]
         public DateTime? Effective { get; set; }
         public bool ShouldSerializeEffective()
         { return Effective.HasValue; }
 
-        [XmlElement(typeof(DateTime),
-            ElementName = "ExpiredDate")]
         public DateTime? Expired { get; set; }
         public bool ShouldSerializeExpired()
         { return Expired.HasValue; }
@@ -69,58 +58,27 @@ namespace BLTServices.Resources
     }//end class simplePULA
 
     public class PULABase
-    {
-        [XmlElement(DataType = "decimal",
-        ElementName = "ID")]
-        public decimal entityID { get; set; }
-
-        [XmlElement(DataType = "decimal",
-        ElementName = "ShapeID")]
+    {        
+        public decimal entityID { get; set; }        
         public decimal ShapeID { get; set; }
-
-        [XmlElement(DataType = "decimal",
-        ElementName = "isPublished")]
         public decimal isPublished { get; set; }
 
     }//end class simplePULA
 
     public class MapperLimitations
-    {
-        [XmlElement(typeof(MapperLimit),
-        ElementName = "PULA")]
+    {      
         public List<MapperLimit> MapperLimits { get; set; }
     }//end MapperLimitations
 
     public class MapperLimit
-    {
-        [XmlElement(typeof(Int32),
-            ElementName = "PULAID")]
+    {        
         public Int32 PULAID { get; set; }
-
-        [XmlElement(typeof(Int32),
-            ElementName = "PULASHPID")]
         public Int32 PULASHPID { get; set; }
-
-        [XmlElement(typeof(String),
-            ElementName = "NAME")]
         public string NAME { get; set; }
-
-        [XmlElement(typeof(String),
-            ElementName = "USE")]
         public string USE { get; set; }
-
-        [XmlElement(typeof(String),
-            ElementName = "APPMETHOD")]
         public string APPMETHOD { get; set; }
-
-        [XmlElement(typeof(String),
-            ElementName = "FORM")]
         public string FORM { get; set; }
-
-        [XmlElement(typeof(limitation),
-            ElementName = "LIMIT")]
         public limitation LIMIT { get; set; }
-
     }//end class simplePULA
 
     public class contributorpulaview
@@ -128,5 +86,5 @@ namespace BLTServices.Resources
         public Int32 id { get; set; }
         public string comments { get; set; }
         
-    }//end class peak_view
+    }//end class contributorpulaview
 }//end namespace

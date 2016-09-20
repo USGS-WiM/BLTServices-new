@@ -132,7 +132,6 @@ namespace BLTServices.Handlers
         public OperationResult Get(string date)
         {
             List<product> aProductList = null;
-            //ProductList aProductList = new ProductList();
             try
             {
                 DateTime? thisDate = ValidDate(date);
@@ -143,13 +142,9 @@ namespace BLTServices.Handlers
                 if (DateTime.Compare(thisDate.Value.Date, DateTime.Now.Date) < 0 && !CanManage()) thisDate = DateTime.Now.Date;
 
                 using (bltEntities aBLTE = GetRDS())
-                {
-                    //just return the first 50 for now..takes too long
-                    //aProductList = aBLTE.PRODUCT.Where(a => a.PRODUCT_NAME.StartsWith("ZOECON")).ToList();
+                {                    
                     aProductList = GetActive(GetEntities<product>(aBLTE), thisDate.Value.Date).OrderBy(a => a.product_name).ToList();
                 }//end using                
-
-                ////activateLinks<product>(aProductList);
 
                 return new OperationResult.OK { ResponseResource = aProductList };
             }

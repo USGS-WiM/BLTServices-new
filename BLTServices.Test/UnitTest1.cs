@@ -36,7 +36,7 @@ namespace BLTServices.Test
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
 
             //'GetVersionedActiveIngredients'
-            List<active_ingredient> versAIRequest = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients?status=PUBLISHED&date=09/14/2016");
+            List<active_ingredient> versAIRequest = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients?Status=Published&date=09/14/2016");
             Assert.IsNotNull(versAIRequest, RequestList.Count.ToString());
 
             //'Get'

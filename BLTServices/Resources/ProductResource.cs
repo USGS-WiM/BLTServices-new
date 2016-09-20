@@ -32,26 +32,19 @@ using System.Xml.Serialization;
 
 namespace BLTServices.Resources
 {
-    [XmlRoot("ArrayOfPRODUCT")]
     public class ProductList
-    {
-        [XmlElement(typeof(SimpleProduct),
-        ElementName = "PROD")]
+    {        
         public List<SimpleProduct> PROD { get; set; }
     }//end ProductList
 
     public class SimpleProduct : ProductBase
-    {
-        [XmlElement(typeof(String),
-            ElementName = "PRODUCT_NAME")]
+    {        
         public string PRODUCT_NAME { get; set; }
 
     }//end class SimpleProduct
 
     public class ProductBase : HypermediaEntity
-    {
-        [XmlElement(DataType = "int",
-        ElementName = "ID")]
+    {        
         public Int32 entityID { get; set; }
 
     }//end class ProductBase
