@@ -247,7 +247,7 @@ namespace BLTServices.Handlers
                         USE = GetActive(aBLTE.crop_use.Where(u => u.crop_use_id == p.crop_use_id), thisDate.Value.Date).FirstOrDefault().use,
                         APPMETHOD = aBLTE.application_method.Where(u => u.application_method_id == p.application_method_id).FirstOrDefault().method,
                         FORM = aBLTE.formulations.Where(u => u.formulation_id == p.formulation_id).FirstOrDefault().form,
-                        LIMIT = aBLTE.limitations.Where(u => u.limitation_id == p.limitation_id).FirstOrDefault()
+                        LIMIT = aBLTE.limitations.FirstOrDefault(u => u.limitation_id == p.limitation_id)                        
                     }).ToList();
                     
                 }//end using
@@ -258,7 +258,7 @@ namespace BLTServices.Handlers
             {
                 return new OperationResult.InternalServerError { ResponseResource = ex.InnerException.ToString() };
             }
-        }
+        }       
 
         //---------------------Returns individual objects---------------------
         [HttpOperation(HttpMethod.GET, ForUriName = "GetEntity")]

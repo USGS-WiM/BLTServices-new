@@ -280,7 +280,7 @@ namespace BLTServices.Handlers
            DateTime tempDate;
            try
            {
-               if (date == null) return null;
+               if (string.IsNullOrEmpty(date)) return null;
                if (!DateTime.TryParse(date, out tempDate))
                {
                    //try oadate
