@@ -83,7 +83,7 @@ namespace BLTServices.Handlers
         [HttpOperation(HttpMethod.GET)]
         public OperationResult Get(Int32 userID)
         {
-            List<user_> userList;
+            user_ aUser;
             try
             {
                 if (userID <= 0)
@@ -92,11 +92,11 @@ namespace BLTServices.Handlers
                 {
                     using (bltEntities aBLTE = GetRDS(securedPassword))
                     {
-                        userList = GetEntities<user_>(aBLTE).Where(u => u.user_id== userID).ToList();
+                        aUser = GetEntities<user_>(aBLTE).Where(u => u.user_id == userID).FirstOrDefault();
                     }//end using
                 }//end using
-                
-                return new OperationResult.OK { ResponseResource = userList };
+
+                return new OperationResult.OK { ResponseResource = aUser };
             }
             catch (Exception ex)
             {

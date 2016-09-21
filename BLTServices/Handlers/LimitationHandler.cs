@@ -276,8 +276,8 @@ namespace BLTServices.Handlers
                             anEntity.limitation_id = GetNextID(aBLTE);
 
                             aBLTE.limitations.Add(anEntity);
-
                             aBLTE.SaveChanges();
+                                                        
                         }//end if
 
                         //activateLinks<limitation>(anEntity);

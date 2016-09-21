@@ -184,6 +184,9 @@
           <Property Name="role_id" Type="int4" Nullable="false" />
           <Property Name="fname" Type="varchar" MaxLength="25" />
           <Property Name="lname" Type="varchar" MaxLength="25" />
+          <Property Name="password" Type="varchar" MaxLength="8000" />
+          <Property Name="salt" Type="varchar" MaxLength="8000" />
+          <Property Name="resetFlag" Type="int4" />
         </EntityType>
         <EntityType Name="version">
           <Key>
@@ -425,6 +428,9 @@
           <NavigationProperty Name="organization" Relationship="bltModel.organizationuser_" FromRole="user_" ToRole="organization" />
           <NavigationProperty Name="division" Relationship="bltModel.divisionuser_" FromRole="user_" ToRole="division" />
           <NavigationProperty Name="role" Relationship="bltModel.roleuser_" FromRole="user_" ToRole="role" />
+          <Property Name="password" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" />
+          <Property Name="salt" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" />
+          <Property Name="resetFlag" Type="Int32" />
         </EntityType>
         <EntityType Name="version">
           <Key>
@@ -970,6 +976,9 @@
           <EntitySetMapping Name="user_">
             <EntityTypeMapping TypeName="bltModel.user_">
               <MappingFragment StoreEntitySet="user_">
+                <ScalarProperty Name="resetFlag" ColumnName="resetFlag" />
+                <ScalarProperty Name="salt" ColumnName="salt" />
+                <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="username" ColumnName="username" />
                 <ScalarProperty Name="email" ColumnName="email" />
