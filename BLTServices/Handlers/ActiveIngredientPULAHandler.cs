@@ -719,6 +719,8 @@ namespace BLTServices.Handlers
                     else
                     { aContributorPULA.comments = anAIPULA.comments; }
 
+                    active_ingredient_pula aPULA = aBLTE.active_ingredient_pula.FirstOrDefault(aip => aip.id == aContributorPULA.id);
+                    aPULA.comments = aContributorPULA.comments;
                     aBLTE.SaveChanges();                    
 
                 }//end using
@@ -866,7 +868,7 @@ namespace BLTServices.Handlers
             string sql = string.Empty;
             switch (type)
             {
-                case "CONTRIBUTORPULAVIEW":                    
+                case "contributorpulaview":                    
                     return @"SELECT * FROM contributorpulaview;";
                 case "met_view":
                     return @"SELECT * FROM meteorological_view;";

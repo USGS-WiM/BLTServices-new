@@ -202,6 +202,9 @@
     <NavigationProperty Name="organization" Relationship="bltModel.organizationuser_" FromRole="user_" ToRole="organization" />
     <NavigationProperty Name="division" Relationship="bltModel.divisionuser_" FromRole="user_" ToRole="division" />
     <NavigationProperty Name="role" Relationship="bltModel.roleuser_" FromRole="user_" ToRole="role" />
+    <Property Name="password" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" />
+    <Property Name="salt" Type="String" MaxLength="8000" FixedLength="false" Unicode="true" />
+    <Property Name="resetFlag" Type="Int32" />
   </EntityType>
   <EntityType Name="version">
     <Key>

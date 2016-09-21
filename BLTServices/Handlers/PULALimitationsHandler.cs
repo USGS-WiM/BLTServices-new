@@ -374,7 +374,7 @@ namespace BLTServices.Handlers
             pula_limitations aPULALimit;
             try
             {
-                if (entityID >= 0)
+                if (entityID <= 0)
                 { return new OperationResult.BadRequest(); }
 
                 using (EasySecureString securedPassword = GetSecuredPassword())
