@@ -32,28 +32,28 @@ namespace BLTServices.Test
         public void AIRequest()
         {
             //GET LIST
-            List<active_ingredient> RequestList = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients");
+            List<active_ingredient> RequestList = this.GETRequest<List<active_ingredient>>(host + "ActiveIngredients");
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
 
             //'GetVersionedActiveIngredients'
-            List<active_ingredient> versAIRequest = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients?Status=Published&date=09/14/2016");
+            List<active_ingredient> versAIRequest = this.GETRequest<List<active_ingredient>>(host + "ActiveIngredients?status=Published&date=09/14/2016");
             Assert.IsNotNull(versAIRequest, RequestList.Count.ToString());
 
             //'Get'
-            List<active_ingredient> getAIRequest = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients?publishedDate=09/14/2016");
+            List<active_ingredient> getAIRequest = this.GETRequest<List<active_ingredient>>(host + "ActiveIngredients?publishedDate=09/14/2016");
             Assert.IsNotNull(getAIRequest, RequestList.Count.ToString());
 
             //'GetAI'
-            List<active_ingredient> getAIR = this.GETRequest<List<active_ingredient>>(host + "/ActiveIngredients?aiID=3151&publishedDate=09/14/2016");
+            List<active_ingredient> getAIR = this.GETRequest<List<active_ingredient>>(host + "ActiveIngredients?aiID=3151&publishedDate=09/14/2016");
             Assert.IsNotNull(getAIR, RequestList.Count.ToString());
 
             //'GetPULAactiveIngredients'
-            List<active_ingredient> getPULAAIR = this.GETRequest<List<active_ingredient>>(host + "/PULAS/15/ActiveIngredients?publishedDate=09/14/2016");
+            List<active_ingredient> getPULAAIR = this.GETRequest<List<active_ingredient>>(host + "PULAS/15/ActiveIngredients?publishedDate=09/14/2016");
             Assert.IsNotNull(getPULAAIR, RequestList.Count.ToString());
 
             //POST
             active_ingredient postObj;
-            postObj = this.POSTRequest<active_ingredient>(host + "/ActiveIngredients", new active_ingredient() { ingredient_name = "post-test" }, basicAuth);
+            postObj = this.POSTRequest<active_ingredient>(host + "ActiveIngredients", new active_ingredient() { ingredient_name = "post-test", pc_code="post-test" }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.active_ingredient_id.ToString());
 
             //GET POSTed item
@@ -62,73 +62,73 @@ namespace BLTServices.Test
 
             //PUT POSTed item
             postObj.ingredient_name = "put-test";
-            active_ingredient putObj = this.PUTRequest<active_ingredient>(host + "/ActiveIngredients/" + postObj.id, postObj, basicAuth);
+            active_ingredient putObj = this.PUTRequest<active_ingredient>(host + "ActiveIngredients/" + postObj.id, postObj, basicAuth);
             Assert.IsNotNull(RequestObj);
 
             //Delete POSTed item
-            bool success = this.DELETERequest<active_ingredient>(host + "/ActiveIngredients/" + postObj.id, basicAuth);
+            bool success = this.DELETERequest<active_ingredient>(host + "ActiveIngredients/" + postObj.id, basicAuth);
             Assert.IsTrue(success);
         }//end method
         [TestMethod]
         public void aiPULARequest()
         {
             //GET LIST
-            List<active_ingredient_pula> RequestList = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs");
+            List<active_ingredient_pula> RequestList = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs");
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
 
             //'GetVersionedPulas'
-            List<active_ingredient_pula> versPUlaRequest = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs?status=CREATED&date=");
+            List<active_ingredient_pula> versPUlaRequest = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs?status=CREATED&date=");
             Assert.IsNotNull(versPUlaRequest, RequestList.Count.ToString());
 
             //'Get'
-            List<active_ingredient_pula> getAIRequest = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs?publishedDate=09/14/2016");
+            List<active_ingredient_pula> getAIRequest = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs?publishedDate=09/14/2016");
             Assert.IsNotNull(getAIRequest, RequestList.Count.ToString());
 
             //'GetAIPULAS'
-            List<active_ingredient_pula> getAIR = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs?pulaId={{    }}&publishedDate=09/14/2016");
+            List<active_ingredient_pula> getAIR = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs/AIPulas?PulaShapeId={{}}&PublishedDate=09/14/2016");
             Assert.IsNotNull(getAIR, RequestList.Count.ToString());
 
             //'GetSimplePULAS'
-            List<active_ingredient_pula> getSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs/simplePULAs?publishedDate=09/14/2016");
+            List<active_ingredient_pula> getSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs/simplePULAs?publishedDate=09/14/2016");
             Assert.IsNotNull(getSimpPula, RequestList.Count.ToString());
 
             //'GetFilteredSimplePULAs'
-            List<active_ingredient_pula> getFiltSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "/PULAs/FilteredSimplePULAs?date=09/14/2016&aiID={activeIngredientID}&productID={productID}&eventID={eventID}");
+            List<active_ingredient_pula> getFiltSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "PULAs/FilteredSimplePULAs?date=09/14/2016&aiID={activeIngredientID}&productID={productID}&eventID={eventID}");
             Assert.IsNotNull(getFiltSimpPula, RequestList.Count.ToString());
 
             //'GetEventPULAs'
-            List<active_ingredient_pula> getEvSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "/Events/{eventId}/PULAs");
+            List<active_ingredient_pula> getEvSimpPula = this.GETRequest<List<active_ingredient_pula>>(host + "Events/{eventId}/PULAs");
             Assert.IsNotNull(getEvSimpPula, RequestList.Count.ToString());
 
             //POST
             active_ingredient_pula postObj;
-            postObj = this.POSTRequest<active_ingredient_pula>(host + "/PULAs", new active_ingredient_pula() { pula_shape_id = 1, base_data = "post-test", event_id = 1 }, basicAuth);
+            postObj = this.POSTRequest<active_ingredient_pula>(host + "PULAs", new active_ingredient_pula() { pula_shape_id = 1, base_data = "post-test", event_id = 1 }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.pula_id.ToString());
 
             //GET POSTed item
-            active_ingredient_pula RequestObj = this.GETRequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id);
+            active_ingredient_pula RequestObj = this.GETRequest<active_ingredient_pula>(host + "PULAs/" + postObj.id);
             Assert.IsNotNull(RequestObj);
 
             //GetShapePULAS
-            active_ingredient_pula shapePULA = this.GETRequest<active_ingredient_pula>(host + "/PULAs/POI/{shapeId}?publishedDate={date}");
+            active_ingredient_pula shapePULA = this.GETRequest<active_ingredient_pula>(host + "PULAs/POI/{shapeId}?publishedDate={date}");
             Assert.IsNotNull(shapePULA);
 
             //UpdatePulaStatus
-            active_ingredient_pula statPULA = this.GETRequest<active_ingredient_pula>(host + "/PULAs/{entityID}/updateStatus?status={status}&statusDate={date}");
+            active_ingredient_pula statPULA = this.GETRequest<active_ingredient_pula>(host + "PULAs/"+ postObj.id +"/updateStatus?status=Published&statusDate=09/21/2016", basicAuth);
             Assert.IsNotNull(statPULA);
 
             //PUT POSTed item
             postObj.base_data = "put-test";
-            active_ingredient_pula putObj = this.PUTRequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id, postObj, basicAuth);
+            active_ingredient_pula putObj = this.PUTRequest<active_ingredient_pula>(host + "PULAs/" + postObj.id, postObj, basicAuth);
             Assert.IsNotNull(putObj);
 
             //AddComments
             postObj.base_data = "put-test";
-            active_ingredient_pula putCommentObj = this.PUTRequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id + "/AddComments", new active_ingredient_pula() { comments = "AddComment-test" }, basicAuth);
+            active_ingredient_pula putCommentObj = this.PUTRequest<active_ingredient_pula>(host + "PULAs/1202/AddComments", new active_ingredient_pula() { comments = "AddComment-test" }, basicAuth);
             Assert.IsNotNull(putCommentObj);
 
             //Delete POSTed item
-            bool success = this.DELETERequest<active_ingredient_pula>(host + "/PULAs/" + postObj.id, basicAuth);
+            bool success = this.DELETERequest<active_ingredient_pula>(host + "PULAs/1202", basicAuth);
             Assert.IsTrue(success);
 
         }//end method
@@ -136,50 +136,50 @@ namespace BLTServices.Test
         public void aiClassRequest()
         {
             //GET LIST
-            List<ai_class> RequestList = this.GETRequest<List<ai_class>>(host + "/AIClasses");
+            List<ai_class> RequestList = this.GETRequest<List<ai_class>>(host + "AIClasses");
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
 
             //'GetVersionedAIClasss'
-            List<ai_class> versAICRequest = this.GETRequest<List<ai_class>>(host + "/AIClasses?status=PUBLISHED&date=");
+            List<ai_class> versAICRequest = this.GETRequest<List<ai_class>>(host + "AIClasses?status=PUBLISHED&date=");
             Assert.IsNotNull(versAICRequest, RequestList.Count.ToString());
 
             //'Get'
-            List<ai_class> getAICRequest = this.GETRequest<List<ai_class>>(host + "/AIClasses?publishedDate=09/14/2016");
+            List<ai_class> getAICRequest = this.GETRequest<List<ai_class>>(host + "AIClasses?publishedDate=09/14/2016");
             Assert.IsNotNull(getAICRequest, RequestList.Count.ToString());
 
             //'GetAIC'
-            List<ai_class> getAICR = this.GETRequest<List<ai_class>>(host + "/AIClasses?aiClassID=3151&publishedDate=09/14/2016");
+            List<ai_class> getAICR = this.GETRequest<List<ai_class>>(host + "AIClasses?aiClassID=3151&publishedDate=09/14/2016");
             Assert.IsNotNull(getAICR, RequestList.Count.ToString());
 
             //'GetActiveIngredientClasses'
-            List<ai_class> getAIaiClassR = this.GETRequest<List<ai_class>>(host + "/ActiveIngredients/{activeIngredientID}/AIClass?publishedDate=09/14/2016");
+            List<ai_class> getAIaiClassR = this.GETRequest<List<ai_class>>(host + "ActiveIngredients/{activeIngredientID}/AIClass?publishedDate=09/14/2016");
             Assert.IsNotNull(getAIaiClassR, RequestList.Count.ToString());
 
             //POST
             ai_class postObj;
-            postObj = this.POSTRequest<ai_class>(host + "/AIClasses", new ai_class() { ai_class_name = "post-test" }, basicAuth);
+            postObj = this.POSTRequest<ai_class>(host + "AIClasses", new ai_class() { ai_class_name = "post-test" }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.ai_class_id.ToString());
 
             //AddAIClassToAI
-            ai_class postAIObj;
-            postAIObj = this.POSTRequest<ai_class>(host + "/AIClasses/{id}/AddAIClass", postObj, basicAuth);
-            Assert.IsNotNull(postAIObj, "ID: " + postObj.ai_class_id.ToString());
+            active_ingredient ai = new active_ingredient(); ai.active_ingredient_id = 1;
+            var asuccess = this.POSTRequest<active_ingredient>(host + "AIClasses/363/AddAIClass", ai, basicAuth);
+            Assert.IsNotNull(asuccess, "ID: " + postObj.ai_class_id.ToString());
 
             //GET POSTed item
-            ai_class RequestObj = this.GETRequest<ai_class>(host + "/AIClasses/" + postObj.id);
+            ai_class RequestObj = this.GETRequest<ai_class>(host + "AIClasses/" + postObj.id);
             Assert.IsNotNull(RequestObj);
 
             //PUT POSTed item
             postObj.ai_class_name = "put-test";
-            ai_class putObj = this.PUTRequest<ai_class>(host + "/AIClasses/" + postObj.id, postObj, basicAuth);
+            ai_class putObj = this.PUTRequest<ai_class>(host + "AIClasses/" + postObj.id, postObj, basicAuth);
             Assert.IsNotNull(RequestObj);
 
             //Delete POSTed item
-            bool success = this.DELETERequest<active_ingredient>(host + "/AIClasses/" + postObj.id, basicAuth);
+            bool success = this.DELETERequest<active_ingredient>(host + "AIClasses/" + postObj.id, basicAuth);
             Assert.IsTrue(success);
 
             //RemoveAIClassFromAI
-            bool successRemove = this.DELETERequest<ai_class>(host + "/AIClasses/{id}/RemoveAIClassFromAI?activeIngredientID={ai id}", basicAuth);
+            bool successRemove = this.DELETERequest<ai_class>(host + "AIClasses/363/RemoveAIClassFromAI?activeIngredientID=5525", basicAuth);
             Assert.IsTrue(successRemove);
 
 
@@ -387,7 +387,7 @@ namespace BLTServices.Test
 
             //POST
             limitation postObj;
-            postObj = this.POSTRequest<limitation>(host + "/Limitations", new limitation() { code = "post-test" }, basicAuth);
+            postObj = this.POSTRequest<limitation>(host + "/Limitations", new limitation() { code = "post1", limitation1 = "post-test1" }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.limitation_id.ToString());
 
             //GET POSTed item
@@ -395,7 +395,7 @@ namespace BLTServices.Test
             Assert.IsNotNull(RequestObj);
 
             //PUT POSTed item
-            postObj.code = "put-test";
+            postObj.code = "put01";
             limitation putObj = this.PUTRequest<limitation>(host + "/Limitations/" + postObj.id, postObj, basicAuth);
             Assert.IsNotNull(RequestObj);
 
@@ -449,14 +449,13 @@ namespace BLTServices.Test
 
             //POST
             product postObj;
-            postObj = this.POSTRequest<product>(host + "/Products", new product() { product_name = "post-test" }, basicAuth);
+            postObj = this.POSTRequest<product>(host + "/Products", new product() { product_name = "post-test", product_registration_number="abc" }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.product_id.ToString());
 
             //POSTproductToAI
-            //product postP2AIObj;
-            //active_ingredient useThisOne = this.GETRequest<active_ingredient>(host + "/ActiveIngredients/{entityId}");
-            //postP2AIObj = this.POSTRequest<active_ingredient>(host + "/Products/{product_id}/AddProductToAI", useThisOne, basicAuth);
-            //Assert.IsNotNull(postP2AIObj, "ID: " + postObj.product_id.ToString());
+            active_ingredient aiObj = new active_ingredient(); aiObj.active_ingredient_id = 1;
+            var postP2AIObj = this.POSTRequest<active_ingredient>(host + "/Products/46909/AddProductToAI", aiObj, basicAuth);
+            Assert.IsNotNull(postP2AIObj, "ID: " + postObj.product_id.ToString());
 
             //GET POSTed item
             product RequestObj = this.GETRequest<product>(host + "/Products/" + postObj.id);
@@ -472,7 +471,7 @@ namespace BLTServices.Test
             Assert.IsTrue(success);
 
             //Delete POSTed ProductAIRel
-            bool successprodAI = this.DELETERequest<product>(host + "Products/" + postObj.product_id + "/RemoveProductFromAI?activeIngredientID={active_ingredient_id}", basicAuth);
+            bool successprodAI = this.DELETERequest<product>(host + "Products/46909/RemoveProductFromAI?activeIngredientID=1", basicAuth);
             Assert.IsTrue(successprodAI);
         }//end method
         [TestMethod]
@@ -495,29 +494,29 @@ namespace BLTServices.Test
             Assert.IsNotNull(getPULAAIR, RequestList.Count.ToString());
 
             //'GetMapperLimitations'
-            List<pula_limitations> getmapperLim = this.GETRequest<List<pula_limitations>>(host + "/PULAs/{pulaID}/LimitationsForMapper?ShapeID={pulaSHPID}&EffectDate=09/14/2016");
+            List<pula_limitations> getmapperLim = this.GETRequest<List<pula_limitations>>(host + "PULAs/{pulaID}/LimitationsForMapper?ShapeID={pulaSHPID}&EffectDate=09/14/2016");
             Assert.IsNotNull(getmapperLim, RequestList.Count.ToString());
 
             //POST
             pula_limitations postObj;
-            postObj = this.POSTRequest<pula_limitations>(host + "/PULALimitation", new pula_limitations() { pula_id = 1, active_ingredient_id = 1, formulation_id = 1, crop_use_id = 1, limitation_id = 1 }, basicAuth);
+            postObj = this.POSTRequest<pula_limitations>(host + "PULALimitations", new pula_limitations() { pula_id = 1, active_ingredient_id = 1, formulation_id = 1, crop_use_id = 1, limitation_id = 1 }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.formulation_id.ToString());
 
             //GET POSTed item
-            pula_limitations RequestObj = this.GETRequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id);
+            pula_limitations RequestObj = this.GETRequest<pula_limitations>(host + "PULALimitations/" + postObj.pula_limitation_id);
             Assert.IsNotNull(RequestObj);
 
-            //GET POSTed item
-            pula_limitations RequestUpdateObj = this.GETRequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id + "/updateStatus/PUBLISHED&statusDate=09/14/2016", basicAuth);
+            //GET POSTed item 
+            pula_limitations RequestUpdateObj = this.GETRequest<pula_limitations>(host + "PULALimitations/1582/updateStatus?status=PUBLISHED&statusDate=09/14/2016", basicAuth);
             Assert.IsNotNull(RequestUpdateObj);
 
             //PUT POSTed item
             postObj.active_ingredient_id = 2;
-            pula_limitations putObj = this.PUTRequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id, postObj, basicAuth);
-            Assert.IsNotNull(RequestObj);
+            pula_limitations putObj = this.PUTRequest<pula_limitations>(host + "PULALimitations/" + postObj.pula_limitation_id, postObj, basicAuth);
+            Assert.IsNotNull(putObj);
 
             //Delete POSTed item
-            bool success = this.DELETERequest<pula_limitations>(host + "/PULALimitation/" + postObj.pula_limitation_id, basicAuth);
+            bool success = this.DELETERequest<pula_limitations>(host + "/PULALimitations/" + postObj.pula_limitation_id, basicAuth);
             Assert.IsTrue(success);
         }//end method
         [TestMethod]
@@ -528,18 +527,18 @@ namespace BLTServices.Test
             Assert.IsNotNull(RequestList, RequestList.Count.ToString());
 
             //POST
-            role postObj;
-            postObj = this.POSTRequest<role>(host + "/Roles", new role() { role_name = "post-test" }, basicAuth);
-            Assert.IsNotNull(postObj, "ID: " + postObj.role_id.ToString());
+            //role postObj;
+            //postObj = this.POSTRequest<role>(host + "/Roles", new role() { role_name = "post-test" }, basicAuth);
+            //Assert.IsNotNull(postObj, "ID: " + postObj.role_id.ToString());
 
             //GET POSTed item
-            role RequestObj = this.GETRequest<role>(host + "/Roles/" + postObj.role_id);
+            role RequestObj = this.GETRequest<role>(host + "/Roles/1");
             Assert.IsNotNull(RequestObj);
 
             //PUT POSTed item
-            postObj.role_name = "put-test";
-            role putObj = this.PUTRequest<role>(host + "/Roles/" + postObj.role_id, postObj, basicAuth);
-            Assert.IsNotNull(RequestObj);
+            //postObj.role_name = "put-test";
+            //role putObj = this.PUTRequest<role>(host + "/Roles/" + postObj.role_id, postObj, basicAuth);
+            //Assert.IsNotNull(RequestObj);
         }//end method
         [TestMethod]
         public void speciesMethodRequest()
@@ -553,16 +552,17 @@ namespace BLTServices.Test
             Assert.IsNotNull(RequestSppList, RequestList.Count.ToString());
 
             //AddSpeciesToPULA
-            //SpeciesList postObj;
-            //postObj = this.POSTRequest<SpeciesList>(host + "//PULAs/{pula_id}/AddSpeciesToPULA?publishedDate={date}", new SpeciesList() { SPECIES = { "ENTITY_ID"="1" } }, basicAuth);
-            //Assert.IsNotNull(postObj, "ID: " + postObj.role_id.ToString());
+            SimpleSpecies sp = new SimpleSpecies(); sp.ENTITY_ID = 1;
+            SpeciesList postObj = new SpeciesList(); postObj.SPECIES = new List<SimpleSpecies>(); postObj.SPECIES.Add(sp);
+            var postedObj = this.POSTRequest<SpeciesList>(host + "PULAs/19/AddSpeciesToPULA?publishedDate={date}", postObj , basicAuth);
+            Assert.IsNotNull(postedObj, "ID: ");
 
             //GET item
             SimpleSpecies RequestObj = this.GETRequest<SimpleSpecies>(host + "/Species/{speciesID}");
             Assert.IsNotNull(RequestObj);
 
             //RemoveSpeciesFromPULA
-            List<SpeciesList> RequestRemSppList = this.GETRequest<List<SpeciesList>>(host + "/PULAs/{entityID}/RemoveSpeciesFromPULA?publishedDate={date}");
+            var RequestRemSppList = this.POSTRequest<SpeciesList>(host + "/PULAs/19/RemoveSpeciesFromPULA?publishedDate=", postObj, basicAuth);
             Assert.IsNotNull(RequestRemSppList, RequestList.Count.ToString());
         }//end method
         [TestMethod]
@@ -585,26 +585,26 @@ namespace BLTServices.Test
                 lname = "user",
                 phone = "123-456-7890",
                 email = "test@usgs.gov",
-                organization_id = 1,
-                //password = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("BLTDef@u1t"))
+                organization_id = 1, role_id = 2,
+                password = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("BLTDef@u1t"))
             }, basicAuth);
             Assert.IsNotNull(postObj, "ID: " + postObj.user_id.ToString());
 
             //GET POSTed item
-            user_ RequestObj = this.GETRequest<user_>(host + "/Users/" + postObj.user_id);
+            user_ RequestObj = this.GETRequest<user_>(host + "Users/302", basicAuth);
             Assert.IsNotNull(RequestObj);
 
             //GET POSTed item by name
-            user_ RequestByNameObj = this.GETRequest<user_>(host + "/Users?username=" + postObj.username);
+            user_ RequestByNameObj = this.GETRequest<user_>(host + "/Users?username=newUser", basicAuth);
             Assert.IsNotNull(RequestByNameObj);
 
             //PUT POSTed item
-            postObj.fname = "put-test";
-            user_ putObj = this.PUTRequest<user_>(host + "/Users/" + postObj.user_id, postObj, basicAuth);
+            RequestObj.fname = "put-test";
+            user_ putObj = this.PUTRequest<user_>(host + "/Users/" + RequestObj.user_id, RequestObj, basicAuth);
             Assert.IsNotNull(RequestObj);
 
             //Delete POSTed item
-            bool success = this.DELETERequest<user_>(host + "Users/" + postObj.user_id, basicAuth);
+            bool success = this.DELETERequest<user_>(host + "Users/" + RequestObj.user_id, basicAuth);
             Assert.IsTrue(success);
         }//end method
         [TestMethod]

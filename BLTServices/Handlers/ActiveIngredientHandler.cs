@@ -71,7 +71,7 @@ namespace BLTServices.Handlers
                 //using (EasySecureString securedPassword = GetSecuredPassword())
                 //{
                 using (bltEntities aBLTE = GetRDS())
-                    {
+                    {                        
                         aiList = GetEntities<active_ingredient>(aBLTE).ToList();
                         aiList = aiList.OrderBy(a => a.ingredient_name).ToList();
                     }//end using
@@ -294,10 +294,28 @@ namespace BLTServices.Handlers
                             anEntity.version_id = SetVersion(aBLTE, anEntity.version_id, LoggedInUser(aBLTE).user_id, StatusType.Published, DateTime.Now.Date).version_id;
 
                             anEntity.active_ingredient_id = GetNextID(aBLTE);
-
                             aBLTE.active_ingredient.Add(anEntity);
-
+                            //try
+                            //{
                             aBLTE.SaveChanges();
+                            //}
+                           // catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                           // {
+                           //     Exception raise = dbEx;
+                           //     foreach (var validationErrors in dbEx.EntityValidationErrors)
+                           //     {
+                           //         foreach (var validationError in validationErrors.ValidationErrors)
+                           //         {
+                           //             string message = string.Format("{0}:{1}",
+                           //                 validationErrors.Entry.Entity.ToString(),
+                           //                 validationError.ErrorMessage);
+                           //             // raise a new exception nesting
+                           //             // the current instance as InnerException
+                           //             raise = new InvalidOperationException(message, raise);
+                           //         }
+                           //     }
+                           //     throw raise;
+                           // }
                         }
                         else
                         {
@@ -310,9 +328,11 @@ namespace BLTServices.Handlers
                                 newAI.cas_number = anEntity.cas_number;
                                 newAI.version_id = SetVersion(aBLTE, newAI.version_id, LoggedInUser(aBLTE).user_id, StatusType.Published, DateTime.Now.Date).version_id;
                                 newAI.active_ingredient_id = anEntity.active_ingredient_id;
-                                //anEntity.ID = 0;
+                                //anEntity.ID = 0;                               
                                 aBLTE.active_ingredient.Add(newAI);
-                                aBLTE.SaveChanges();
+                                
+                                    aBLTE.SaveChanges();
+                                
                             }
                         }//end if
 
