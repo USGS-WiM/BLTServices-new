@@ -179,6 +179,9 @@
     <Property Name="role_id" Type="int4" Nullable="false" />
     <Property Name="fname" Type="varchar" MaxLength="25" />
     <Property Name="lname" Type="varchar" MaxLength="25" />
+    <Property Name="password" Type="varchar" MaxLength="8000" />
+    <Property Name="salt" Type="varchar" MaxLength="8000" />
+    <Property Name="resetFlag" Type="int4" />
   </EntityType>
   <EntityType Name="version">
     <Key>

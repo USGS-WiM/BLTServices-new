@@ -30,6 +30,9 @@ namespace BLTDB
         public int role_id { get; set; }
         public string fname { get; set; }
         public string lname { get; set; }
+        public string password { get; set; }
+        public string salt { get; set; }
+        public Nullable<int> resetFlag { get; set; }
     
         public virtual ICollection<version> versions { get; set; }
         public virtual ICollection<version> versions1 { get; set; }

@@ -34,7 +34,8 @@ namespace BLTServices.Handlers
        #endregion
 
        #region "Base Properties"
-       protected String connectionString = ConfigurationManager.ConnectionStrings["BLTRDSEntities1"].ConnectionString;
+       //protected String connectionString = ConfigurationManager.ConnectionStrings["bltEntities"].ConnectionString;
+       protected String connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnewtest.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
 
        // will be automatically injected by DI in OpenRasta
        public ICommunicationContext Context { get; set; }
@@ -258,21 +259,19 @@ namespace BLTServices.Handlers
 
        protected bltEntities GetRDS(EasySecureString password)
        {
-           return new bltEntities(string.Format(connectionString, Context.User.Identity.Name, password.decryptString()));
+           return new bltEntities(string.Format(connectionString, "bltadmin", new EasySecureString("***REMOVED***").decryptString()));
        }
 
        protected bltEntities GetRDS()
        {
-           string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnewtest.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
-        
-           //return new bltEntities(string.Format(connectionString, "BLTPUBLIC", "B1TPu673sS"));
+           
            return new bltEntities(string.Format(connectionString, "bltadmin", "***REMOVED***"));
        }
 
        protected EasySecureString GetSecuredPassword()
        {
            //return new EasySecureString("B1TMan673sS");
-           return new EasySecureString(BLTBasicAuthentication.ExtractBasicHeader(Context.Request.Headers["Authorization"]).Password);
+           return new EasySecureString(BasicAuthorizationHeader.Parse(Context.Request.Headers["Authorization"]).Password);
        }
 
        protected DateTime? ValidDate(string date)

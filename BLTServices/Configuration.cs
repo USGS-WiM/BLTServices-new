@@ -28,11 +28,12 @@
 using System.Collections.Generic;
 using BLTDB;
 using OpenRasta.Authentication;
-using OpenRasta.Authentication.Basic;
 using OpenRasta.Configuration;
 using OpenRasta.DI;
 using OpenRasta.Web.UriDecorators;
-
+using OpenRasta.Pipeline.Contributors;
+using OpenRasta.Pipeline;
+using OpenRasta.Security;
 using BLTServices.Authentication;
 using BLTServices.Resources;
 using BLTServices.Handlers;
@@ -48,9 +49,10 @@ namespace BLTServices
             using (OpenRastaConfiguration.Manual)
             {
                 // specify the authentication scheme you want to use, you can register multiple ones
-                ResourceSpace.Uses.CustomDependency<IAuthenticationScheme, BasicAuthenticationScheme>(DependencyLifetime.Singleton);
+                ResourceSpace.Uses.CustomDependency<IAuthenticationProvider, BLTAuthenticationProvider>(DependencyLifetime.Singleton);
+                ResourceSpace.Uses.PipelineContributor<BasicAuthorizerContributor>();
+
                 // register your basic authenticator in the DI resolver
-                ResourceSpace.Uses.CustomDependency<IBasicAuthenticator, BLTBasicAuthentication>(DependencyLifetime.Transient);
                 // Allow codec choice by extension 
                 ResourceSpace.Uses.UriDecorator<ContentTypeExtensionUriDecorator>();
                 ResourceSpace.Uses.PipelineContributor<CrossDomainPipelineContributor>();
@@ -70,7 +72,7 @@ namespace BLTServices
                 AddPULA_LIMITATIONS_Resources();
                 AddROLE_Resources();                
                 AddSPECIES_Resources();
-                //AddUSER_Resources();
+                AddUSER_Resources();
                 AddVERSION_Resources();
 
             }//End using OpenRastaConfiguration.Manual
@@ -305,7 +307,7 @@ namespace BLTServices
 
             ResourceSpace.Has.ResourcesOfType<pula_limitations>()
                 .AtUri("/PULALimitations/{entityID}").Named("GetEntity")
-                .And.AtUri("/PULALimitations/{entityID}/updateStatus/{status}&statusDate={date}").Named("UpdatePulaLimitationsStatus")
+                .And.AtUri("/PULALimitations/{entityID}/updateStatus?status={status}&statusDate={date}").Named("UpdatePulaLimitationsStatus")
                 .HandledBy<PULALimitationsHandler>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
@@ -346,24 +348,22 @@ namespace BLTServices
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
         }//end AddSPECIES_Resources
         
-        //private void AddUSER_Resources()
-        //{
-        //    ResourceSpace.Has.ResourcesOfType<List<user_>>()
-        //        .AtUri("/Users")
-        //        .And.AtUri("Versions/{versionID}/Users").Named("GetVersionUsers")
-        //        .HandledBy<UserHandler>()
-        //        .TranscodedBy<SimpleUTF8XmlSerializerCodec>()
-        //        .And.TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
+        private void AddUSER_Resources()
+        {
+            ResourceSpace.Has.ResourcesOfType<List<user_>>()
+                .AtUri("/Users")
+                .And.AtUri("Versions/{versionID}/Users").Named("GetVersionUsers")
+                .HandledBy<UserHandler>()
+                .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
-        //    ResourceSpace.Has.ResourcesOfType<user_>()
-        //        .AtUri("/Users/{userID}")
-        //        .And.AtUri("Users?username={userName}").Named("GetUserByUserName")
-        //        //.And.AtUri("/Users?username={userName}newPass={newPassword}").Named("ChangeUserPassword")
-        //        .HandledBy<UserHandler>()
-        //        .TranscodedBy<SimpleUTF8XmlSerializerCodec>()
-        //        .And.TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
+            ResourceSpace.Has.ResourcesOfType<user_>()
+                .AtUri("/Users/{userID}")
+                .And.AtUri("Users?username={userName}").Named("GetUserByUserName")
+                //.And.AtUri("/Users?username={userName}newPass={newPassword}").Named("ChangeUserPassword")
+                .HandledBy<UserHandler>()
+                .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
-        //}//end AddUSER_Resources
+        }//end AddUSER_Resources
 
         private void AddVERSION_Resources()
         {

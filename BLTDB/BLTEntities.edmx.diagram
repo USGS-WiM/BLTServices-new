@@ -13,7 +13,7 @@
         <EntityTypeShape EntityType="bltModel.crop_use" Width="1.5" PointX="12.625" PointY="2.625" IsExpanded="true" />
         <EntityTypeShape EntityType="bltModel.division" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="bltModel.event" Width="1.5" PointX="2.5" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="bltModel.formulation" Width="1.5" PointX="11.25" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="bltModel.formulation" Width="1.5" PointX="11.25" PointY="5.625" IsExpanded="true" />
         <EntityTypeShape EntityType="bltModel.limitation" Width="1.5" PointX="4.25" PointY="7.375" IsExpanded="true" />
         <EntityTypeShape EntityType="bltModel.organization" Width="1.5" PointX="6.875" PointY="8.5" IsExpanded="true" />
         <EntityTypeShape EntityType="bltModel.product" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />

@@ -186,6 +186,9 @@
     <EntitySetMapping Name="user_">
       <EntityTypeMapping TypeName="bltModel.user_">
         <MappingFragment StoreEntitySet="user_">
+          <ScalarProperty Name="resetFlag" ColumnName="resetFlag" />
+          <ScalarProperty Name="salt" ColumnName="salt" />
+          <ScalarProperty Name="password" ColumnName="password" />
           <ScalarProperty Name="user_id" ColumnName="user_id" />
           <ScalarProperty Name="username" ColumnName="username" />
           <ScalarProperty Name="email" ColumnName="email" />

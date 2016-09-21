@@ -143,8 +143,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\BLTAuthenticationProvider.cs" />
+    <Compile Include="Authentication\BLTAuthorizerContributer.cs" />
+    <Compile Include="Authentication\BLTCredentials.cs" />
     <Compile Include="Authentication\EasySecureString.cs" />
-    <Compile Include="Authentication\BLTBasicAuthentication.cs" />
     <Compile Include="Authentication\WiMRequiresRoleAttribute.cs" />
     <Compile Include="Authentication\WiMRequiresRoleInterceptor.cs" />
     <Compile Include="Codecs\application\json\JsonDotNetCodec.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="Handlers\HandlerBase.cs" />
     <Compile Include="Handlers\OrganizationHandler.cs" />
     <Compile Include="Handlers\RoleHandler.cs" />
+    <Compile Include="Handlers\UserHandler.cs" />
     <Compile Include="Handlers\VersionHandler.cs" />
     <Compile Include="Hypermedia.cs" />
     <Compile Include="PipelineContributors\CrossDomainPipelineContributor.cs" />
