@@ -35,7 +35,7 @@ namespace BLTServices.Handlers
 
        #region "Base Properties"
        //protected String connectionString = ConfigurationManager.ConnectionStrings["bltEntities"].ConnectionString;
-       protected String connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnewtest.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
+       protected String connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnew.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
 
        // will be automatically injected by DI in OpenRasta
        public ICommunicationContext Context { get; set; }

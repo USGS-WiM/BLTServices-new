@@ -10,8 +10,7 @@ namespace BLTDB.Test
     public class UnitTest1
     {
         //test 
-        //private string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnew.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username=bltadmin;PASSWORD={0};ApplicationName=blt';";
-        private string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnewtest.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username=bltadmin;PASSWORD={0};ApplicationName=blt';";
+        private string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnew.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username=bltadmin;PASSWORD={0};ApplicationName=blt';";
         private string password = "***REMOVED***";
 
         [TestMethod]
