@@ -227,21 +227,16 @@ namespace BLTServices.Handlers
                 {
                     //fetch the object to be updated (assuming that it exists)
                     user_ ObjectToBeUpdated = aBLTE.user_.Single(m => m.user_id == userID);
-                    
-                    //Username
+                                       
                     ObjectToBeUpdated.username = aUser.username;
-                    //FirstName
                     ObjectToBeUpdated.fname = aUser.fname;
-                    //Last Name
                     ObjectToBeUpdated.lname = aUser.lname;
-                    //OrganizationID
                     ObjectToBeUpdated.organization_id = aUser.organization_id;
-                    //DivisionID
                     ObjectToBeUpdated.division_id = aUser.division_id;
-                    //Phone
                     ObjectToBeUpdated.phone = aUser.phone;
-                    //Email
                     ObjectToBeUpdated.email = aUser.email;
+                    if (IsAuthorized(AdminRole))
+                        ObjectToBeUpdated.role_id =  aUser.role_id;
 
                    if (!string.IsNullOrEmpty(aUser.password) && !Cryptography
                             .VerifyPassword(Encoding.UTF8.GetString(Convert.FromBase64String(aUser.password)), ObjectToBeUpdated.salt, ObjectToBeUpdated.password))
