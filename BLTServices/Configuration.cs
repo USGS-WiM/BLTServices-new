@@ -312,7 +312,7 @@ namespace BLTServices
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
             ResourceSpace.Has.ResourcesOfType<MapperLimitations>()
-                .AtUri("/PULAs/{pulaID}/LimitationsForMapper?ShapeID={pulaSHPID}&EffectDate={date}").Named("GetMapperLimitations")
+                .AtUri("/PULAs/LimitationsForMapper?ShapeID={pulaSHPID}&EffectDate={date}").Named("GetMapperLimitations")
                 .HandledBy<PULALimitationsHandler>()
                 .TranscodedBy<JsonDotNetCodec>(null).ForMediaType("application/json;q=0.9").ForExtension("json");
 
