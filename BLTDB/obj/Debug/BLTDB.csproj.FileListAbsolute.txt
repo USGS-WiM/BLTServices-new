@@ -36,6 +36,5 @@ D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\fi\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\fr\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\ja\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\bin\Debug\zh-CN\Npgsql.resources.dll
-D:\TMRData\WIMprojects\BLTServices\BLTDB\obj\Debug\BLTDB.csprojResolveAssemblyReference.cache
 D:\TMRData\WIMprojects\BLTServices\BLTDB\obj\Debug\BLTDB.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB\obj\Debug\BLTDB.pdb
