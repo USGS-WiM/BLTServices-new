@@ -216,9 +216,9 @@ namespace BLTServices.Handlers
             }
         }//end HttpMethod.GET
 
-        // returns Active PULA_LIMITATIONS for the given pulaID
+        // returns Active PULA_LIMITATIONS for the given pulaID     Int32 pulaId, 
         [HttpOperation(HttpMethod.GET, ForUriName = "GetMapperLimitations")]
-        public OperationResult GetMapperLimitations(Int32 pulaId, Int32 pulaSHPID, string date)
+        public OperationResult GetMapperLimitations(Int32 pulaSHPID, string date)
         {
             try
             {
@@ -233,15 +233,15 @@ namespace BLTServices.Handlers
 
                 using (bltEntities aBLTE = GetRDS())
                 {
-                    active_ingredient_pula thisPULA = aBLTE.active_ingredient_pula.Where(x=>x.pula_id == pulaId && x.pula_shape_id == pulaSHPID).FirstOrDefault();
+                    active_ingredient_pula thisPULA = aBLTE.active_ingredient_pula.Where(x=> x.pula_shape_id == pulaSHPID).FirstOrDefault();
 
                     //go get the limitations, then when populating each MapperLimit - go get each piece using the id of each
-                    IQueryable<pula_limitations> query1 = GetEntities<pula_limitations>(aBLTE).Where(a => a.pula_id == pulaId);
+                    IQueryable<pula_limitations> query1 = GetEntities<pula_limitations>(aBLTE).Where(a => a.pula_id == thisPULA.pula_id);
 
                     List<pula_limitations> pulaLimitationList = GetActive(query1, thisDate.Value.Date).ToList();
                     MapLimitList.MapperLimits = pulaLimitationList.Select(p => new MapperLimit()
                     {
-                        PULAID = pulaId,
+                        PULAID = thisPULA.pula_id,
                         PULASHPID = pulaSHPID,
                         NAME = GetAIorProdName(p.active_ingredient_id, p.product_id, thisDate.Value.Date, aBLTE),
                         USE = GetActive(aBLTE.crop_use.Where(u => u.crop_use_id == p.crop_use_id), thisDate.Value.Date).FirstOrDefault().use,

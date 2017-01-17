@@ -59,12 +59,14 @@ D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\System.Web.Razor.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\System.Web.WebPages.Deployment.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\System.Web.WebPages.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\System.Web.WebPages.Razor.dll
+D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\Microsoft.Web.Infrastructure.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\BLTDB.pdb
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\EntityFramework.xml
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\Npgsql.xml
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\Npgsql.EntityFrameworkLegacy.xml
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\PdfSharp.xml
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\PdfSharp.Charting.xml
+D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\Microsoft.Web.Infrastructure.xml
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\de\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\es\Npgsql.resources.dll
 D:\TMRData\WIMprojects\BLTServices\BLTServices\bin\fi\Npgsql.resources.dll
