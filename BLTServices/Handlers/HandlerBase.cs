@@ -259,13 +259,13 @@ namespace BLTServices.Handlers
 
        protected bltEntities GetRDS(EasySecureString password)
        {
-           return new bltEntities(string.Format(connectionString, "bltadmin", new EasySecureString("1MhTGVxs").decryptString()));
+           return new bltEntities(string.Format(connectionString, ConfigurationManager.AppSettings["Username"], new EasySecureString(ConfigurationManager.AppSettings["Password"]).decryptString()));
        }
 
        protected bltEntities GetRDS()
        {
            
-           return new bltEntities(string.Format(connectionString, "bltadmin", "1MhTGVxs"));
+           return new bltEntities(string.Format(connectionString, ConfigurationManager.AppSettings["Username"],ConfigurationManager.AppSettings["Password"]));
        }
 
        protected EasySecureString GetSecuredPassword()
