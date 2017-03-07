@@ -72,6 +72,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Web" />
     <Reference Include="WiMServices.Test, Version=1.0.6032.17739, Culture=neutral, processorArchitecture=MSIL">

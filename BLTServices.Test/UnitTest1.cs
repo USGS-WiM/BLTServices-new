@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BLTDB;
@@ -15,7 +16,7 @@ namespace BLTServices.Test
         #region Private Fields
         private string host = "http://localhost/";
         private string basicAuth = "Basic " + Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1")
-                                .GetBytes("bltadmin:***REMOVED***"));
+                                .GetBytes(ConfigurationManager.AppSettings["Username"] + ":" + ConfigurationManager.AppSettings["Password"]));
 
 
         #endregion
