@@ -30,7 +30,6 @@ D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\BLTDB.Test.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\BLTDB.Test.pdb
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\BLTDB.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\EntityFramework.dll
-D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\Mono.Security.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\Newtonsoft.Json.dll
 D:\TMRData\WIMprojects\BLTServices\BLTDB.Test\bin\Debug\Npgsql.dll

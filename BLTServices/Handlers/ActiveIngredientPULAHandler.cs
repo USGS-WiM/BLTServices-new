@@ -35,6 +35,7 @@ using System.Data;
 using System.Data.EntityClient;
 using System.Data.Metadata.Edm;
 using System.Data.Objects;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -854,7 +855,7 @@ namespace BLTServices.Handlers
                 //}
                 //else
                 sql = String.Format(getSQLStatement(typeof(T).Name), args);
-                var context = new bltEntities(string.Format(connectionString, "bltadmin", new EasySecureString("***REMOVED***").decryptString()));
+                var context = new bltEntities(string.Format(connectionString, ConfigurationManager.AppSettings["Username"], new EasySecureString(ConfigurationManager.AppSettings["Password"]).decryptString()));
                 context.Configuration.ProxyCreationEnabled = false;
                 return context.Database.SqlQuery<T>(sql).AsQueryable();
             }
