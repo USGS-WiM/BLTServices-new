@@ -15,7 +15,7 @@ namespace BLTServices.Authentication
         {
             string connectionString = "metadata=res://*/BLTEntities.csdl|res://*/BLTEntities.ssdl|res://*/BLTEntities.msl;provider=Npgsql;provider connection string=';Database=blt;Host=bltnew.ck2zppz9pgsw.us-east-1.rds.amazonaws.com;Username={0};PASSWORD={1};ApplicationName=blt';";
 
-            using (bltEntities sa = new bltEntities(string.Format(connectionString, "bltadmin", "1MhTGVxs")))
+            using (bltEntities sa = new bltEntities(string.Format(connectionString, ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"])))
             {
                 user_ user = sa.user_.Include(r => r.role).AsEnumerable().FirstOrDefault(u => string.Equals(u.username, username, StringComparison.OrdinalIgnoreCase));
                 if (user == null) return (null);
