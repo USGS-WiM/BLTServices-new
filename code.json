@@ -4,7 +4,7 @@
     "organization": "U.S. Geological Survey",
     "description": "Most current version of BLTServices.",
     "version": "v0.0.0",
-    "status": "Archival"
+    "status": "Archival",
 
     "permissions": {
       "usageType": "openSource",
