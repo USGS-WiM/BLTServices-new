@@ -12,8 +12,8 @@ Newest version of the BLT Services. REST endpoints to access data for Bulletins 
 
 ## Authors
 
-* **[Tonia Roddick](https://www.usgs.gov/staff-profiles/tonia-m-roddick)**  - *Lead Developer* - [USGS Web Informatics & Mapping](https://wim.usgs.gov/)
 * **[Jeremy Newson](https://www.usgs.gov/staff-profiles/jeremy-k-newson)** - *Lead Developer* -  [USGS Web Informatics & Mapping](https://wim.usgs.gov/)
+* **[Tonia Roddick](https://github.com/troddick)**  - *Developer*
 
 See also the list of [contributors](../../graphs/contributors) who participated in this project.
 
